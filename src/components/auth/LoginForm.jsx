@@ -1,24 +1,17 @@
-import React, { useState, useEffect } from "react";
 import pc2 from "../../img/anhthietke1.webp";
+import React, { useState, useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 
-const LoginForm = () => {
+export default function AuthForm() {
     const [isLogin, setIsLogin] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [formData, setFormData] = useState({
-        firstName: "",
-        lastName: "",
-        email: "",
-        username: "",
-        password: "",
-        confirmPassword: "",
-    });
-    const [errors, setErrors] = useState({});
 
-
+    // Init AOS
     useEffect(() => {
         AOS.init({ duration: 800, once: false, offset: 100 });
     }, []);
@@ -26,76 +19,62 @@ const LoginForm = () => {
         AOS.refresh();
     }, [isLogin]);
 
-
+    // Check trạng thái login từ localStorage
     useEffect(() => {
         const loggedIn = localStorage.getItem("isLoggedIn") === "true";
         setIsLoggedIn(loggedIn);
     }, []);
 
+    // Schema validation
+    const LoginSchema = Yup.object({
+        email: Yup.string().email("Email không hợp lệ").required("Vui lòng nhập email"),
+        password: Yup.string().min(6, "Mật khẩu phải ít nhất 6 ký tự").required("Vui lòng nhập mật khẩu"),
+    });
 
-    useEffect(() => {
-        setFormData({
-            firstName: "",
-            lastName: "",
-            email: "",
-            username: "",
-            password: "",
-            confirmPassword: "",
-        });
-        setErrors({});
-        setShowPassword(false);
-        setShowConfirmPassword(false);
-    }, [isLogin]);
+    const RegisterSchema = Yup.object({
+        firstName: Yup.string().required("Vui lòng nhập họ"),
+        lastName: Yup.string().required("Vui lòng nhập tên"),
+        email: Yup.string().email("Email không hợp lệ").required("Vui lòng nhập email"),
+        password: Yup.string().min(6, "Mật khẩu phải ít nhất 6 ký tự").required("Vui lòng nhập mật khẩu"),
+        confirmPassword: Yup.string()
+            .oneOf([Yup.ref("password"), null], "Mật khẩu nhập lại không khớp")
+            .required("Vui lòng nhập lại mật khẩu"),
+    });
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    const validate = () => {
-        const newErrors = {};
-        if (!isLogin) {
-            if (!formData.firstName.trim()) newErrors.firstName = "Vui lòng nhập họ";
-            if (!formData.lastName.trim()) newErrors.lastName = "Vui lòng nhập tên";
-            if (!formData.email.trim()) {
-                newErrors.email = "Vui lòng nhập email";
-            } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-                newErrors.email = "Email không hợp lệ";
-            }
-        }
-        if (!formData.username.trim()) newErrors.username = "Vui lòng nhập tên đăng nhập";
-        if (!formData.password.trim()) {
-            newErrors.password = "Vui lòng nhập mật khẩu";
-        } else if (formData.password.length < 6) {
-            newErrors.password = "Mật khẩu phải ít nhất 6 ký tự";
-        }
-        if (!isLogin) {
-            if (!formData.confirmPassword.trim()) {
-                newErrors.confirmPassword = "Vui lòng nhập lại mật khẩu";
-            } else if (formData.password !== formData.confirmPassword) {
-                newErrors.confirmPassword = "Mật khẩu nhập lại không khớp";
-            }
-        }
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (!validate()) return;
+    const handleSubmit = (values, { setSubmitting, setErrors, resetForm }) => {
+        const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
 
         if (isLogin) {
-
-            if (formData.username && formData.password) {
-                localStorage.setItem("isLoggedIn", "true");
-                setIsLoggedIn(true);
-            } else {
-                setErrors({ username: "Sai tên đăng nhập hoặc mật khẩu!" });
+            const existingUser = storedUsers.find(
+                (u) => u.email === values.email && u.password === values.password
+            );
+            if (!existingUser) {
+                setErrors({ email: "Sai email hoặc mật khẩu!" });
+                setSubmitting(false);
+                return;
             }
+            localStorage.setItem("isLoggedIn", "true");
+            setIsLoggedIn(true);
         } else {
-
+            const userExists = storedUsers.some((u) => u.email === values.email);
+            if (userExists) {
+                setErrors({ email: "Email đã tồn tại!" });
+                setSubmitting(false);
+                return;
+            }
+            const newUser = {
+                firstName: values.firstName,
+                lastName: values.lastName,
+                email: values.email,
+                password: values.password,
+            };
+            storedUsers.push(newUser);
+            localStorage.setItem("users", JSON.stringify(storedUsers));
             alert("Đăng ký thành công, mời bạn đăng nhập!");
             setIsLogin(true);
+            resetForm();
         }
+        setSubmitting(false);
     };
 
     const logoutHandler = () => {
@@ -107,11 +86,11 @@ const LoginForm = () => {
         return (
             <div className="flex justify-center items-center min-h-screen bg-gray-100">
                 <div className="bg-white shadow-lg rounded-lg p-8 text-center" data-aos="zoom-in">
-                    <h2 className="text-2xl font-bold text-orange-500 mb-4">Xin chào!</h2>
+                    <h2 className="text-2xl font-bold text-[#ad7555] mb-4">Xin chào!</h2>
                     <p className="mb-4">Bạn đã đăng nhập thành công 🎉</p>
                     <button
                         onClick={logoutHandler}
-                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition duration-300"
+                        className="bg-[#ad7555] hover:bg-[#8c5c3f] text-white px-4 py-2 rounded-md transition duration-300"
                     >
                         Đăng xuất
                     </button>
@@ -131,7 +110,7 @@ const LoginForm = () => {
                     ${isLogin ? "justify-center items-center" : "justify-start items-center"}`}
                     data-aos="fade-right"
                 >
-                    <h2 className="text-2xl font-bold text-orange-500 mb-4">
+                    <h2 className="text-2xl font-bold text-[#ad7555] mb-4">
                         {isLogin ? "Đăng ký" : "Đăng nhập"}
                     </h2>
                     <p className="text-gray-600 text-base mb-6 text-center">
@@ -141,7 +120,7 @@ const LoginForm = () => {
                     </p>
                     <button
                         onClick={() => setIsLogin(!isLogin)}
-                        className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md transition duration-300 cursor-pointer"
+                        className="bg-[#ad7555] hover:bg-[#8c5c3f] text-white px-4 py-2 rounded-md transition duration-300 cursor-pointer"
                     >
                         {isLogin ? "Tạo tài khoản" : "Tôi có tài khoản"}
                     </button>
@@ -159,172 +138,162 @@ const LoginForm = () => {
                     className="w-full md:w-1/2 p-6 md:p-8"
                     data-aos="fade-left"
                 >
-                    <h2 className="text-xl md:text-2xl font-bold text-orange-500 mb-4 md:mb-6 text-center">
+                    <h2 className="text-xl md:text-2xl font-bold text-[#ad7555] mb-4 md:mb-6 text-center">
                         {isLogin ? "Đăng nhập" : "Đăng ký"}
                     </h2>
 
-                    <form className="space-y-3 md:space-y-4" onSubmit={handleSubmit}>
-                        {!isLogin && (
-                            <div className="space-y-3 md:space-y-4">
+                    <Formik
+                        initialValues={{
+                            firstName: "",
+                            lastName: "",
+                            email: "",
+                            password: "",
+                            confirmPassword: "",
+                        }}
+                        validationSchema={isLogin ? LoginSchema : RegisterSchema}
+                        onSubmit={handleSubmit}
+                    >
+                        {({ isSubmitting }) => (
+                            <Form className="space-y-3 md:space-y-4">
+                                {!isLogin && (
+                                    <div className="space-y-3 md:space-y-4">
+                                        <div>
+                                            <Field
+                                                type="text"
+                                                name="firstName"
+                                                placeholder="Họ"
+                                                className="w-full p-2 border border-gray-400 rounded-xl focus:outline-none focus:border-[#ad7555] shadow-sm focus:shadow-md"
+                                            />
+                                            <ErrorMessage name="firstName" component="p" className="text-red-500 text-sm" />
+                                        </div>
+                                        <div>
+                                            <Field
+                                                type="text"
+                                                name="lastName"
+                                                placeholder="Tên"
+                                                className="w-full p-2 border border-gray-400 rounded-xl focus:outline-none focus:border-[#ad7555] shadow-sm focus:shadow-md"
+                                            />
+                                            <ErrorMessage name="lastName" component="p" className="text-red-500 text-sm" />
+                                        </div>
+                                    </div>
+                                )}
+
                                 <div>
-                                    <input
-                                        type="text"
-                                        name="firstName"
-                                        placeholder="Họ"
-                                        value={formData.firstName}
-                                        onChange={handleChange}
-                                        className="w-full p-2 border border-gray-400 rounded-xl focus:outline-none focus:border-orange-500 shadow-sm focus:shadow-md"
-                                    />
-                                    {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName}</p>}
-                                </div>
-                                <div>
-                                    <input
-                                        type="text"
-                                        name="lastName"
-                                        placeholder="Tên"
-                                        value={formData.lastName}
-                                        onChange={handleChange}
-                                        className="w-full p-2 border border-gray-400 rounded-xl focus:outline-none focus:border-orange-500 shadow-sm focus:shadow-md"
-                                    />
-                                    {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName}</p>}
-                                </div>
-                                <div>
-                                    <input
+                                    <Field
                                         type="email"
                                         name="email"
                                         placeholder="Email"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        className="w-full p-2 border border-gray-400 rounded-xl focus:outline-none focus:border-orange-500 shadow-sm focus:shadow-md"
+                                        className="w-full p-2 border border-gray-400 rounded-xl focus:outline-none focus:border-[#ad7555] shadow-sm focus:shadow-md"
                                     />
-                                    {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+                                    <ErrorMessage name="email" component="p" className="text-red-500 text-sm" />
                                 </div>
-                            </div>
-                        )}
 
-                        <div>
-                            <input
-                                type="text"
-                                name="username"
-                                placeholder="Tên đăng nhập"
-                                value={formData.username}
-                                onChange={handleChange}
-                                className="w-full p-2 border border-gray-400 rounded-xl focus:outline-none focus:border-orange-500 shadow-sm focus:shadow-md"
-                            />
-                            {errors.username && <p className="text-red-500 text-sm">{errors.username}</p>}
-                        </div>
+                                <div className="relative">
+                                    <Field
+                                        type={showPassword ? "text" : "password"}
+                                        name="password"
+                                        placeholder="Mật khẩu"
+                                        className="w-full p-2 border border-gray-400 rounded-xl focus:outline-none focus:border-[#ad7555] shadow-sm focus:shadow-md"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 text-base"
+                                    >
+                                        {showPassword ? (
+                                            <i className="fa-solid fa-eye"></i>
+                                        ) : (
+                                            <i className="fa-solid fa-eye-slash"></i>
+                                        )}
+                                    </button>
+                                    <ErrorMessage name="password" component="p" className="text-red-500 text-sm" />
+                                </div>
 
-                        <div className="relative">
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                name="password"
-                                placeholder="Mật khẩu"
-                                value={formData.password}
-                                onChange={handleChange}
-                                className="w-full p-2 border border-gray-400 rounded-xl focus:outline-none focus:border-orange-500 shadow-sm focus:shadow-md"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-2 text-gray-500 text-lg"
-                            >
-                                {showPassword ? (
-                                    <i className="fa-solid fa-eye text-black"></i>
-                                ) : (
-                                    <i className="fa-solid fa-eye-slash text-black"></i>
+                                {!isLogin && (
+                                    <div className="relative">
+                                        <Field
+                                            type={showConfirmPassword ? "text" : "password"}
+                                            name="confirmPassword"
+                                            placeholder="Xác nhận lại mật khẩu"
+                                            className="w-full p-2 border border-gray-400 rounded-xl focus:outline-none focus:border-[#ad7555] shadow-sm focus:shadow-md"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 text-base"
+                                        >
+                                            {showConfirmPassword ? (
+                                                <i className="fa-solid fa-eye"></i>
+                                            ) : (
+                                                <i className="fa-solid fa-eye-slash"></i>
+                                            )}
+                                        </button>
+                                        <ErrorMessage name="confirmPassword" component="p" className="text-red-500 text-sm" />
+                                    </div>
                                 )}
-                            </button>
-                            {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
-                        </div>
 
-                        {!isLogin && (
-                            <div className="relative">
-                                <input
-                                    type={showConfirmPassword ? "text" : "password"}
-                                    name="confirmPassword"
-                                    placeholder="Xác nhận lại mật khẩu"
-                                    value={formData.confirmPassword}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border border-gray-400 rounded-xl focus:outline-none focus:border-orange-500 shadow-sm focus:shadow-md"
-                                />
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="w-full bg-[#ad7555] hover:bg-[#8c5c3f] text-white py-2 rounded-md transition duration-300 cursor-pointer"
+                                    data-aos="zoom-in"
+                                >
+                                    {isLogin ? "Đăng nhập" : "Đăng ký"}
+                                </button>
+
+                                <div className="text-center text-sm md:text-base" data-aos="fade-up">
+                                    {isLogin ? (
+                                        <p>
+                                            Bạn chưa có tài khoản?{" "}
+                                            <span
+                                                onClick={() => setIsLogin(false)}
+                                                className="text-[#ad7555] cursor-pointer"
+                                            >
+                                                Đăng ký
+                                            </span>
+                                        </p>
+                                    ) : (
+                                        <p>
+                                            Bạn đã có tài khoản?{" "}
+                                            <span
+                                                onClick={() => setIsLogin(true)}
+                                                className="text-[#ad7555] cursor-pointer"
+                                            >
+                                                Đăng nhập
+                                            </span>
+                                        </p>
+                                    )}
+                                </div>
+
+                                {isLogin && (
+                                    <p className="text-center text-sm text-gray-500 cursor-pointer">
+                                        Quên mật khẩu?
+                                    </p>
+                                )}
+
+                                <div className="flex items-center my-3 md:my-4" data-aos="fade-up">
+                                    <hr className="flex-grow border-gray-300" />
+                                    <span className="mx-2 text-gray-500 text-sm md:text-base">Hoặc</span>
+                                    <hr className="flex-grow border-gray-300" />
+                                </div>
+
                                 <button
                                     type="button"
-                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                    className="absolute right-3 top-2 text-gray-500 text-lg"
+                                    className="w-full border border-gray-300 py-2 rounded-md flex justify-center items-center gap-2 cursor-pointer text-sm md:text-base hover:bg-gray-100 transition"
+                                    data-aos="flip-up"
                                 >
-                                    {showConfirmPassword ? (
-                                        <i className="fa-solid fa-eye text-black"></i>
-                                    ) : (
-                                        <i className="fa-solid fa-eye-slash text-black"></i>
-                                    )}
+                                    <img
+                                        src="https://www.svgrepo.com/show/355037/google.svg"
+                                        alt="Google"
+                                        className="w-5 h-5"
+                                    />
+                                    Đăng nhập bằng Google
                                 </button>
-                                {errors.confirmPassword && (
-                                    <p className="text-red-500 text-sm">{errors.confirmPassword}</p>
-                                )}
-                            </div>
+                            </Form>
                         )}
-
-                        <button
-                            type="submit"
-                            className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-md transition duration-300 cursor-pointer"
-                            data-aos="zoom-in"
-                        >
-                            {isLogin ? "Đăng nhập" : "Đăng ký"}
-                        </button>
-
-                        <div className="text-center text-sm md:text-base" data-aos="fade-up">
-                            {isLogin ? (
-                                <p>
-                                    Bạn chưa có tài khoản?{" "}
-                                    <span
-                                        onClick={() => setIsLogin(false)}
-                                        className="text-orange-500 cursor-pointer"
-                                    >
-                                        Đăng ký
-                                    </span>
-                                </p>
-                            ) : (
-                                <p>
-                                    Bạn đã có tài khoản?{" "}
-                                    <span
-                                        onClick={() => setIsLogin(true)}
-                                        className="text-orange-500 cursor-pointer"
-                                    >
-                                        Đăng nhập
-                                    </span>
-                                </p>
-                            )}
-                        </div>
-
-                        {isLogin && (
-                            <p className="text-center text-sm text-gray-500 cursor-pointer">
-                                Quên mật khẩu?
-                            </p>
-                        )}
-
-                        <div className="flex items-center my-3 md:my-4" data-aos="fade-up">
-                            <hr className="flex-grow border-gray-300" />
-                            <span className="mx-2 text-gray-500 text-sm md:text-base">Hoặc</span>
-                            <hr className="flex-grow border-gray-300" />
-                        </div>
-
-                        <button
-                            type="button"
-                            className="w-full border border-gray-300 py-2 rounded-md flex justify-center items-center gap-2 cursor-pointer text-sm md:text-base"
-                            data-aos="flip-up"
-                        >
-                            <img
-                                src="https://www.svgrepo.com/show/355037/google.svg"
-                                alt="Google"
-                                className="w-5 h-5"
-                            />
-                            Đăng nhập bằng Google
-                        </button>
-                    </form>
+                    </Formik>
                 </div>
             </div>
         </div>
     );
 }
-
-export default LoginForm
