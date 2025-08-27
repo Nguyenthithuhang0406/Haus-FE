@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import Layout from "@/components/commons/Layout";
 const ChangePassword = () => {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -22,7 +23,7 @@ const ChangePassword = () => {
             newErrors.currentPassword = "Mật khẩu cũ không đúng";
         }
 
-        
+
         if (!newPassword.trim()) {
             newErrors.newPassword = "Vui lòng nhập mật khẩu mới";
         } else {
@@ -32,7 +33,7 @@ const ChangePassword = () => {
             }
         }
 
-        
+
         if (!confirmPassword.trim()) {
             newErrors.confirmPassword = "Vui lòng nhập xác nhận mật khẩu";
         } else if (newPassword !== confirmPassword) {
@@ -46,7 +47,7 @@ const ChangePassword = () => {
     const handleSubmit = () => {
         if (validateForm()) {
             alert("Đặt lại mật khẩu thành công!");
-            // Reset form
+
             setCurrentPassword('');
             setNewPassword('');
             setConfirmPassword('');
@@ -56,10 +57,10 @@ const ChangePassword = () => {
 
     const handleInputChange = (field, value) => {
         if (errors[field]) {
-            setErrors({...errors, [field]: null});
+            setErrors({ ...errors, [field]: null });
         }
-        
-        switch(field) {
+
+        switch (field) {
             case 'currentPassword':
                 setCurrentPassword(value);
                 break;
@@ -73,149 +74,196 @@ const ChangePassword = () => {
     };
 
     return (
-
-        <div className="min-h-screen bg-gray-50">
-            <div className="relative h-44 bg-cover bg-center" style={{
-                backgroundImage: "url('data:image/svg+xml,%3Csvg width='1600' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100%25' height='100%25' fill='%23a0826d'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='24' fill='white' text-anchor='middle' dy='.3em'%3ELiving Room Interior%3C/text%3E%3C/svg%3E')"
-            }}>
-                <div className="absolute inset-0 bg-black bg-opacity-50"></div>
-                <div className="relative z-10 flex items-center justify-center h-full">
-                    <div className="text-center text-white">
-                        <nav className="flex items-center space-x-2 text-medium">
-                            <span>Trang chủ</span>
-                            <span>&gt;</span>
-                            <span className="text-yellow-400 font-bold">Thay đổi mật khẩu</span>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-
-            <div className="container mx-auto px-20 py-8">
-                <div className="flex flex-col lg:flex-row gap-8">
-                    
-                    <div className="lg:w-1/4">
-                        <div className="p-1">
-                            <h2 className="text-xl text-gray-800 mb-2">TRANG TÀI KHOẢN</h2>
-                            <p className="text-gray-600 mb-5">
-                               <span className="font-bold"> Xin chào,</span> <span className="text-[#ad7555] font-semibold">lan lam</span> !
-                            </p>
-                            
-                            <nav className="space-y-2">
-                                <Link
-                                    to="/view-infor" 
-                                    className="block w-full text-left py-2 px-3 rounded transition-colors text-gray-700 hover:bg-gray-100"
-                                >
-                                    Thông tin tài khoản
-                                </Link>
-                                <Link to="#"        
-                                    className="block w-full text-left py-2 px-3 rounded transition-colors text-gray-700 hover:bg-gray-100"
-                                >
-                                    Đơn hàng của bạn
-                                </Link>
-                                <Link to="/change-password" className="block w-full text-left py-2 px-3 rounded  text-[#ad7555] font-medium">
-                                    Đổi mật khẩu
-                                </Link>
-                                <Link to="#"                                    
-                                    className="block w-full text-left py-2 px-3 rounded transition-colors text-gray-700 hover:bg-gray-100"
-                                >
-                                    Sổ địa chỉ (0)
-                                </Link>
-                            </nav>
-                        </div>
-                    </div>
-
-                    <div className="lg:w-3/4">
-                        <div className="p-1">
-                            <div>
-                                <h2 className="text-xl text-gray-800 mb-6">ĐỔI MẬT KHẨU</h2>
-                                
-                                <div className="mb-6">
-                                    <p className="text-gray-600 mb-2">
-                                        Để đảm bảo tính bảo mật vui lòng đặt lại mật khẩu với ít nhất 8 kí tự
-                                    </p>
-                                    {(errors.newPassword === "Mật khẩu mới dài từ 6 đến 50 ký tự" || errors.confirmPassword === "Xác nhận mật khẩu không khớp") && (
-                                        <div className="text-red-600 text-sm space-y-1">
-                                            {errors.newPassword === "Mật khẩu mới dài từ 6 đến 50 ký tự" && (
-                                                <div>Mật khẩu mới dài từ 6 đến 50 ký tự</div>
-                                            )}
-                                            {errors.confirmPassword === "Xác nhận mật khẩu không khớp" && (
-                                                <div>Xác nhận mật khẩu không khớp</div>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="space-y-4">
-                                    <div>
-                                        <label className="block text-gray-700 font-medium mb-2">
-                                            Mật khẩu cũ *
-                                        </label>
-                                        <input
-                                            type="password"
-                                            value={currentPassword}
-                                            onChange={(e) => handleInputChange('currentPassword', e.target.value)}
-                                            className={`w-auto px-4 py-3 bg-gray-100 border rounded-md focus:outline-none focus:ring-2 ${
-                                                errors.currentPassword 
-                                                    ? 'border-red-300 focus:ring-red-500' 
-                                                    : 'border-gray-200 focus:ring-orange-500'
-                                            }`}
-                                        />
-                                        {errors.currentPassword && (
-                                            <p className="text-red-600 text-sm mt-1">{errors.currentPassword}</p>
-                                        )}
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-gray-700 font-medium mb-2">
-                                            Mật khẩu mới *
-                                        </label>
-                                        <input
-                                            type="password"
-                                            value={newPassword}
-                                            onChange={(e) => handleInputChange('newPassword', e.target.value)}
-                                            className={`w-auto px-4 py-3 bg-gray-100 border rounded-md focus:outline-none focus:ring-2 ${
-                                                errors.newPassword 
-                                                    ? 'border-red-300 focus:ring-red-500' 
-                                                    : 'border-gray-200 focus:ring-[#ad7555]'
-                                            }`}
-                                        />
-                                        {errors.newPassword && errors.newPassword !== "Mật khẩu mới dài từ 6 đến 50 ký tự" && (
-                                            <p className="text-red-600 text-sm mt-1">{errors.newPassword}</p>
-                                        )}
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-gray-700 font-medium mb-2">
-                                            Xác nhận lại mật khẩu *
-                                        </label>
-                                        <input
-                                            type="password"
-                                            value={confirmPassword}
-                                            onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                                            className={`w-auto px-4 py-3 bg-gray-100 border rounded-md focus:outline-none focus:ring-2 ${
-                                                errors.confirmPassword 
-                                                    ? 'border-red-300 focus:ring-red-500' 
-                                                    : 'border-gray-200 focus:ring-[#ad7555]'
-                                            }`}
-                                        />
-                                        {errors.confirmPassword && errors.confirmPassword !== "Xác nhận mật khẩu không khớp" && (
-                                            <p className="text-red-600 text-sm mt-1">{errors.confirmPassword}</p>
-                                        )}
-                                    </div>
-
-                                    <button
-                                        onClick={handleSubmit}
-                                        className="max-w-xl w-auto px-6 bg-[#ad7555] text-white font-medium py-2.5 rounded-md border border-[#ad7555] hover:bg-white hover:text-[#ad7555] transition duration-200 text-sm"
+        <Layout>
+            <div className="min-h-screen bg-gray-50 pt-[100px]">
+                <div className="container mx-auto px-20 py-8">
+                    <div className="flex flex-col lg:flex-row gap-8">
+                        <div className="pl-[2%] pt-[2%] lg:w-1/5 ">
+                            <div className="p-1 border-b-2 lg:border-b-0 lg:border-r-2">
+                                <nav className="space-y-2">
+                                    <Link
+                                        to="/view-infor"
+                                        className="block w-full text-left py-2 px-3 rounded transition-colors text-gray-700 hover:bg-gray-100"
                                     >
-                                        Đặt lại mật khẩu
-                                    </button>
+                                        ĐỔI MẬT KHẨU
+                                    </Link>
+                                    <Link to="#"
+                                        className="block w-full text-left py-2 px-3 rounded transition-colors text-gray-700 hover:bg-gray-100"
+                                    >
+                                        Đơn hàng của bạn
+                                    </Link>
+                                    <Link to="/change-password" className="block w-full text-left py-3 px-4 rounded bg-[#ad7555]/10 text-[#ad7555] font-medium border-l-4 border-[#ad7555]">
+                                        Đổi mật khẩu
+                                    </Link>
+                                    <Link to="#"
+                                        className="block w-full text-left py-2 px-3 rounded transition-colors text-gray-700 hover:bg-gray-100"
+                                    >
+                                        Sổ địa chỉ (0)
+                                    </Link>
+                                </nav>
+                            </div>
+                        </div>
+
+                        <div className="lg:w-4/5 pt-[2%] ">
+                            <div className="p-1">
+                                <div>
+                                    <div className="flex flex-col lg:flex-row">
+                                        <div className="mb-auto lg:w-1/2 ">
+                                            <div className=" border-2 rounded-lg shadow-md bg-white">
+                                                <div className="bg-[#ad7555] text-white px-6 py-4 rounded-t-lg">
+                                                    <h2 className="text-xl font-semibold">ĐỔI MẬT KHẨU</h2>
+                                                </div>
+                                                <div className="p-[2%]">
+                                                    <div className="bg-amber-50 border-l-4 border-amber-400 p-4 mb-6 rounded">
+                                                        <p className="text-amber-800 text-sm">
+                                                            Để đảm bảo tính bảo mật vui lòng đặt lại mật khẩu với ít nhất 8 kí tự
+
+                                                        </p>
+                                                    </div>
+
+                                                    {(errors.newPassword === "Mật khẩu mới dài từ 6 đến 50 ký tự" || errors.confirmPassword === "Xác nhận mật khẩu không khớp") && (
+                                                        <div className="text-red-600 text-sm space-y-1">
+                                                            {errors.newPassword === "Mật khẩu mới dài từ 6 đến 50 ký tự" && (
+                                                                <div>Mật khẩu mới dài từ 6 đến 50 ký tự</div>
+                                                            )}
+                                                            {errors.confirmPassword === "Xác nhận mật khẩu không khớp" && (
+                                                                <div>Xác nhận mật khẩu không khớp</div>
+                                                            )}
+                                                        </div>
+                                                    )}
+
+
+                                                    <div className="space-y-4">
+                                                        <div>
+                                                            <label className="block text-gray-700 font-medium mb-2">
+                                                                Mật khẩu cũ <span className="text-red-600">*</span>
+                                                            </label>
+                                                            <div className="relative max-w-[250px]">
+                                                                <input
+                                                                    type="password"
+                                                                    value={currentPassword}
+                                                                    onChange={(e) => handleInputChange('currentPassword', e.target.value)}
+                                                                    className={`w-full px-4 py-3 pr-12 bg-gray-100 border rounded-md focus:outline-none focus:ring-2 ${errors.currentPassword
+                                                                        ? 'border-red-300 focus:ring-red-500'
+                                                                        : 'border-gray-200 focus:ring-[#ad7555]'
+                                                                        }`}
+                                                                />
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={(e) => {
+                                                                        const input = e.target.closest('div').querySelector('input');
+                                                                        const icon = e.target.closest('button').querySelector('i');
+                                                                        if (input.type === 'password') {
+                                                                            input.type = 'text';
+                                                                            icon.className = 'fas fa-eye-slash text-sm';
+                                                                        } else {
+                                                                            input.type = 'password';
+                                                                            icon.className = 'fas fa-eye text-sm';
+                                                                        }
+                                                                    }}
+                                                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                                                >
+                                                                    <i className="fas fa-eye text-sm"></i>
+                                                                </button>
+                                                            </div>
+                                                            {errors.currentPassword && (
+                                                                <p className="text-red-600 text-sm mt-1">{errors.currentPassword}</p>
+                                                            )}
+                                                        </div>
+
+                                                        <div>
+                                                            <label className="block text-gray-700 font-medium mb-2">
+                                                                Mật khẩu mới <span className="text-red-600">*</span>
+                                                            </label>
+                                                            <div className="relative max-w-[250px]">
+                                                                <input
+                                                                    type="password"
+                                                                    value={newPassword}
+                                                                    onChange={(e) => handleInputChange('newPassword', e.target.value)}
+                                                                    className={`w-full px-4 py-3 pr-12 bg-gray-100 border rounded-md focus:outline-none focus:ring-2 ${errors.newPassword
+                                                                        ? 'border-red-300 focus:ring-red-500'
+                                                                        : 'border-gray-200 focus:ring-[#ad7555]'
+                                                                        }`}
+                                                                />
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={(e) => {
+                                                                        const input = e.target.closest('div').querySelector('input');
+                                                                        const icon = e.target.closest('button').querySelector('i');
+                                                                        if (input.type === 'password') {
+                                                                            input.type = 'text';
+                                                                            icon.className = 'fas fa-eye-slash text-sm';
+                                                                        } else {
+                                                                            input.type = 'password';
+                                                                            icon.className = 'fas fa-eye text-sm';
+                                                                        }
+                                                                    }}
+                                                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                                                >
+                                                                    <i className="fas fa-eye text-sm"></i>
+                                                                </button>
+                                                            </div>
+                                                            {errors.newPassword && errors.newPassword !== "Mật khẩu mới dài từ 6 đến 50 ký tự" && (
+                                                                <p className="text-red-600 text-sm mt-1">{errors.newPassword}</p>
+                                                            )}
+                                                        </div>
+
+                                                        <div>
+                                                            <label className="block text-gray-700 font-medium mb-2">
+                                                                Xác nhận lại mật khẩu <span className="text-red-600">*</span>
+                                                            </label>
+                                                            <div className="relative max-w-[250px]">
+                                                                <input
+                                                                    type="password"
+                                                                    value={confirmPassword}
+                                                                    onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                                                                    className={`w-full px-4 py-3 pr-12 bg-gray-100 border rounded-md focus:outline-none focus:ring-2 ${errors.confirmPassword
+                                                                        ? 'border-red-300 focus:ring-red-500'
+                                                                        : 'border-gray-200 focus:ring-[#ad7555]'
+                                                                        }`}
+                                                                />
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={(e) => {
+                                                                        const input = e.target.closest('div').querySelector('input');
+                                                                        const icon = e.target.closest('button').querySelector('i');
+                                                                        if (input.type === 'password') {
+                                                                            input.type = 'text';
+                                                                            icon.className = 'fas fa-eye-slash text-sm';
+                                                                        } else {
+                                                                            input.type = 'password';
+                                                                            icon.className = 'fas fa-eye text-sm';
+                                                                        }
+                                                                    }}
+                                                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                                                >
+                                                                    <i className="fas fa-eye text-sm"></i>
+                                                                </button>
+                                                            </div>
+                                                            {errors.confirmPassword && errors.confirmPassword !== "Xác nhận mật khẩu không khớp" && (
+                                                                <p className="text-red-600 text-sm mt-1">{errors.confirmPassword}</p>
+                                                            )}
+                                                        </div>
+
+                                                        <button
+                                                            onClick={handleSubmit}
+                                                            className=" w-full px-6 bg-[#ad7555] text-white font-medium py-2.5 rounded-md border border-[#ad7555] lg:w-auto hover:bg-white hover:text-[#ad7555] transition duration-200 text-sm"
+                                                        >
+                                                            Đặt lại mật khẩu
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </Layout>
     );
 };
 
