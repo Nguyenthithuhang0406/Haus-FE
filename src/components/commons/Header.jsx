@@ -8,6 +8,7 @@ import { MdFlipCameraIos, MdOutlineAccountCircle } from "react-icons/md";
 import { AiOutlineHeart } from "react-icons/ai";
 import { GrCart } from "react-icons/gr";
 import Logo from "@/assets/icons/Logo";
+import { getCookie } from "@/utils/cookies";
 
 const Header = () => {
   const [inputText, setInputText] = useState("");
@@ -18,7 +19,8 @@ const Header = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
+    const accessToken = getCookie("accessToken");
+    console.log("🚀 ~ accessToken:", accessToken);
     if (accessToken) {
       setIsLogin(true);
     } else {
@@ -121,13 +123,13 @@ const Header = () => {
                 className="absolute top-[60px] text-black left-1/3 bg-[#f3f2f2] rounded-lg w-[150px] shadow z-10"
               >
                 <p
-                  // onClick={() => navigate("/auth")}
+                  onClick={() => navigate("/auth")}
                   className="px-5 py-2 rounded-lg text-[15px] hover:bg-[#fdfbfb] hover:text-[#9a542c] cursor-pointer"
                 >
                   Đăng ký
                 </p>
                 <p
-                  // onClick={() => navigate("/auth")}
+                  onClick={() => navigate("/auth")}
                   className="px-5 py-2 rounded-lg text-[15px] hover:bg-[#fdfbfb] hover:text-[#9a542c] cursor-pointer"
                 >
                   Đăng nhập
