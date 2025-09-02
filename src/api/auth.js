@@ -21,10 +21,11 @@ export const register = async (data) => {
     return response.data;
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
 
-export const verifyOTPRegister = async (data) => {
+export const verifyOTP = async (data) => {
   const { email, otp } = data;
   try {
     const response = await request(axiosPublic, {
@@ -39,6 +40,7 @@ export const verifyOTPRegister = async (data) => {
     return response.data;
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
 
@@ -61,6 +63,7 @@ export const login = async (data) => {
     return response.data;
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
 
@@ -78,6 +81,7 @@ export const logout = async () => {
     return response.data;
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
 
@@ -88,7 +92,7 @@ export const refreshToken = async () => {
       method: "POST",
       url: "/auth/refresh",
       data: {
-        refreshToken
+        refreshToken,
       },
     });
     const { accessToken, refreshToken: newRefreshToken } = response.data.data;
@@ -99,4 +103,22 @@ export const refreshToken = async () => {
     console.log(error);
     throw error;
   }
-}
+};
+
+export const sentEmailForgotPassword = async (data) => {
+  const { email } = data;
+  try {
+    const response = await request(axiosPublic, {
+      method: "POST",
+      url: "/auth/forgot-password",
+      data: {
+        email,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};

@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Menu from "./Menu";
 
 import { FiSearch } from "react-icons/fi";
@@ -17,6 +17,7 @@ const Header = () => {
   const childRef = useRef(null);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const accessToken = getCookie("accessToken");
@@ -77,7 +78,11 @@ const Header = () => {
   // const quantityOfProducts = useSelector((state) => state.order.quantityOfCart);
 
   return (
-    <div className="w-full bg-[#0a0400] bg-opacity-30 px-[20px]  md:px-[50px] lg:px-[130px] py-[20px] shadow-md absolute z-10">
+    <div
+      className={`w-full ${
+        location.pathname === "/" ? "bg-[#0a0400] bg-opacity-30" : "bg-[#885e45]"
+      } px-[20px]  md:px-[50px] lg:px-[130px] py-[20px] shadow-md absolute z-10`}
+    >
       <div className="flex items-center justify-between mb-[11px] flex-wrap gap-4">
         {/* Logo */}
         <div

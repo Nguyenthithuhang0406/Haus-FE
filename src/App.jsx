@@ -4,6 +4,8 @@ import "swiper/css";
 import "swiper/css/navigation";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Home = lazy(() => import("@/pages/Home"));
 const AuthForm = lazy(() => import("@/components/auth/AuthForm"));
@@ -28,7 +30,23 @@ const App = () => {
     { path: "/view-infor", element: <ViewEditInfor /> },
   ]);
 
-  return <Suspense fallback={<div>Loading...</div>}>{routes}</Suspense>;
+  return (
+    <>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        containerClassName="!z-20"
+      />
+      <Suspense fallback={<div>Loading...</div>}>{routes}</Suspense>
+    </>
+  );
 };
 
 export default App;

@@ -10,6 +10,7 @@ export const getUserProfile = async () => {
     return response.data;
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
 
@@ -28,5 +29,6 @@ export const resetPassword = async (data) => {
     return response.data;
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
