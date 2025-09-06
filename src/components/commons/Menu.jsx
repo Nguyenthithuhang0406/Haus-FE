@@ -6,6 +6,7 @@ import { FaCaretDown, FaBars, FaShoppingCart, FaCaretUp } from "react-icons/fa";
 import { IoHeart } from "react-icons/io5";
 import { MdAccountCircle } from "react-icons/md";
 import { menuListProduct, menuProjects } from "@/utils/contants/Menu";
+import { removeAllCookies } from "@/utils/cookies";
 
 const Menu = () => {
   const navigate = useNavigate();
@@ -37,11 +38,10 @@ const Menu = () => {
   }, [childRef, menuMbRef]);
 
   const handleLogout = () => {
-    // localStorage.removeItem("accessToken");
-    // localStorage.removeItem("refreshToken");
-    // toast.success("Đăng xuất thành công");
-    // setIsLogin(false);
-    // navigate("/auth");
+    removeAllCookies();
+    setIsLogin(false);
+    toast.success("Đăng xuất thành công!");
+    navigate("/");
   };
 
   return (
@@ -219,7 +219,7 @@ const Menu = () => {
             >
               <p
                 className="px-5 rounded-lg py-2 text-[15px] hover:bg-[#fdfbfb] hover:text-[#9a542c] cursor-pointer"
-                onClick={() => navigate("/profile")}
+                onClick={() => navigate("/view-infor")}
               >
                 Trang cá nhân
               </p>

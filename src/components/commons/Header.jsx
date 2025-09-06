@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Menu from "./Menu";
 
 import { FiSearch } from "react-icons/fi";
@@ -8,6 +8,8 @@ import { MdFlipCameraIos, MdOutlineAccountCircle } from "react-icons/md";
 import { AiOutlineHeart } from "react-icons/ai";
 import { GrCart } from "react-icons/gr";
 import Logo from "@/assets/icons/Logo";
+import { getCookie, removeAllCookies } from "@/utils/cookies";
+import { toast } from "react-toastify";
 
 const Header = () => {
   const [inputText, setInputText] = useState("");
@@ -16,14 +18,14 @@ const Header = () => {
   const childRef = useRef(null);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
+    const accessToken = getCookie("accessToken");
     if (accessToken) {
       setIsLogin(true);
     } else {
       setIsLogin(false);
-      // navigate("/auth");
     }
   }, []);
 
@@ -52,13 +54,12 @@ const Header = () => {
   //   }
   // };
 
-  // const handleLogout = () => {
-  //   localStorage.removeItem("accessToken");
-  //   localStorage.removeItem("refreshToken");
-  //   toast.success("Đăng xuất thành công");
-  //   setIsLogin(false);
-  //   navigate("/auth");
-  // };
+  const handleLogout = () => {
+    removeAllCookies();
+    setIsLogin(false);
+    toast.success("Đăng xuất thành công!");
+    navigate("/");
+  };
 
   // useEffect(() => {
   //   const fetchProductOfCart = async () => {
@@ -75,7 +76,13 @@ const Header = () => {
   // const quantityOfProducts = useSelector((state) => state.order.quantityOfCart);
 
   return (
-    <div className="w-full bg-[#0a0400] bg-opacity-30 px-[20px]  md:px-[50px] lg:px-[130px] py-[20px] shadow-md absolute z-10">
+    <div
+      className={`w-full ${
+        location.pathname === "/"
+          ? "bg-[#0a0400] bg-opacity-30"
+          : "bg-[#885e45]"
+      } px-[20px]  md:px-[50px] lg:px-[130px] py-[20px] shadow-md absolute z-10`}
+    >
       <div className="flex items-center justify-between mb-[11px] flex-wrap gap-4">
         {/* Logo */}
         <div
@@ -121,13 +128,13 @@ const Header = () => {
                 className="absolute top-[60px] text-black left-1/3 bg-[#f3f2f2] rounded-lg w-[150px] shadow z-10"
               >
                 <p
-                  // onClick={() => navigate("/auth")}
+                  onClick={() => navigate("/auth")}
                   className="px-5 py-2 rounded-lg text-[15px] hover:bg-[#fdfbfb] hover:text-[#9a542c] cursor-pointer"
                 >
                   Đăng ký
                 </p>
                 <p
-                  // onClick={() => navigate("/auth")}
+                  onClick={() => navigate("/auth")}
                   className="px-5 py-2 rounded-lg text-[15px] hover:bg-[#fdfbfb] hover:text-[#9a542c] cursor-pointer"
                 >
                   Đăng nhập
@@ -140,13 +147,13 @@ const Header = () => {
                 className="absolute text-black rounded-lg top-[60px] left-1/3 bg-[#f3f2f2] w-[150px] shadow z-10"
               >
                 <p
-                  // onClick={() => navigate("/profile")}
+                  onClick={() => navigate("/view-infor")}
                   className="px-5 rounded-lg py-2 text-[15px] hover:bg-[#fdfbfb] hover:text-[#9a542c] cursor-pointer"
                 >
                   Trang cá nhân
                 </p>
                 <p
-                  // onClick={handleLogout}
+                  onClick={handleLogout}
                   className="px-5 rounded-lg py-2 text-[15px] hover:bg-[#fdfbfb] hover:text-[#9a542c] cursor-pointer"
                 >
                   Đăng xuất
