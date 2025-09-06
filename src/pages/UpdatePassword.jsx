@@ -1,5 +1,5 @@
 // ResetNewPassword.jsx
-import { resetPassword } from "@/api/user";
+import { updatePassword } from "@/api/user";
 import Layout from "@/components/commons/Layout";
 import { updatePasswordSchema } from "@/utils/validation/authValidation";
 import { ErrorMessage, Field, Form, Formik } from "formik";
@@ -25,7 +25,7 @@ export default function UpdatePassword() {
 
   const handleSubmit = async (values) => {
     try {
-      const response = await resetPassword({
+      const response = await updatePassword({
         email,
         newPassword: values.password,
       });

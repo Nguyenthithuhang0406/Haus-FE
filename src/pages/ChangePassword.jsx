@@ -1,17 +1,25 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import Layout from "@/components/commons/Layout";
-import { resetPassword } from "@/api/user";
-import { getCookie } from "@/utils/cookies";
 import { toast } from "react-toastify";
 import axios from "axios";
 import SidebarProfile from "@/components/auth/SidebarProfile";
+import { resetPassword } from "@/api/user";
+import { useNavigate } from "react-router-dom";
+import { IoEye } from "react-icons/io5";
+import { IoEyeOff } from "react-icons/io5";
 
 const ChangePassword = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({});
+  const [isShowPassword, setShowPassword] = useState({
+    currentPassword: false,
+    newPassword: false,
+    confirmPassword: false,
+  });
+
+  const navigate = useNavigate();
 
   const validatePassword = (password) => {
     if (password.length < 8) {
@@ -71,7 +79,6 @@ const ChangePassword = () => {
     if (validateForm()) {
       try {
         const data = {
-          email: getCookie("email"),
           currentPassword,
           newPassword,
         };
@@ -82,6 +89,7 @@ const ChangePassword = () => {
           setNewPassword("");
           setConfirmPassword("");
           setErrors({});
+          navigate("/auth");
         }
       } catch (error) {
         if (axios.isAxiosError(error) && error.response) {
@@ -156,7 +164,11 @@ const ChangePassword = () => {
                               </label>
                               <div className="relative max-w-[250px]">
                                 <input
-                                  type="password"
+                                  type={
+                                    isShowPassword.currentPassword
+                                      ? "text"
+                                      : "password"
+                                  }
                                   value={currentPassword}
                                   onChange={(e) =>
                                     handleInputChange(
@@ -170,28 +182,27 @@ const ChangePassword = () => {
                                       : "border-gray-200 focus:ring-[#ad7555]"
                                   }`}
                                 />
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    const input = e.target
-                                      .closest("div")
-                                      .querySelector("input");
-                                    const icon = e.target
-                                      .closest("button")
-                                      .querySelector("i");
-                                    if (input.type === "password") {
-                                      input.type = "text";
-                                      icon.className =
-                                        "fas fa-eye-slash text-sm";
-                                    } else {
-                                      input.type = "password";
-                                      icon.className = "fas fa-eye text-sm";
-                                    }
-                                  }}
-                                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
-                                >
-                                  <i className="fas fa-eye text-sm"></i>
-                                </button>
+                                {isShowPassword.currentPassword ? (
+                                  <IoEye
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer"
+                                    onClick={() => {
+                                      setShowPassword((prev) => ({
+                                        ...prev,
+                                        currentPassword: !prev.currentPassword,
+                                      }));
+                                    }}
+                                  />
+                                ) : (
+                                  <IoEyeOff
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer"
+                                    onClick={() => {
+                                      setShowPassword((prev) => ({
+                                        ...prev,
+                                        currentPassword: !prev.currentPassword,
+                                      }));
+                                    }}
+                                  />
+                                )}
                               </div>
                               {errors.currentPassword && (
                                 <p className="text-red-600 text-sm mt-1">
@@ -207,7 +218,11 @@ const ChangePassword = () => {
                               </label>
                               <div className="relative max-w-[250px]">
                                 <input
-                                  type="password"
+                                  type={
+                                    isShowPassword.newPassword
+                                      ? "text"
+                                      : "password"
+                                  }
                                   value={newPassword}
                                   onChange={(e) =>
                                     handleInputChange(
@@ -221,28 +236,27 @@ const ChangePassword = () => {
                                       : "border-gray-200 focus:ring-[#ad7555]"
                                   }`}
                                 />
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    const input = e.target
-                                      .closest("div")
-                                      .querySelector("input");
-                                    const icon = e.target
-                                      .closest("button")
-                                      .querySelector("i");
-                                    if (input.type === "password") {
-                                      input.type = "text";
-                                      icon.className =
-                                        "fas fa-eye-slash text-sm";
-                                    } else {
-                                      input.type = "password";
-                                      icon.className = "fas fa-eye text-sm";
-                                    }
-                                  }}
-                                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
-                                >
-                                  <i className="fas fa-eye text-sm"></i>
-                                </button>
+                                {isShowPassword.newPassword ? (
+                                  <IoEye
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer"
+                                    onClick={() => {
+                                      setShowPassword((prev) => ({
+                                        ...prev,
+                                        newPassword: !prev.newPassword,
+                                      }));
+                                    }}
+                                  />
+                                ) : (
+                                  <IoEyeOff
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer"
+                                    onClick={() => {
+                                      setShowPassword((prev) => ({
+                                        ...prev,
+                                        newPassword: !prev.newPassword,
+                                      }));
+                                    }}
+                                  />
+                                )}
                               </div>
                               {errors.newPassword && (
                                 <div className="text-red-600 text-sm mt-1">
@@ -258,7 +272,11 @@ const ChangePassword = () => {
                               </label>
                               <div className="relative max-w-[250px]">
                                 <input
-                                  type="password"
+                                  type={
+                                    isShowPassword.confirmPassword
+                                      ? "text"
+                                      : "password"
+                                  }
                                   value={confirmPassword}
                                   onChange={(e) =>
                                     handleInputChange(
@@ -272,28 +290,27 @@ const ChangePassword = () => {
                                       : "border-gray-200 focus:ring-[#ad7555]"
                                   }`}
                                 />
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    const input = e.target
-                                      .closest("div")
-                                      .querySelector("input");
-                                    const icon = e.target
-                                      .closest("button")
-                                      .querySelector("i");
-                                    if (input.type === "password") {
-                                      input.type = "text";
-                                      icon.className =
-                                        "fas fa-eye-slash text-sm";
-                                    } else {
-                                      input.type = "password";
-                                      icon.className = "fas fa-eye text-sm";
-                                    }
-                                  }}
-                                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
-                                >
-                                  <i className="fas fa-eye text-sm"></i>
-                                </button>
+                                {isShowPassword.confirmPassword ? (
+                                  <IoEye
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer"
+                                    onClick={() => {
+                                      setShowPassword((prev) => ({
+                                        ...prev,
+                                        confirmPassword: !prev.confirmPassword,
+                                      }));
+                                    }}
+                                  />
+                                ) : (
+                                  <IoEyeOff
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer"
+                                    onClick={() => {
+                                      setShowPassword((prev) => ({
+                                        ...prev,
+                                        confirmPassword: !prev.confirmPassword,
+                                      }));
+                                    }}
+                                  />
+                                )}
                               </div>
                               {errors.confirmPassword && (
                                 <div className="text-red-600 text-sm mt-1">
@@ -301,7 +318,6 @@ const ChangePassword = () => {
                                 </div>
                               )}
                             </div>
-
                             <button
                               onClick={handleSubmit}
                               className=" w-full px-6 bg-[#ad7555] text-white font-medium py-2.5 rounded-md border border-[#ad7555] lg:w-auto hover:bg-white hover:text-[#ad7555] transition duration-200 text-sm"

@@ -14,6 +14,9 @@ const ForgotPassword = lazy(() => import("@/components/auth/ForgotPassword"));
 const UpdatePassword = lazy(() => import("@/pages/UpdatePassword"));
 const ChangePassword = lazy(() => import("@/pages/ChangePassword"));
 const ViewEditInfor = lazy(() => import("@/pages/ViewEditInfor"));
+const ListProductByCategory = lazy(() =>
+  import("@/pages/ListProductByCategory")
+);
 const App = () => {
   useEffect(() => {
     AOS.init({
@@ -30,6 +33,7 @@ const App = () => {
     { path: "/update-password", element: <UpdatePassword /> },
     { path: "/change-password", element: <ChangePassword /> },
     { path: "/view-infor", element: <ViewEditInfor /> },
+    { path: "/listProductByCategory", element: <ListProductByCategory /> },
   ]);
 
   return (
