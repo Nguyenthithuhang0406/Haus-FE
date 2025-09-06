@@ -1,9 +1,15 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import Layout from "@/components/commons/Layout";
-const ViewEditInfor = () => {
-  const CURRENT_USER_PASSWORD = "123456"; // Thay đổi mật khẩu
+import { getUserProfile, updateUserProfile, uploadAvatar } from "@/api/user";
+import { toast } from "react-toastify";
+import axios from "axios";
+import SidebarProfile from "@/components/auth/SidebarProfile";
+import avt from "@/assets/images/avt.jpg";
+import { Select } from "antd";
+import { formatDate, formatDateForApi } from "@/utils/function";
+import { setCookie } from "@/utils/cookies";
 
+const ViewEditInfor = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [userInfo, setUserInfo] = useState({
     name: "lan lam",
@@ -15,8 +21,38 @@ const ViewEditInfor = () => {
     email: "",
     phone: "",
     password: "",
+    dateOfBirth: "",
+    gender: "OTHER",
   });
   const [errors, setErrors] = useState({});
+
+  const fetchUser = async () => {
+    try {
+      const response = await getUserProfile();
+      if (response.status === 200) {
+        setUserInfo(response.data);
+        setUserInfo((prev) => ({
+          ...prev,
+          avatar: response.data.avatarLink,
+        }));
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        switch (error.response.status) {
+          case 500:
+            toast.error("Lỗi hệ thống");
+            break;
+          default:
+            toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
+        }
+      }
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -53,8 +89,12 @@ const ViewEditInfor = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!editForm.name.trim()) {
-      newErrors.name = "Vui lòng nhập họ tên";
+    if (!editForm.firstName.trim()) {
+      newErrors.name = "Vui lòng nhập họ";
+    }
+
+    if (!editForm.lastName.trim()) {
+      newErrors.name = "Vui lòng nhập tên";
     }
 
     if (!editForm.email.trim()) {
@@ -71,30 +111,62 @@ const ViewEditInfor = () => {
 
     if (!editForm.password.trim()) {
       newErrors.password = "Vui lòng nhập mật khẩu để xác nhận";
-    } else if (editForm.password !== CURRENT_USER_PASSWORD) {
-      newErrors.password = "Mật khẩu không đúng";
+    }
+
+    if (editForm.gender === null) {
+      newErrors.gender = "Vui lòng chọn giới tính";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validateForm()) {
-      setUserInfo({
-        name: editForm.name,
-        email: editForm.email,
-        phone: editForm.phone,
-      });
-      setIsEditing(false);
-      alert("Cập nhật thông tin thành công!");
-      setEditForm({
-        name: "",
-        email: "",
-        phone: "",
-        password: "",
-      });
-      setErrors({});
+      try {
+        console.log(editForm);
+        const data = {
+          passwordConfirm: editForm.password,
+          firstName: editForm.firstName,
+          lastName: editForm.lastName,
+          email: editForm.email,
+          phone: editForm.phone,
+          dateOfBirth: editForm.dateOfBirth,
+          gender: editForm.gender,
+        };
+        const response = await updateUserProfile(data);
+        if (response.status === 200) {
+          toast.success("Cập nhật thông tin thành công!");
+          setUserInfo(response.data);
+          setIsEditing(false);
+          setCookie("email", response.data.email);
+
+          setEditForm({
+            name: "",
+            email: "",
+            phone: "",
+            password: "",
+          });
+          setErrors({});
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+          switch (error.response.status) {
+            case 500:
+              toast.error("Lỗi hệ thống");
+              break;
+            case 400:
+              toast.error("Dữ liệu không hợp lệ");
+              break;
+            case 401:
+              toast.error("Bạn không có quyền truy cập");
+              break;
+            default:
+              toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
+          }
+        }
+        console.log(error);
+      }
     }
   };
 
@@ -105,41 +177,51 @@ const ViewEditInfor = () => {
     setEditForm({ ...editForm, [field]: value });
   };
 
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUserInfo({ ...userInfo, avatar: reader.result });
+      };
+      reader.readAsDataURL(file);
+
+      try {
+        const data = {
+          avatar: file,
+        };
+        const response = await uploadAvatar(data);
+        if (response.status === 200) {
+          setUserInfo({ ...userInfo, avatar: response.data.avatarLink });
+          toast.success("Cập nhật ảnh đại diện thành công!");
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+          switch (error.response.status) {
+            case 500:
+              toast.error("Lỗi hệ thống");
+              break;
+            case 400:
+              toast.error("Dữ liệu không hợp lệ");
+              break;
+            case 401:
+              toast.error("Bạn không có quyền truy cập");
+              break;
+            default:
+              toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
+          }
+        }
+        console.log(error);
+      }
+    }
+  };
+
   return (
     <Layout>
       <div className="min-h-screen bg-gray-50 pt-[100px]">
         <div className="container mx-auto px-20 py-8">
           <div className="flex flex-col lg:flex-row gap-8">
-            <div className="pl-[2%] pt-[2%] lg:w-1/5 ">
-              <div className="p-1 border-b-2 lg:border-b-0 lg:border-r-2">
-                <nav className="space-y-2">
-                  <Link
-                    to="/view-infor"
-                    className="block w-full text-left py-3 px-4 rounded bg-[#ad7555]/10 text-[#ad7555] font-medium border-l-4 border-[#ad7555]"
-                  >
-                    Thông tin tài khoản
-                  </Link>
-                  <Link
-                    to="#"
-                    className="block w-full text-left py-2 px-3 rounded transition-colors text-gray-700 hover:bg-gray-100"
-                  >
-                    Đơn hàng của bạn
-                  </Link>
-                  <Link
-                    to="/change-password"
-                    className="block w-full text-left py-2 px-3 rounded transition-colors text-gray-700 hover:bg-gray-100"
-                  >
-                    Đổi mật khẩu
-                  </Link>
-                  <Link
-                    to="#"
-                    className="block w-full text-left py-2 px-3 rounded transition-colors text-gray-700 hover:bg-gray-100"
-                  >
-                    Sổ địa chỉ (0)
-                  </Link>
-                </nav>
-              </div>
-            </div>
+            <SidebarProfile />
 
             <div className="lg:w-4/5 pt-[2%] ">
               <div className=" border-2 rounded-lg shadow-md bg-white">
@@ -150,14 +232,22 @@ const ViewEditInfor = () => {
                   <div className=" mx-auto lg:w-1/4">
                     <div className=" relative rounded-2xl overflow-hidden shadow-md">
                       <img
-                        src="avt_img\avt.jpg"
+                        src={userInfo.avatar || avt}
                         alt="Uploaded"
                         className="w-full aspect-square object-cover rounded-lg"
                       />
                     </div>
 
                     <button className="mt-3 w-full px-6 bg-[#ad7555] text-white font-medium py-2.5 rounded-md border border-[#ad7555] hover:bg-white hover:text-[#ad7555] transition duration-200 text-sm">
-                      Cập nhật ảnh
+                      <label htmlFor="fileInput" className="cursor-pointer">
+                        Thay đổi ảnh
+                        <input
+                          type="file"
+                          id="fileInput"
+                          className="hidden"
+                          onChange={(e) => handleFileChange(e)}
+                        />
+                      </label>
                     </button>
                   </div>
 
@@ -167,10 +257,19 @@ const ViewEditInfor = () => {
                         <div className="grid grid-cols gap-6">
                           <div className="bg-gray-50 p-1 rounded-lg">
                             <span className="font-medium text-gray-700 block mb-1">
-                              Họ tên:
+                              Họ:
                             </span>
                             <span className="text-gray-800 text-lg">
-                              {userInfo.name}
+                              {userInfo.firstName}
+                            </span>
+                          </div>
+
+                          <div className="bg-gray-50 p-1 rounded-lg">
+                            <span className="font-medium text-gray-700 block mb-1">
+                              Tên:
+                            </span>
+                            <span className="text-gray-800 text-lg">
+                              {userInfo.lastName}
                             </span>
                           </div>
                           <div className="bg-gray-50 p-1 rounded-lg">
@@ -187,6 +286,26 @@ const ViewEditInfor = () => {
                             </span>
                             <span className="text-gray-800">
                               {userInfo.phone}
+                            </span>
+                          </div>
+                          <div className="bg-gray-50 p-1 rounded-lg">
+                            <span className="font-medium text-gray-700 block mb-1">
+                              Ngày sinh:
+                            </span>
+                            <span className="text-gray-800">
+                              {formatDate(userInfo.dateOfBirth)}
+                            </span>
+                          </div>
+                          <div className="bg-gray-50 p-1 rounded-lg">
+                            <span className="font-medium text-gray-700 block mb-1">
+                              Giới tính:
+                            </span>
+                            <span className="text-gray-800">
+                              {userInfo.gender === "MALE"
+                                ? "Nam"
+                                : userInfo.gender === "FEMALE"
+                                ? "Nữ"
+                                : "Khác"}
                             </span>
                           </div>
                         </div>
@@ -212,23 +331,45 @@ const ViewEditInfor = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="block text-gray-700 font-medium mb-2">
-                              Họ tên <span className="text-red-600">*</span>
+                              Họ <span className="text-red-600">*</span>
                             </label>
                             <input
                               type="text"
-                              value={editForm.name}
+                              value={editForm.firstName}
                               onChange={(e) =>
-                                handleInputChange("name", e.target.value)
+                                handleInputChange("firstName", e.target.value)
                               }
                               className={`w-full px-4 py-3 bg-gray-50 border rounded-md focus:outline-none focus:ring-2 ${
-                                errors.name
+                                errors.firstName
                                   ? "border-red-300 focus:ring-red-500"
                                   : "border-gray-200 focus:ring-[#ad7555]"
                               }`}
                             />
-                            {errors.name && (
+                            {errors.firstName && (
                               <p className="text-red-600 text-sm mt-1">
-                                {errors.name}
+                                {errors.firstName}
+                              </p>
+                            )}
+                          </div>
+                          <div>
+                            <label className="block text-gray-700 font-medium mb-2">
+                              Tên <span className="text-red-600">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              value={editForm.lastName}
+                              onChange={(e) =>
+                                handleInputChange("lastName", e.target.value)
+                              }
+                              className={`w-full px-4 py-3 bg-gray-50 border rounded-md focus:outline-none focus:ring-2 ${
+                                errors.lastName
+                                  ? "border-red-300 focus:ring-red-500"
+                                  : "border-gray-200 focus:ring-[#ad7555]"
+                              }`}
+                            />
+                            {errors.lastName && (
+                              <p className="text-red-600 text-sm mt-1">
+                                {errors.lastName}
                               </p>
                             )}
                           </div>
@@ -275,6 +416,68 @@ const ViewEditInfor = () => {
                             {errors.phone && (
                               <p className="text-red-600 text-sm mt-1">
                                 {errors.phone}
+                              </p>
+                            )}
+                          </div>
+
+                          <div>
+                            <label className="block text-gray-700 font-medium mb-2">
+                              Ngày sinh
+                            </label>
+                            <input
+                              type="date"
+                              value={
+                                editForm.dateOfBirth
+                                  ? editForm.dateOfBirth
+                                      .split("/")
+                                      .reverse()
+                                      .join("-") // convert "dd/MM/yyyy" -> "yyyy-MM-dd" để hiển thị
+                                  : ""
+                              }
+                              onChange={(e) =>
+                                handleInputChange(
+                                  "dateOfBirth",
+                                  formatDateForApi(e.target.value)
+                                )
+                              }
+                              className={`w-full px-4 py-3 bg-gray-50 border rounded-md focus:outline-none focus:ring-2 ${
+                                errors.dateOfBirth
+                                  ? "border-red-300 focus:ring-red-500"
+                                  : "border-gray-200 focus:ring-[#ad7555]"
+                              }`}
+                            />
+                            {errors.dateOfBirth && (
+                              <p className="text-red-600 text-sm mt-1">
+                                {errors.dateOfBirth}
+                              </p>
+                            )}
+                          </div>
+
+                          <div>
+                            <label className="block text-gray-700 font-medium mb-2">
+                              Giới tính <span className="text-red-600">*</span>
+                            </label>
+                            <Select
+                              name="gender"
+                              value={editForm.gender}
+                              allowClear
+                              placeholder="Chọn giới tính"
+                              onChange={(value) =>
+                                handleInputChange("gender", value)
+                              }
+                              className={`w-full h-[49px] bg-gray-50 border rounded-md focus:outline-none focus:ring-2 ${
+                                errors.gender
+                                  ? "border-red-300 focus:ring-red-500"
+                                  : "border-gray-200 focus:ring-[#ad7555]"
+                              }`}
+                            >
+                              <Select.Option value="OTHER">Khác</Select.Option>
+                              <Select.Option value="MALE">Nam</Select.Option>
+                              <Select.Option value="FEMALE">Nữ</Select.Option>
+                            </Select>
+                            {errors.dateOfBirth && (
+                              <p className="text-red-600 text-sm mt-1">
+                                {errors.dateOfBirth}
                               </p>
                             )}
                           </div>

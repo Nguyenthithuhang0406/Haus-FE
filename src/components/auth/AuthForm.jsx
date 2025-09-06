@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { LoginSchema, RegisterSchema } from "@/utils/validation/authValidation";
 import Layout from "../commons/Layout";
+import { setCookie } from "@/utils/cookies";
 
 export default function AuthForm() {
   const [isLogin, setIsLogin] = useState(true);
@@ -20,6 +21,7 @@ export default function AuthForm() {
       try {
         const response = await login(values);
         if (response.status === 200) {
+          setCookie("email", values.email);
           toast.success("Đăng nhập thành công!");
           navigate("/");
         }
@@ -53,7 +55,9 @@ export default function AuthForm() {
             "Đăng ký thành công! Mã OTP đã được gửi tới email của bạn."
           );
 
-          navigate("/auth/verifyOTP", { state: { email: values.email } });
+          navigate("/auth/verifyOTP", {
+            state: { email: values.email, data: values },
+          });
         }
       } catch (error) {
         if (axios.isAxiosError(error) && error.response) {

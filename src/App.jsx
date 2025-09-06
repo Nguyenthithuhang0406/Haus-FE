@@ -11,6 +11,7 @@ const Home = lazy(() => import("@/pages/Home"));
 const AuthForm = lazy(() => import("@/components/auth/AuthForm"));
 const OTPForm = lazy(() => import("@/components/auth/OtpForm"));
 const ForgotPassword = lazy(() => import("@/components/auth/ForgotPassword"));
+const UpdatePassword = lazy(() => import("@/pages/UpdatePassword"));
 const ChangePassword = lazy(() => import("@/pages/ChangePassword"));
 const ViewEditInfor = lazy(() => import("@/pages/ViewEditInfor"));
 const App = () => {
@@ -26,6 +27,7 @@ const App = () => {
     { path: "/auth", element: <AuthForm /> },
     { path: "/auth/verifyOTP", element: <OTPForm /> },
     { path: "/forgot-password", element: <ForgotPassword /> },
+    { path: "/update-password", element: <UpdatePassword /> },
     { path: "/change-password", element: <ChangePassword /> },
     { path: "/view-infor", element: <ViewEditInfor /> },
   ]);

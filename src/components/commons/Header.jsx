@@ -8,7 +8,8 @@ import { MdFlipCameraIos, MdOutlineAccountCircle } from "react-icons/md";
 import { AiOutlineHeart } from "react-icons/ai";
 import { GrCart } from "react-icons/gr";
 import Logo from "@/assets/icons/Logo";
-import { getCookie } from "@/utils/cookies";
+import { getCookie, removeAllCookies } from "@/utils/cookies";
+import { toast } from "react-toastify";
 
 const Header = () => {
   const [inputText, setInputText] = useState("");
@@ -21,12 +22,10 @@ const Header = () => {
 
   useEffect(() => {
     const accessToken = getCookie("accessToken");
-    console.log("🚀 ~ accessToken:", accessToken);
     if (accessToken) {
       setIsLogin(true);
     } else {
       setIsLogin(false);
-      // navigate("/auth");
     }
   }, []);
 
@@ -55,13 +54,12 @@ const Header = () => {
   //   }
   // };
 
-  // const handleLogout = () => {
-  //   localStorage.removeItem("accessToken");
-  //   localStorage.removeItem("refreshToken");
-  //   toast.success("Đăng xuất thành công");
-  //   setIsLogin(false);
-  //   navigate("/auth");
-  // };
+  const handleLogout = () => {
+    removeAllCookies();
+    setIsLogin(false);
+    toast.success("Đăng xuất thành công!");
+    navigate("/");
+  };
 
   // useEffect(() => {
   //   const fetchProductOfCart = async () => {
@@ -80,7 +78,9 @@ const Header = () => {
   return (
     <div
       className={`w-full ${
-        location.pathname === "/" ? "bg-[#0a0400] bg-opacity-30" : "bg-[#885e45]"
+        location.pathname === "/"
+          ? "bg-[#0a0400] bg-opacity-30"
+          : "bg-[#885e45]"
       } px-[20px]  md:px-[50px] lg:px-[130px] py-[20px] shadow-md absolute z-10`}
     >
       <div className="flex items-center justify-between mb-[11px] flex-wrap gap-4">
@@ -147,13 +147,13 @@ const Header = () => {
                 className="absolute text-black rounded-lg top-[60px] left-1/3 bg-[#f3f2f2] w-[150px] shadow z-10"
               >
                 <p
-                  // onClick={() => navigate("/profile")}
+                  onClick={() => navigate("/view-infor")}
                   className="px-5 rounded-lg py-2 text-[15px] hover:bg-[#fdfbfb] hover:text-[#9a542c] cursor-pointer"
                 >
                   Trang cá nhân
                 </p>
                 <p
-                  // onClick={handleLogout}
+                  onClick={handleLogout}
                   className="px-5 rounded-lg py-2 text-[15px] hover:bg-[#fdfbfb] hover:text-[#9a542c] cursor-pointer"
                 >
                   Đăng xuất

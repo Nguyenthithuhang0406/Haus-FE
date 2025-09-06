@@ -1,4 +1,4 @@
-import { verifyOTP } from "@/api/auth";
+import { register, verifyOTP } from "@/api/auth";
 import axios from "axios";
 import React, { useState, useRef, useEffect } from "react";
 import { FaUserLock } from "react-icons/fa";
@@ -9,7 +9,7 @@ import { formatTime } from "@/utils/function";
 
 const AuthenOTP = () => {
   const location = useLocation();
-  const { email } = location.state || {};
+  const { email, data } = location.state || {};
   const [otp, setOtp] = useState(new Array(6).fill(""));
   const inputRefs = useRef([]);
   const [timeLeft, setTimeLeft] = useState(300);
@@ -56,7 +56,7 @@ const AuthenOTP = () => {
 
     try {
       const response = await verifyOTP(data);
-      if (response.status === 200) {
+      if (response.status === 201) {
         toast.success("Xác thực OTP thành công!");
         navigate("/");
       }
@@ -80,11 +80,18 @@ const AuthenOTP = () => {
     }
   };
 
-  const handleResend = () => {
-    setTimeLeft(120);
+  const handleResend = async () => {
+    setTimeLeft(300);
     setOtp(new Array(6).fill(""));
     inputRefs.current[0].focus();
-    // onResend();
+    const response = await register(data);
+    if (
+      response.status === 201 ||
+      response.message ===
+        "Register successful. OTP has been sent to your email"
+    ) {
+      toast.success("Gửi lại mã OTP thành công!");
+    }
   };
 
   return (

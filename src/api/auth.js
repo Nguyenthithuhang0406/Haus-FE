@@ -59,7 +59,7 @@ export const login = async (data) => {
     const { accessToken, refreshToken } = response.data.data;
     setCookie("accessToken", accessToken);
     setCookie("refreshToken", refreshToken);
-
+    
     return response.data;
   } catch (error) {
     console.log(error);
@@ -113,6 +113,25 @@ export const sentEmailForgotPassword = async (data) => {
       url: "/auth/forgot-password",
       data: {
         email,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const verifyOTPForForgotPassword = async (data) => {
+  const { email, otp } = data;
+  try {
+    const response = await request(axiosPublic, {
+      method: "POST",
+      url: "/auth/verify-otp-to-reset-password",
+      data: {
+        email,
+        otp,
       },
     });
 

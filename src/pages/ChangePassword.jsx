@@ -5,6 +5,8 @@ import { resetPassword } from "@/api/user";
 import { getCookie } from "@/utils/cookies";
 import { toast } from "react-toastify";
 import axios from "axios";
+import SidebarProfile from "@/components/auth/SidebarProfile";
+
 const ChangePassword = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -44,9 +46,6 @@ const ChangePassword = () => {
 
     if (!currentPassword.trim()) {
       newErrors.currentPassword = "Vui lòng nhập mật khẩu cũ";
-    } else if (currentPassword !== "123456") {
-      // Simulate wrong password
-      newErrors.currentPassword = "Mật khẩu cũ không đúng";
     }
 
     if (!newPassword.trim()) {
@@ -77,7 +76,7 @@ const ChangePassword = () => {
           newPassword,
         };
         const response = await resetPassword(data);
-        if (response.status === 0) {
+        if (response.status === 200) {
           toast.success("Đổi mật khẩu thành công!");
           setCurrentPassword("");
           setNewPassword("");
@@ -128,36 +127,7 @@ const ChangePassword = () => {
       <div className="min-h-screen bg-gray-50 pt-[100px]">
         <div className="container mx-auto px-20 py-8">
           <div className="flex flex-col lg:flex-row gap-8">
-            <div className="pl-[2%] pt-[2%] lg:w-1/5 ">
-              <div className="p-1 border-b-2 lg:border-b-0 lg:border-r-2">
-                <nav className="space-y-2">
-                  <Link
-                    to="/view-infor"
-                    className="block w-full text-left py-2 px-3 rounded transition-colors text-gray-700 hover:bg-gray-100"
-                  >
-                    Thông tin tài khoản
-                  </Link>
-                  <Link
-                    to="#"
-                    className="block w-full text-left py-2 px-3 rounded transition-colors text-gray-700 hover:bg-gray-100"
-                  >
-                    Đơn hàng của bạn
-                  </Link>
-                  <Link
-                    to="/change-password"
-                    className="block w-full text-left py-3 px-4 rounded bg-[#ad7555]/10 text-[#ad7555] font-medium border-l-4 border-[#ad7555]"
-                  >
-                    Đổi mật khẩu
-                  </Link>
-                  <Link
-                    to="#"
-                    className="block w-full text-left py-2 px-3 rounded transition-colors text-gray-700 hover:bg-gray-100"
-                  >
-                    Sổ địa chỉ (0)
-                  </Link>
-                </nav>
-              </div>
-            </div>
+            <SidebarProfile />
 
             <div className="lg:w-4/5 pt-[2%] ">
               <div className="p-1">

@@ -3,8 +3,12 @@ import React, { useState, useEffect } from "react";
 import Layout from "../commons/Layout";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { sentEmailForgotPassword, verifyOTP } from "@/api/auth";
+import {
+  sentEmailForgotPassword,
+  verifyOTPForForgotPassword,
+} from "@/api/auth";
 import { toast } from "react-toastify";
+import { formatTime } from "@/utils/function";
 
 const ForgotPassword = () => {
   const [forgotEmail, setForgotEmail] = useState("");
@@ -12,7 +16,7 @@ const ForgotPassword = () => {
   const [forgotEmailError, setForgotEmailError] = useState("");
   const [accountNotFound, setAccountNotFound] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
-  const [countdown, setCountdown] = useState(0);
+  const [countdown, setCountdown] = useState(300);
   const [canResend, setCanResend] = useState(false);
 
   const navigate = useNavigate();
@@ -58,58 +62,78 @@ const ForgotPassword = () => {
     return true;
   };
 
-  const handleForgotPassword = async () => {
-    if (resetEmailSent) {
-      const data = {
+  const handleSendEmail = async () => {
+    try {
+      const response = await sentEmailForgotPassword({
         email: forgotEmail,
-        otp,
-      };
-      const response = await verifyOTP(data);
-      if (response.status === 0) {
+      });
+      if (response?.status === 202) {
+        setResetEmailSent(true);
+        setAccountNotFound(false);
+        setCanResend(false);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        switch (error.response.status) {
+          case 500:
+            toast.error("Lỗi hệ thống");
+            break;
+          case 400:
+            toast.error("Email không hợp lệ");
+            break;
+          case 404:
+            setAccountNotFound(true);
+            toast.error("Không tìm thấy tài khoản");
+            break;
+          default:
+            toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
+        }
+        setResetEmailSent(false);
+      }
+    }
+  };
+
+  const verifyOTP = async () => {
+    const data = {
+      email: forgotEmail,
+      otp,
+    };
+    try {
+      const response = await verifyOTPForForgotPassword(data);
+      if (response.status === 200) {
         setResetEmailSent(false);
         setAccountNotFound(false);
+        navigate("/update-password", { state: { email: forgotEmail } });
       }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        switch (error.response.status) {
+          case 500:
+            toast.error("Lỗi hệ thống");
+            break;
+          case 400:
+            toast.error("OTP không hợp lệ");
+            break;
+          default:
+            toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
+        }
+        setResetEmailSent(false);
+      }
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (resetEmailSent) {
+      verifyOTP();
     } else {
       if (validateEmail(forgotEmail, true)) {
-        try {
-          const response = await sentEmailForgotPassword({
-            email: forgotEmail,
-          });
-          if (response?.status === 0) {
-            setResetEmailSent(true);
-            setAccountNotFound(false);
-            setCanResend(false);
-          }
-        } catch (error) {
-          if (axios.isAxiosError(error) && error.response) {
-            switch (error.response.status) {
-              case 500:
-                toast.error("Lỗi hệ thống");
-                break;
-              case 400:
-                toast.error("Email không hợp lệ");
-                break;
-              case 404:
-                setAccountNotFound(true);
-                toast.error("Không tìm thấy tài khoản");
-                break;
-              default:
-                toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
-            }
-            setResetEmailSent(false);
-          }
-        }
+        handleSendEmail();
       }
     }
   };
 
   const handleResendOTP = () => {
-    if (canResend) {
-      setCountdown(60); // Reset countdown to 60 seconds
-      setCanResend(false);
-      // Logic to resend OTP here
-      console.log("Resending OTP...");
-    }
+    handleSendEmail();
   };
 
   const handleForgotEmailChange = (e) => {
@@ -121,14 +145,6 @@ const ForgotPassword = () => {
 
   const handleOtpChange = (e) => {
     setOtp(e.target.value);
-  };
-
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs
-      .toString()
-      .padStart(2, "0")}`;
   };
 
   return (

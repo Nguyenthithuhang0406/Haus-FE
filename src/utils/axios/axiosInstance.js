@@ -56,9 +56,9 @@ const processQueue = (error, token = null) => {
 
 axiosPrivate.interceptors.response.use(
   (response) => {
-    if (response && response.data) {
-      return response.data;
-    }
+    // if (response && response.data) {
+    //   return response.data;
+    // }
     return response;
   },
   async (error) => {
@@ -93,7 +93,7 @@ axiosPrivate.interceptors.response.use(
       } catch (error) {
         processQueue(error, null);
         removeAllCookies();
-        window.location.href = "/login";
+        window.location.href = "/auth";
         return Promise.reject(error);
       } finally {
         isRefreshing = false;

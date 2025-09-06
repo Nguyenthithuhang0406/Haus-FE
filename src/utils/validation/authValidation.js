@@ -31,3 +31,15 @@ export const RegisterSchema = Yup.object({
     .oneOf([Yup.ref("password"), null], "Mật khẩu nhập lại không khớp")
     .required("Vui lòng nhập lại mật khẩu"),
 });
+
+export const updatePasswordSchema = Yup.object({
+  password: Yup.string()
+    .matches(
+      passwordRules,
+      "Mật khẩu phải ≥ 8 ký tự, có chữ hoa, chữ thường, số và ký tự đặc biệt"
+    )
+    .required("Vui lòng nhập mật khẩu"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password"), null], "Mật khẩu nhập lại không khớp")
+    .required("Vui lòng nhập lại mật khẩu"),
+});
