@@ -1,5 +1,5 @@
-import { requestWithToken } from "@/utils/axios/axios-http";
-import { axiosPrivate } from "@/utils/axios/axiosInstance";
+import { request, requestWithToken } from "@/utils/axios/axios-http";
+import { axiosPrivate, axiosPublic } from "@/utils/axios/axiosInstance";
 
 export const getUserProfile = async () => {
   try {
@@ -15,10 +15,10 @@ export const getUserProfile = async () => {
   }
 };
 
-export const resetPassword = async (data) => {
+export const updatePassword = async (data) => {
   const { email, newPassword } = data;
   try {
-    const response = await requestWithToken(axiosPrivate, {
+    const response = await request(axiosPublic, {
       method: "POST",
       url: "/auth/reset-password",
       data: {
@@ -87,3 +87,21 @@ export const updateUserProfile = async (data) => {
     throw error;
   }
 };
+
+export const resetPassword = async (data) => {
+  const { currentPassword, newPassword } = data;
+  try {
+    const response = await requestWithToken(axiosPrivate, {
+      method: "PATCH",
+      url: "/user/update-password",
+      data: {
+        currentPassword,
+        newPassword,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}

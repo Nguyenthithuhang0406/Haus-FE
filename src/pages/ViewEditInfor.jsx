@@ -8,9 +8,12 @@ import avt from "@/assets/images/avt.jpg";
 import { Select } from "antd";
 import { formatDate, formatDateForApi } from "@/utils/function";
 import { setCookie } from "@/utils/cookies";
+import { IoEye } from "react-icons/io5";
+import { IoEyeOff } from "react-icons/io5";
 
 const ViewEditInfor = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [userInfo, setUserInfo] = useState({
     name: "lan lam",
     email: "yirpng@gmail.com",
@@ -489,7 +492,7 @@ const ViewEditInfor = () => {
                             </label>
                             <div className="relative">
                               <input
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 value={editForm.password}
                                 onChange={(e) =>
                                   handleInputChange("password", e.target.value)
@@ -501,27 +504,17 @@ const ViewEditInfor = () => {
                                 }`}
                                 placeholder="Nhập mật khẩu để xác nhận"
                               />
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  const input = e.target
-                                    .closest("div")
-                                    .querySelector("input");
-                                  const icon = e.target
-                                    .closest("button")
-                                    .querySelector("i");
-                                  if (input.type === "password") {
-                                    input.type = "text";
-                                    icon.className = "fas fa-eye-slash text-lg";
-                                  } else {
-                                    input.type = "password";
-                                    icon.className = "fas fa-eye text-lg";
-                                  }
-                                }}
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
-                              >
-                                <i className="fas fa-eye text-lg"></i>
-                              </button>
+                              {showPassword ? (
+                                <IoEye
+                                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 text-xl cursor-pointer"
+                                  onClick={() => setShowPassword(false)}
+                                />
+                              ) : (
+                                <IoEyeOff
+                                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 text-xl cursor-pointer"
+                                  onClick={() => setShowPassword(true)}
+                                />
+                              )}
                             </div>
                             {errors.password && (
                               <p className="text-red-600 text-sm mt-1">
