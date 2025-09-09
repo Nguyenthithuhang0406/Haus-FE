@@ -9,6 +9,7 @@ const Home = lazy(() => import("@/pages/Home"));
 const ForgotPassword = lazy(() => import("@/components/auth/ForgotPassword"));
 const ChangePassword = lazy(() => import("@/pages/ChangePassword"));
 const ViewEditInfor = lazy(() => import("@/pages/ViewEditInfor"));
+const Promotion = lazy(()=> import("@/pages/Promotion")) ;
 const ListProductByCategory = lazy(() =>
   import("@/pages/ListProductByCategory")
 );
@@ -26,6 +27,7 @@ const App = () => {
     { path: "/change-password", element: <ChangePassword /> },
     { path: "/view-infor", element: <ViewEditInfor /> },
     { path: "/listProductByCategory", element: <ListProductByCategory /> },
+    {path:"/promotion",element:<Promotion/>},
   ]);
 
   return <Suspense fallback={<div>Loading...</div>}>{routes}</Suspense>;
