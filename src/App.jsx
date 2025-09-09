@@ -14,6 +14,7 @@ const ForgotPassword = lazy(() => import("@/components/auth/ForgotPassword"));
 const UpdatePassword = lazy(() => import("@/pages/UpdatePassword"));
 const ChangePassword = lazy(() => import("@/pages/ChangePassword"));
 const ViewEditInfor = lazy(() => import("@/pages/ViewEditInfor"));
+const Promotion = lazy(()=> import("@/pages/Promotion")) ;
 const ListProductByCategory = lazy(() =>
   import("@/pages/ListProductByCategory")
 );
@@ -34,6 +35,7 @@ const App = () => {
     { path: "/change-password", element: <ChangePassword /> },
     { path: "/view-infor", element: <ViewEditInfor /> },
     { path: "/listProductByCategory", element: <ListProductByCategory /> },
+    {path:"/promotion",element:<Promotion/>},
   ]);
 
   return (
