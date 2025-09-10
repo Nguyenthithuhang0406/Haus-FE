@@ -10,6 +10,9 @@ import { GrCart } from "react-icons/gr";
 import Logo from "@/assets/icons/Logo";
 import { getCookie, removeAllCookies } from "@/utils/cookies";
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { setKeySearch, setListSearch } from "@/store/SearchSlice";
+import { listProduct } from "@/utils/contants/product";
 
 const Header = () => {
   const [inputText, setInputText] = useState("");
@@ -19,6 +22,7 @@ const Header = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const accessToken = getCookie("accessToken");
@@ -39,20 +43,13 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [childRef]);
 
-  // const handleKeyPress = async (e) => {
-  //   if (e.key === "Enter") {
-  //     dispatch(setInputValue(inputText));
-  //     try {
-  //       const response = await searchProducts(inputText);
-  //       dispatch(setResult(response.data));
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //     dispatch(setInputImage(""));
-  //     navigate("/search");
-  //     dispatch(setInputValue(""));
-  //   }
-  // };
+  const handleKeyPress = async (e) => {
+    if (e.key === "Enter") {
+      dispatch(setKeySearch(inputText));
+      dispatch(setListSearch(listProduct));
+      navigate("/search");
+    }
+  };
 
   const handleLogout = () => {
     removeAllCookies();
@@ -99,7 +96,7 @@ const Header = () => {
           </button>
           <input
             onChange={(e) => setInputText(e.target.value)}
-            // onKeyDown={handleKeyPress}
+            onKeyDown={handleKeyPress}
             value={inputText}
             type="text"
             placeholder="Tìm kiếm sản phẩm"

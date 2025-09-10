@@ -14,11 +14,12 @@ const ForgotPassword = lazy(() => import("@/components/auth/ForgotPassword"));
 const UpdatePassword = lazy(() => import("@/pages/UpdatePassword"));
 const ChangePassword = lazy(() => import("@/pages/ChangePassword"));
 const ViewEditInfor = lazy(() => import("@/pages/ViewEditInfor"));
-const Promotion = lazy(()=> import("@/pages/Promotion")) ;
+const Promotion = lazy(() => import("@/pages/Promotion"));
 const ListProductByCategory = lazy(() =>
   import("@/pages/ListProductByCategory")
 );
 const DetailProduct = lazy(() => import("@/pages/DetailProduct"));
+const Search = lazy(() => import("@/pages/Search"));
 
 const App = () => {
   useEffect(() => {
@@ -38,7 +39,8 @@ const App = () => {
     { path: "/view-infor", element: <ViewEditInfor /> },
     { path: "/listProductByCategory", element: <ListProductByCategory /> },
     { path: "/detailProduct/:id", element: <DetailProduct /> },
-    {path:"/promotion",element:<Promotion/>},
+    { path: "/search", element: <Search /> },
+    { path: "/promotion", element: <Promotion /> },
   ]);
 
   return (
