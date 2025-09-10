@@ -18,6 +18,8 @@ const Promotion = lazy(()=> import("@/pages/Promotion")) ;
 const ListProductByCategory = lazy(() =>
   import("@/pages/ListProductByCategory")
 );
+const DetailProduct = lazy(() => import("@/pages/DetailProduct"));
+
 const App = () => {
   useEffect(() => {
     AOS.init({
@@ -35,6 +37,7 @@ const App = () => {
     { path: "/change-password", element: <ChangePassword /> },
     { path: "/view-infor", element: <ViewEditInfor /> },
     { path: "/listProductByCategory", element: <ListProductByCategory /> },
+    { path: "/detailProduct/:id", element: <DetailProduct /> },
     {path:"/promotion",element:<Promotion/>},
   ]);
 

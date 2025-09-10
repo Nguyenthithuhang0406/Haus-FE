@@ -25,7 +25,7 @@ const SideBar = () => {
   };
 
   return (
-    <div className="w-full flex flex-col gap-[30px]">
+    <div data-aos="fade-right" className="w-full flex flex-col gap-[30px]">
       <div className="w-full border-[1px] border-[#efefef] rounded-[6px] p-[15px]">
         <p className="text-[20px] break-words font-medium leading-[140%] pb-[8px] border-b-[3px] border-[#ad7555] w-fit">
           Danh mục sản phẩm

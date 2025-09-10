@@ -37,7 +37,7 @@ const ProductItem = ({ product }) => {
 
   return (
     <div
-      onClick={() => navigate("/product/2")}
+      onClick={() => navigate("/detailProduct/2")}
       className="relative w-[200px] h-[350px] lg:w-[260px] lg:h-[370px] xl:w-[300px] xl:h-[400px] bg-white rounded-xl shadow cursor-pointer overflow-hidden group transition-all duration-300"
     >
       {/* Giảm giá */}

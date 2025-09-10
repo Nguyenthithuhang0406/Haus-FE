@@ -8,7 +8,7 @@ const { Option } = Select;
 const Content = () => {
   const products = listProduct;
   return (
-    <div className="w-full flex flex-col gap-[30px]">
+    <div  data-aos="fade-left" className="w-full flex flex-col gap-[30px]">
       <div className="w-full flex items-center justify-between">
         <p className="text-[20px] md:text-[30px] font-semibold">Tất cả sản phẩm</p>
         <div className="flex items-center gap-[10px] font-medium">
@@ -29,7 +29,7 @@ const Content = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xm:grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 2xl:grid-cols-3 gap-[30px] w-full justify-items-center">
+      <div data-aos="fade-up" className="grid grid-cols-1 xm:grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 2xl:grid-cols-3 gap-[30px] w-full justify-items-center">
         {products.map((product) => (
           <ProductItem key={product.id} product={product} />
         ))}
