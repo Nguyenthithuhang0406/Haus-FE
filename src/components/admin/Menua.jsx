@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { MdDashboard, MdManageAccounts, MdInventory, MdShoppingCart } from "react-icons/md";
+import { MdDashboard, MdManageAccounts, MdInventory, MdShoppingCart,MdDiscount } from "react-icons/md";
 
 const Menua = ({ isMenuOpen, activeItem, handleMenuItemClick, isMobile }) => {
   const menuItems = [
@@ -7,6 +7,7 @@ const Menua = ({ isMenuOpen, activeItem, handleMenuItemClick, isMobile }) => {
       id: "thong-ke", 
       name: "Thống kê", 
       icon: <MdDashboard className="w-5 h-5" />, 
+      path:"/"
       
     },
     { 
@@ -28,7 +29,7 @@ const Menua = ({ isMenuOpen, activeItem, handleMenuItemClick, isMobile }) => {
     { 
       id: "quan-ly-khuyen-mai", 
       name: "Quản lý khuyến mãi", 
-      icon: <MdShoppingCart className="w-5 h-5" />, 
+      icon: <MdDiscount className="w-5 h-5" />, 
       path: "/promotion" 
     },
   ];
