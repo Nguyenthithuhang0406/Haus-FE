@@ -1,36 +1,36 @@
 import { Link } from "react-router-dom";
-import { MdDashboard, MdManageAccounts, MdInventory, MdShoppingCart,MdDiscount } from "react-icons/md";
+import { MdDashboard, MdManageAccounts, MdInventory, MdShoppingCart, MdDiscount } from "react-icons/md";
 
 const Menua = ({ isMenuOpen, activeItem, handleMenuItemClick, isMobile }) => {
   const menuItems = [
-    { 
-      id: "thong-ke", 
-      name: "Thống kê", 
-      icon: <MdDashboard className="w-5 h-5" />, 
-      path:"/"
-      
+    {
+      id: "thong-ke",
+      name: "Thống kê",
+      icon: <MdDashboard className="w-5 h-5" />,
+      path: "/"
     },
-    { 
-      id: "quan-ly-danh-muc", 
-      name: "Quản lý danh mục", 
-      icon: <MdManageAccounts className="w-5 h-5" /> 
+    {
+      id: "quan-ly-danh-muc",
+      name: "Quản lý danh mục",
+      icon: <MdManageAccounts className="w-5 h-5" />,
+      path: "/admin/managerCategory"
     },
-    { 
-      id: "quan-ly-san-pham", 
-      name: "Quản lý sản phẩm", 
-      icon: <MdInventory className="w-5 h-5" />, 
-      path: "/view-infor" 
+    {
+      id: "quan-ly-san-pham",
+      name: "Quản lý sản phẩm",
+      icon: <MdInventory className="w-5 h-5" />,
+      path: "/admin/managerProduct"
     },
-    { 
-      id: "quan-ly-don-hang", 
-      name: "Quản lý đơn hàng", 
-      icon: <MdShoppingCart className="w-5 h-5" /> 
+    {
+      id: "quan-ly-don-hang",
+      name: "Quản lý đơn hàng",
+      icon: <MdShoppingCart className="w-5 h-5" />
     },
-    { 
-      id: "quan-ly-khuyen-mai", 
-      name: "Quản lý khuyến mãi", 
-      icon: <MdDiscount className="w-5 h-5" />, 
-      path: "/promotion" 
+    {
+      id: "quan-ly-khuyen-mai",
+      name: "Quản lý khuyến mãi",
+      icon: <MdDiscount className="w-5 h-5" />,
+      path: "/promotion"
     },
   ];
 
@@ -38,7 +38,7 @@ const Menua = ({ isMenuOpen, activeItem, handleMenuItemClick, isMobile }) => {
     <div
       className={`
         bg-gradient-to-b from-[#A0522D] to-[#bb8c74] shadow-lg
-        ${isMobile 
+        ${isMobile
           ? 'w-64 h-screen' // Full screen height on mobile
           : `transition-all duration-300 ease-in-out 
              ${isMenuOpen ? "w-64 opacity-100" : "w-0 opacity-0"} 

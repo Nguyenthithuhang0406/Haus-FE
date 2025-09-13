@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^41.4.2",
+    "@ckeditor/ckeditor5-react": "^11.0.0",
     "@reduxjs/toolkit": "^2.9.0",
     "antd": "^5.27.3",
     "aos": "^2.3.4",
