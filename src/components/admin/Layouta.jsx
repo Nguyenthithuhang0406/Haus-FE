@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Heada from "./Heada";
 import Menua from "./Menua";
+import { Outlet } from "react-router-dom";
 
 const Layouta = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(true);
@@ -21,7 +22,7 @@ const Layouta = ({ children }) => {
 
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    
+
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
@@ -50,7 +51,7 @@ const Layouta = ({ children }) => {
 
   const toggleMenu = useCallback(() => {
     toggleRef.current = true; // Mark that toggle was clicked
-    
+
     if (isMenuOpen) {
       // Nếu menu đang mở, click X sẽ đóng menu
       setIsMenuOpen(false);
@@ -59,7 +60,7 @@ const Layouta = ({ children }) => {
       setIsMenuOpen(true);
     }
   }, [isMenuOpen]);
-  
+
   const handleMenuItemClick = (item) => {
     setActiveItem(item);
     // Auto close menu on mobile after selecting item
@@ -87,7 +88,7 @@ const Layouta = ({ children }) => {
         <div
           ref={menuRef}
           className={`
-            ${isMobile 
+            ${isMobile
               ? `fixed top-0 left-0 h-screen z-50 
                  transition-transform duration-300 ease-in-out
                  ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`
@@ -105,7 +106,7 @@ const Layouta = ({ children }) => {
 
         {/* Main Content */}
         <main className="flex-1 p-6 overflow-y-auto bg-gray-50">
-          {children}
+          {children || <Outlet />}
         </main>
       </div>
     </div>
