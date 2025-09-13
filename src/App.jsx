@@ -14,7 +14,10 @@ const ForgotPassword = lazy(() => import("@/components/auth/ForgotPassword"));
 const UpdatePassword = lazy(() => import("@/pages/UpdatePassword"));
 const ChangePassword = lazy(() => import("@/pages/ChangePassword"));
 const ViewEditInfor = lazy(() => import("@/pages/ViewEditInfor"));
-const Promotion = lazy(()=> import("@/pages/Promotion")) ;
+const Promotion = lazy(() => import("@/pages/Promotion"));
+const LayoutAdmin = lazy(() => import("@/components/admin/Layouta"));
+const ManagerCategory = lazy(() => import("@/components/admin/Category/CategoriesPage"));
+const ManagerProduct = lazy(() => import("@/components/admin/Product/ProductsPage"));
 const ListProductByCategory = lazy(() =>
   import("@/pages/ListProductByCategory")
 );
@@ -35,7 +38,15 @@ const App = () => {
     { path: "/change-password", element: <ChangePassword /> },
     { path: "/view-infor", element: <ViewEditInfor /> },
     { path: "/listProductByCategory", element: <ListProductByCategory /> },
-    {path:"/promotion",element:<Promotion/>},
+    { path: "/promotion", element: <Promotion /> },
+    {
+      path: "/admin",
+      element: <LayoutAdmin />,
+      children: [
+        { path: "managerCategory", element: <ManagerCategory /> },
+        { path: "managerProduct", element: <ManagerProduct /> },
+      ],
+    },
   ]);
 
   return (
