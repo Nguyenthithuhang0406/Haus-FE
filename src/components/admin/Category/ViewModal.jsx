@@ -6,8 +6,8 @@ import { toast } from "react-toastify";
 
 export default function ViewModal({ item, onClose, rooms }) {
   const [isEditing, setIsEditing] = useState(false);
-    const [categoryDetails, setCategoryDetails] = useState(null);
-    
+  const [categoryDetails, setCategoryDetails] = useState(null);
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -62,7 +62,9 @@ export default function ViewModal({ item, onClose, rooms }) {
             <b>Tên danh mục:</b> {categoryDetails?.categoryName}
           </p>
           <p>
-            <b>Phòng:</b> {rooms.find((r) => r.id === categoryDetails?.parentId)?.categoryName || "N/A"}
+            <b>Phòng:</b>{" "}
+            {rooms.find((r) => r.id === categoryDetails?.parentId)
+              ?.categoryName || "N/A"}
           </p>
           <p>
             <b>Mô tả:</b> {categoryDetails?.description}

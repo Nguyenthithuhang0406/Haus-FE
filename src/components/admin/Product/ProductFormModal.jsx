@@ -15,10 +15,10 @@ const ProductSchema = (isEdit) =>
         category: Yup.string().required("Danh mục bắt buộc"),
         shortDesc: Yup.string()
             .required("Mô tả ngắn bắt buộc")
-            .max(1000, "Mô tả ngắn tối đa 1000 ký tự"),
+            .max(100, "Mô tả ngắn tối đa 1000 ký tự"),
         detailDesc: Yup.string()
             .required("Mô tả chi tiết bắt buộc")
-            .max(2000, "Mô tả chi tiết tối đa 2000 ký tự"),
+            .max(1000, "Mô tả chi tiết tối đa 2000 ký tự"),
         price: Yup.number().min(1000, "Giá tối thiểu 1000đ").required("Giá bắt buộc"),
         stock: Yup.number().min(0, "Số lượng không âm").required("Số lượng bắt buộc"),
         images: isEdit
@@ -114,7 +114,7 @@ export default function ProductFormModal({
                                     </label>
                                     <Field
                                         name="name"
-                                        className="border border-gray-300 p-3 rounded-xl w-full"
+                                        className="border border-gray-200 focus:ring-1 focus:ring-gray-300 focus:border-gray-400 outline-none p-3 rounded-xl w-full"
                                     />
                                     <ErrorMessage
                                         name="name"
@@ -131,7 +131,7 @@ export default function ProductFormModal({
                                     <Field
                                         as="select"
                                         name="category"
-                                        className="border border-gray-300 p-3 rounded-xl w-full bg-white"
+                                        className="border border-gray-200 focus:ring-1 focus:ring-gray-300 focus:border-gray-400 outline-none p-3 rounded-xl w-full bg-white"
                                     >
                                         <option value="">-- Chọn danh mục --</option>
                                         {dummyData.map((c) => (
@@ -156,13 +156,25 @@ export default function ProductFormModal({
                                         as="textarea"
                                         rows={2}
                                         name="shortDesc"
-                                        className="border border-gray-300 p-3 rounded-xl w-full"
+                                        className="border border-gray-200 focus:ring-1 focus:ring-gray-300 focus:border-gray-400 outline-none p-3 rounded-xl w-full"
                                     />
-                                    <ErrorMessage
-                                        name="shortDesc"
-                                        component="div"
-                                        className="text-red-500 text-sm"
-                                    />
+                                    <div className="flex items-center justify-between mt-1">
+                                        <ErrorMessage
+                                            name="shortDesc"
+                                            component="div"
+                                            className="text-red-500 text-sm"
+                                        />
+                                        <span
+                                            className={`text-sm ml-auto ${values.shortDesc.length > 900
+                                                ? "text-red-500"
+                                                : values.shortDesc.length > 700
+                                                    ? "text-yellow-600"
+                                                    : "text-gray-500"
+                                                }`}
+                                        >
+                                            {values.shortDesc.length} / 100
+                                        </span>
+                                    </div>
                                 </div>
 
                                 {/* Mô tả chi tiết với CKEditor */}
@@ -194,11 +206,23 @@ export default function ProductFormModal({
                                             setFieldValue("detailDesc", data);
                                         }}
                                     />
-                                    <ErrorMessage
-                                        name="detailDesc"
-                                        component="div"
-                                        className="text-red-500 text-sm"
-                                    />
+                                    <div className="flex items-center justify-between mt-1">
+                                        <ErrorMessage
+                                            name="detailDesc"
+                                            component="div"
+                                            className="text-red-500 text-sm"
+                                        />
+                                        <span
+                                            className={`text-sm ml-auto ${values.detailDesc.length > 1800
+                                                ? "text-red-500"
+                                                : values.detailDesc.length > 1500
+                                                    ? "text-yellow-600"
+                                                    : "text-gray-500"
+                                                }`}
+                                        >
+                                            {values.detailDesc.length} / 1000
+                                        </span>
+                                    </div>
                                 </div>
 
                                 {/* Giá + số lượng */}
@@ -210,7 +234,7 @@ export default function ProductFormModal({
                                         <Field
                                             name="price"
                                             type="number"
-                                            className="border border-gray-300 p-3 rounded-xl w-full"
+                                            className="border border-gray-200 focus:ring-1 focus:ring-gray-300 focus:border-gray-400 outline-none p-3 rounded-xl w-full"
                                         />
                                         <ErrorMessage
                                             name="price"
@@ -225,7 +249,7 @@ export default function ProductFormModal({
                                         <Field
                                             name="stock"
                                             type="number"
-                                            className="border border-gray-300 p-3 rounded-xl w-full"
+                                            className="border border-gray-200 focus:ring-1 focus:ring-gray-300 focus:border-gray-400 outline-none p-3 rounded-xl w-full"
                                         />
                                         <ErrorMessage
                                             name="stock"
@@ -279,7 +303,7 @@ export default function ProductFormModal({
                                                 e.stopPropagation();
                                                 fileInputRef.current.click();
                                             }}
-                                            className="bg-[#f97316] text-white px-6 py-2 rounded-lg font-medium hover:bg-[#ea580c]"
+                                            className="bg-[#ad7555] hover:bg-[#945f46] text-white px-6 py-2 rounded-lg font-medium "
                                         >
                                             Tải hình ảnh lên
                                         </button>
@@ -315,7 +339,7 @@ export default function ProductFormModal({
                                 </div>
 
                                 {/* Nút hủy / lưu */}
-                                <div className="flex justify-end gap-3 mt-4 sticky bottom-0 bg-white py-3">
+                                <div className="flex flex-col sm:flex-row justify-end gap-3">
                                     <button
                                         type="button"
                                         onClick={() => {
@@ -323,15 +347,15 @@ export default function ProductFormModal({
                                             setEditId(null);
                                             setPreviews([]);
                                         }}
-                                        className="px-5 py-2.5 border rounded-xl hover:bg-gray-100"
+                                        className="px-5 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-100"
                                     >
                                         Hủy
                                     </button>
                                     <button
                                         type="submit"
-                                        className="px-5 py-2.5 bg-[#ad7555] text-white rounded-xl shadow-md hover:bg-[#945f46]"
+                                        className="px-5 py-2.5 bg-[#ad7555] hover:bg-[#945f46] text-white rounded-xl shadow-md "
                                     >
-                                        {editId ? "Cập nhật" : "Lưu"}
+                                        {editId ? "Cập nhật" : "Thêm mới"}
                                     </button>
                                 </div>
                             </Form>
