@@ -34,10 +34,10 @@ export default function ProductTable({
                     <thead className="bg-gray-100 text-sm font-semibold text-gray-700">
                         <tr>
                             <th className="p-4">TÊN SẢN PHẨM</th>
-                            <th className="p-4">MÔ TẢ NGẮN</th>
-                            <th className="p-4">MÔ TẢ CHI TIẾT</th>
+                            <th className="p-4 hidden sm:table-cell">MÔ TẢ NGẮN</th>
+                            <th className="p-4 hidden md:table-cell">MÔ TẢ CHI TIẾT</th>
                             <th className="p-4">GIÁ</th>
-                            <th className="p-4">SỐ LƯỢNG CÒN</th>
+                            <th className="p-4 text-center">SỐ LƯỢNG CÒN</th>
                             <th className="p-4 text-center">THAO TÁC</th>
                         </tr>
                     </thead>

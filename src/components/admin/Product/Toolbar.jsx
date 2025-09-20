@@ -14,7 +14,7 @@ export default function Toolbar({ search, setSearch, setShowForm, setCurrentPage
                         setSearch(e.target.value);
                         setCurrentPage(1);
                     }}
-                    className="pl-9 pr-3 py-2 border border-gray-300 rounded-xl w-full focus:ring-2 focus:ring-gray-500 focus:border-gray-500 shadow-sm"
+                    className="pl-9 pr-3 py-2 rounded-xl w-full border border-gray-200 focus:ring-1 focus:ring-gray-300 focus:border-gray-400 outline-none shadow-sm"
                 />
             </div>
             <button

@@ -5,25 +5,29 @@ export default function ProductRow({ product, setViewItem, setEditId, setShowFor
     return (
         <tr className="hover:bg-[#fdf8f5] transition">
             {/* Tên + mã sản phẩm */}
-            <td className="p-4 font-medium text-gray-800">
-                <div className="flex items-center gap-3">
+            <td className="p-4 font-medium text-gray-800 min-w-[140px]">
+                <div className="flex items-center gap-2 sm:gap-3">
                     <img
-                        src={product.image}
+                        src={product.image[0]}
                         alt={product.name}
-                        className="w-12 h-12 object-cover rounded-lg border"
+                        className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 object-cover rounded-lg border border-gray-300"
                     />
-                    <div>
-                        <div className="text-gray-800 font-medium">{product.name}</div>
-                        <div className="text-gray-500 text-xs">{product.code}</div>
+                    <div className="truncate">
+                        <div className="text-gray-800 font-medium text-sm sm:text-base md:text-base truncate">
+                            {product.name}
+                        </div>
+                        <div className="text-gray-500 text-xs sm:text-sm truncate">
+                            {product.code}
+                        </div>
                     </div>
                 </div>
             </td>
 
-            {/* Mô tả ngắn */}
-            <td className="p-4 text-gray-600">{product.shortDesc}</td>
+            {/* Mô tả ngắn - hiện từ sm trở lên */}
+            <td className="p-4 text-gray-600 hidden sm:table-cell">{product.shortDesc}</td>
 
-            {/* Mô tả chi tiết */}
-            <td className="p-4 text-gray-600 max-w-xs">
+            {/* Mô tả chi tiết - hiện từ md trở lên */}
+            <td className="p-4 text-gray-600 max-w-xs hidden md:table-cell">
                 <div
                     className="prose prose-sm max-w-none line-clamp-3 overflow-hidden"
                     dangerouslySetInnerHTML={{ __html: product.detailDesc }}
@@ -31,10 +35,10 @@ export default function ProductRow({ product, setViewItem, setEditId, setShowFor
             </td>
 
             {/* Giá */}
-            <td className="p-4 text-gray-600">{product.price.toLocaleString()}đ</td>
+            <td className="p-4 text-gray-600">{product.price?.toLocaleString()}đ</td>
 
             {/* Số lượng */}
-            <td className="p-4 text-gray-600">{product.stock}</td>
+            <td className="p-4 text-gray-600 text-center">{product.stock}</td>
 
             {/* Nút thao tác */}
             <td className="p-4 text-center">

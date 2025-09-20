@@ -5,6 +5,7 @@ import ProductTable from "./ProductTable";
 import ProductFormModal from "./ProductFormModal";
 import ProductViewModal from "./ProductViewModal";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import ConfirmDeleteVariantModal from "./ConfirmDeleteVariantModal";
 
 export default function ProductsPage() {
     const [products, setProducts] = useState(dummyProducts);
@@ -17,6 +18,10 @@ export default function ProductsPage() {
     const [viewItem, setViewItem] = useState(null);
     const [deleteItem, setDeleteItem] = useState(null);
 
+    const [editVariant, setEditVariant] = useState(null);
+    const [deleteVariant, setDeleteVariant] = useState(null);
+
+    // Lọc & phân trang
     const filtered = products.filter((p) =>
         p.name.toLowerCase().includes(search.toLowerCase())
     );
@@ -26,13 +31,49 @@ export default function ProductsPage() {
         (currentPage - 1) * itemsPerPage + itemsPerPage
     );
 
+    // Xoá sản phẩm
     const handleDelete = () => {
         setProducts(products.filter((p) => p.id !== deleteItem.id));
         setDeleteItem(null);
+        setViewItem(null);
+    };
+
+    // Sửa biến thể
+    const handleEditVariant = (updatedVariant) => {
+        setProducts((prev) =>
+            prev.map((p) => {
+                if (p.id === viewItem.id) {
+                    return {
+                        ...p,
+                        variants: p.variants.map((v) =>
+                            v.id === updatedVariant.id ? updatedVariant : v
+                        ),
+                    };
+                }
+                return p;
+            })
+        );
+        setEditVariant(null);
+    };
+
+    // Xoá biến thể
+    const handleDeleteVariant = () => {
+        setProducts((prev) =>
+            prev.map((p) => {
+                if (p.id === viewItem.id) {
+                    return {
+                        ...p,
+                        variants: p.variants.filter((v) => v.id !== deleteVariant.id),
+                    };
+                }
+                return p;
+            })
+        );
+        setDeleteVariant(null);
     };
 
     return (
-        <div className="px-6 w-full">
+        <div className="px-4 w-full">
             {/* Toolbar */}
             <Toolbar
                 search={search}
@@ -71,15 +112,31 @@ export default function ProductsPage() {
                     setViewItem={setViewItem}
                     setEditId={setEditId}
                     setShowForm={setShowForm}
+                    setDeleteItem={setDeleteItem}
+                    editVariant={editVariant}
+                    setEditVariant={setEditVariant}
+                    deleteVariant={deleteVariant}
+                    setDeleteVariant={setDeleteVariant}
+                    handleEditVariant={handleEditVariant}
+                    handleDeleteVariant={handleDeleteVariant}
                 />
             )}
 
-            {/* Delete Modal */}
+            {/* Delete Modal sản phẩm */}
             {deleteItem && (
                 <ConfirmDeleteModal
                     item={deleteItem}
                     onCancel={() => setDeleteItem(null)}
                     onConfirm={handleDelete}
+                />
+            )}
+
+            {/* Delete Modal biến thể (nếu có) */}
+            {deleteVariant && (
+                <ConfirmDeleteVariantModal
+                    item={deleteVariant}
+                    onCancel={() => setDeleteVariant(null)}
+                    onConfirm={handleDeleteVariant}
                 />
             )}
         </div>

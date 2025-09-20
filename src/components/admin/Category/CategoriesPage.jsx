@@ -43,7 +43,7 @@ export default function CategoriesPage() {
     };
 
     return (
-        <div className="px-6 w-full">
+        <div className="px-4 w-full">
             {/* Thanh công cụ */}
             <div className="flex justify-between items-center mb-6 p-4 border border-gray-200 rounded-2xl shadow-sm bg-white">
                 <div className="relative w-1/3">
@@ -56,7 +56,7 @@ export default function CategoriesPage() {
                             setSearch(e.target.value);
                             setCurrentPage(1);
                         }}
-                        className="pl-9 pr-3 py-2 border border-gray-300 rounded-xl w-full focus:ring-2 focus:ring-gray-500 focus:border-gray-500 shadow-sm"
+                        className="pl-9 pr-3 py-2 border border-gray-100 rounded-xl w-full focus:ring-1 focus:ring-gray-300 focus:border-gray-400 outline-none shadow-sm"
                     />
                 </div>
 

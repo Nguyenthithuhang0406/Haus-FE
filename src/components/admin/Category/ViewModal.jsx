@@ -44,7 +44,7 @@ export default function ViewModal({ item, onClose, categories, setCategories, ro
                 <div className="flex justify-end mt-6 space-x-3">
                     <button
                         onClick={onClose}
-                        className="px-5 py-2.5 border rounded-xl hover:bg-gray-100 transition shadow-sm"
+                        className="px-5 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-100 transition shadow-sm"
                     >
                         Đóng
                     </button>
