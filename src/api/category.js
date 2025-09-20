@@ -1,4 +1,4 @@
-import { request, requestWithToken } from "@/utils/axios/axios-http";
+import { request} from "@/utils/axios/axios-http";
 import { axiosPrivate, axiosPublic } from "@/utils/axios/axiosInstance";
 
 export const getAllCategory = async () => {
@@ -32,7 +32,7 @@ export const createCategory = async (data) => {
   const { parentId, categoryName, description } = data;
 
   try {
-    const response = await requestWithToken(axiosPrivate, {
+    const response = await request(axiosPrivate, {
       method: "POST",
       url: "/category",
       data: {
@@ -51,7 +51,7 @@ export const createCategory = async (data) => {
 export const updateCategory = async (data) => {
   const { categoryId, parentId, categoryName, description } = data;
   try {
-    const response = await requestWithToken(axiosPrivate, {
+    const response = await request(axiosPrivate, {
       method: "PUT",
 
       url: `/category/${categoryId}`,
@@ -70,7 +70,7 @@ export const updateCategory = async (data) => {
 
 export const getCategoryById = async (categoryId) => {
   try {
-    const response = await requestWithToken(axiosPrivate, {
+    const response = await request(axiosPrivate, {
       method: "GET",
       url: `/category/${categoryId}`,
     });
@@ -83,7 +83,7 @@ export const getCategoryById = async (categoryId) => {
 
 export const deleteCategory = async (categoryId) => {
   try {
-    const response = await requestWithToken(axiosPrivate, {
+    const response = await request(axiosPrivate, {
       method: "DELETE",
       url: `/category/${categoryId}`,
     });
@@ -96,7 +96,7 @@ export const deleteCategory = async (categoryId) => {
 
 export const searchCategoryByName = async (categoryName) => {
   try {
-    const response = await requestWithToken(axiosPrivate, {
+    const response = await request(axiosPrivate, {
       method: "GET",
       url: `/category/name/${categoryName}`,
     });
