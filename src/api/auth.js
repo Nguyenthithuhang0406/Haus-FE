@@ -56,9 +56,10 @@ export const login = async (data) => {
       },
     });
 
-    const { accessToken, refreshToken } = response.data.data;
+    const { accessToken, refreshToken, role } = response.data.data;
     setCookie("accessToken", accessToken);
     setCookie("refreshToken", refreshToken);
+    setCookie("role", role);
     
     return response.data;
   } catch (error) {

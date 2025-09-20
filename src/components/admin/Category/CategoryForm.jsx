@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 
 export default function CategoryForm({ editId, rooms, onClose }) {
+  console.log("Rooms in CategoryForm:", rooms);
   const [categories, setCategories] = useState({
     name: "",
     room: rooms[0].id,

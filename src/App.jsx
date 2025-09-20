@@ -6,6 +6,7 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { getCookie } from "./utils/cookies";
 
 const Home = lazy(() => import("@/pages/Home"));
 const AuthForm = lazy(() => import("@/components/auth/AuthForm"));
@@ -37,14 +38,19 @@ const App = () => {
   }, []);
 
   const ProtectedRoute = ({ children, allowedRoles }) => {
-    const user = JSON.parse(localStorage.getItem("user"));
+    const role = getCookie("role");
 
-    if (!user) {
+    if (!role) {
       return <Navigate to="/login" replace />;
     }
 
-    if (!allowedRoles.includes(user.role)) {
-      return <Navigate to="/" replace />;
+    if (!allowedRoles.includes(role)) {
+      return (
+        <div className="text-center text-red-500 text-xl mt-20">
+          {" "}
+          Page not found
+        </div>
+      );
     }
 
     return children;
@@ -63,17 +69,26 @@ const App = () => {
     { path: "/search", element: <Search /> },
     {
       path: "/admin",
-      element: <LayoutAdmin />,
-      // element: (
-      //   <ProtectedRoute allowedRoles={["admin"]}>
-      //     <LayoutAdmin />
-      //   </ProtectedRoute>
-      // ),
+      // element: <LayoutAdmin />,
+      element: (
+        <ProtectedRoute allowedRoles={["ADMIN"]}>
+          <LayoutAdmin />
+        </ProtectedRoute>
+      ),
       children: [
         { path: "managerCategory", element: <ManagerCategory /> },
         { path: "managerProduct", element: <ManagerProduct /> },
         { path: "managerPromotion", element: <Promotion /> },
       ],
+    },
+    {
+      path: "*",
+      element: (
+        <div className="text-center text-red-500 text-xl mt-20">
+          {" "}
+          Page not found
+        </div>
+      ),
     },
   ]);
 

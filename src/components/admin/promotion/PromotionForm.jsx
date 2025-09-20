@@ -1,6 +1,22 @@
-import React from "react";
+import { getAllCategoryChildren } from "@/api/category";
+import React, { useEffect, useState } from "react";
 
-const PromotionForm = ({ selectedType, formData,handleInputChange }) => {
+const PromotionForm = ({ selectedType, formData, handleInputChange }) => {
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await getAllCategoryChildren();
+        if (response.status === 200) {
+          setCategories(response.data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   return (
     <>
@@ -86,11 +102,11 @@ const PromotionForm = ({ selectedType, formData,handleInputChange }) => {
               required
             >
               <option value="">-- Chọn danh mục --</option>
-              <option value="Thời trang nam">Thời trang nam</option>
-              <option value="Thời trang nữ">Thời trang nữ</option>
-              <option value="Giày dép">Giày dép</option>
-              <option value="Phụ kiện">Phụ kiện</option>
-              <option value="Túi xách">Túi xách</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.categoryName}
+                </option>
+              ))}
             </select>
           </div>
 

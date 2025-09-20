@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import PromotionForm from "./PromotionForm";
 import { X } from "lucide-react";
+import { createPromotion } from "@/api/promotion";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 const PromotionCreate = ({ setShowAddModal }) => {
   const [selectedType, setSelectedType] = useState("");
@@ -11,8 +14,8 @@ const PromotionCreate = ({ setShowAddModal }) => {
     priceStart: "",
     priceEnd: "",
     category: "",
-    startdate: "",
-    enddate: "",
+    startDate: "",
+    endDate: "",
   });
 
   const handleInputChange = (e) => {
@@ -23,21 +26,69 @@ const PromotionCreate = ({ setShowAddModal }) => {
     }));
   };
 
-  const handleAddPromotion = () => {
+  const handleAddPromotion = async () => {
     //api
-    setShowAddModal(false);
-    setFormData({
-      promotionType: "",
+    console.log("formData", formData);
+    let data;
+    if (formData.promotionType === "Theo đơn hàng") {
+      data = {
+        promotionCode: `ORDER${Math.floor(100000 + Math.random() * 900000)}`,
+        description: "Khuyến mãi theo đơn hàng",
+        type: "order",
+        status: "active",
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        minPriceOrder: formData.priceStart,
+        maxPriceOrder: formData.priceEnd,
+        discountPercent: formData.value,
+      };
+    } else {
+      data = {
+        promotionCode: `CAT${Math.floor(100000 + Math.random() * 900000)}`,
+        description: "Khuyến mãi theo danh mục",
+        type: "category",
+        status: "active",
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        categoryId: formData.category,
+        discountPercent: formData.value,
+      };
+    }
 
-      value: "",
-      status: "Hoạt động",
-      priceStart: "",
-      priceEnd: "",
-      category: "",
-      startdate: "",
-      enddate: "",
-    });
+    try {
+      const response = await createPromotion(data);
+      if (response.status === 200) {
+        toast.success("Thêm khuyến mãi thành công");
+
+        setShowAddModal(false);
+        setFormData({
+          promotionType: "",
+
+          value: "",
+          status: "Hoạt động",
+          priceStart: "",
+          priceEnd: "",
+          category: "",
+          startdate: "",
+          enddate: "",
+        });
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        switch (error.response.status) {
+          case 500:
+            toast.error("Lỗi hệ thống");
+            break;
+          case 400:
+            toast.error("Dữ liệu không hợp lệ");
+            break;
+          default:
+            toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
+        }
+      }
+    }
   };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-none  p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto">

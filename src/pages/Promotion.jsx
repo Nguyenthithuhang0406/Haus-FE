@@ -1,4 +1,5 @@
 /* eslint-disable*/
+import { getAllPromotions } from "@/api/promotion";
 import FillterPromotion from "@/components/admin/promotion/FillterPromotion";
 import ListPromotion from "@/components/admin/promotion/ListPromotion";
 import Pagination from "@/components/admin/promotion/Pagination";
@@ -6,7 +7,7 @@ import PromotionCreate from "@/components/admin/promotion/PromotionCreate";
 import PromotionDetail from "@/components/admin/promotion/PromotionDetail";
 import PromotionEdit from "@/components/admin/promotion/PromotionEdit";
 import { ListPromotions } from "@/utils/contants/promotion";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const Promotion = () => {
   const [promotions, setPromotions] = useState(ListPromotions || []);
@@ -31,6 +32,16 @@ const Promotion = () => {
     status: "",
   });
 
+  useEffect(() => {
+    const fetchPromotions = async () => {
+      const response = await getAllPromotions();
+      if (response.status === 200) {
+        setPromotions(response.data);
+      }
+    };
+    fetchPromotions();
+  }, [filters]);
+  
   const openEditModal = (promotion) => {
     setCurrentPromotion(promotion);
     setShowEditModal(true);

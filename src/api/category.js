@@ -1,11 +1,18 @@
-import { request} from "@/utils/axios/axios-http";
+import { request } from "@/utils/axios/axios-http";
 import { axiosPrivate, axiosPublic } from "@/utils/axios/axiosInstance";
 
-export const getAllCategory = async () => {
+export const getAllCategory = async (data) => {
   try {
-    const response = await request(axiosPublic, {
+    const { keyword, sortByName, pageNum, pageSize } = data;
+    const response = await request(axiosPrivate, {
       method: "GET",
-      url: "/category",
+      url: "/category/search",
+      params: {
+        keyword,
+        sortByName,
+        pageNum,
+        pageSize,
+      },
     });
 
     return response.data;

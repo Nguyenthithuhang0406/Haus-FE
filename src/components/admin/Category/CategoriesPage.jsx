@@ -9,7 +9,6 @@ import Pagination from "./Pagination";
 import {
   deleteCategory,
   getAllCategory,
-  searchCategoryByName,
 } from "@/api/category";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -17,20 +16,18 @@ import { toast } from "react-toastify";
 export default function CategoriesPage() {
   const [categories, setCategories] = useState([]);
   const [rooms, setRooms] = useState([]);
-  const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 7;
+  const [search, setSearch] = useState({pageNum: 1, pageSize: 7, keyword: "", sortByName: ""});
 
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
   const [viewItem, setViewItem] = useState(null);
 
-  const fetchCategories = async () => {
+  const fetchCategories = async (data) => {
     try {
-      const response = await getAllCategory();
+      const response = await getAllCategory(data);
       if (response.status === 200) {
-        const flattenedCategories = response.data.flatMap((catParent) => {
+        const flattenedCategories = response.data.items.flatMap((catParent) => {
           const childrens = catParent.subCategories.map((sub) => ({
             ...sub,
             parentName: catParent.categoryName,
@@ -57,8 +54,8 @@ export default function CategoriesPage() {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await getAllCategory();
-        setRooms(response.data);
+        const response = await getAllCategory({ pageNum: 1, pageSize: 100, keyword: "", sortByName: "" });
+        setRooms(response.data.items || []);
       } catch (error) {
         console.log(error);
       }
@@ -68,16 +65,8 @@ export default function CategoriesPage() {
   }, []);
 
   useEffect(() => {
-    fetchCategories();
+    fetchCategories({pageNum: search.pageNum, pageSize: search.pageSize, keyword: search.keyword, sortByName: search.sortByName});
   }, [showForm]);
-
-  // const filtered = categories.filter((c) =>
-  //   c.name.toLowerCase().includes(search.toLowerCase())
-  // );
-
-  // const totalPages = Math.ceil(filtered.length / itemsPerPage);
-  // const startIndex = (currentPage - 1) * itemsPerPage;
-  // const currentItems = filtered.slice(startIndex, startIndex + itemsPerPage);
 
   const handleAddClick = () => {
     setEditId(null);
@@ -94,7 +83,7 @@ export default function CategoriesPage() {
       const response = await deleteCategory(deleteItem.id);
       if (response.status === 204) {
         toast.success("Xóa danh mục thành công");
-        fetchCategories();
+        fetchCategories({pageNum: search.pageNum, pageSize: search.pageSize, keyword: search.keyword, sortByName: search.sortByName});
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -114,48 +103,14 @@ export default function CategoriesPage() {
     setDeleteItem(null);
   };
 
-  const handleSearch = async () => {
-    try {
-      const response = await searchCategoryByName(search);
-      if (response.status === 200) {
-        // console.log(response.data);
-        // const flattenedCategories = response.data.flatMap((catParent) => {
-        //   const childrens = catParent.subCategories.map((sub) => ({
-        //     ...sub,
-        //     parentName: catParent.categoryName,
-        //     parentId: catParent.id,
-        //   }));
-        //   return [...childrens];
-        // });
-        // setCategories(flattenedCategories);
-        setCategories([response.data]);
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        switch (error.response.status) {
-          case 500:
-            toast.error("Lỗi hệ thống");
-            break;
-          case 404:
-            toast.error("Không tìm thấy danh mục");
-            break;
-          default:
-            toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
-        }
-      }
-      console.log(error);
-    }
-  };
-
   useEffect(() => {
-    if (search.trim() === "") {
-      fetchCategories();
+    if (search.keyword.trim() === "") {
+      fetchCategories({pageNum: 1, pageSize: 7, keyword: "", sortByName: ""});
       return;
     }
 
     const delayDebounce = setTimeout(() => {
-      setCurrentPage(1);
-      handleSearch(search);
+      fetchCategories(search);
     }, 500);
 
     return () => clearTimeout(delayDebounce);
@@ -170,9 +125,9 @@ export default function CategoriesPage() {
           <input
             type="text"
             placeholder="Tìm kiếm danh mục..."
-            value={search}
+            value={search.keyword}
             onChange={(e) => {
-              setSearch(e.target.value);
+              setSearch({...search, keyword: e.target.value, pageNum: 1});
             }}
             className="pl-9 pr-3 py-2 border border-gray-300 rounded-xl w-full focus:ring-2 focus:ring-gray-500 focus:border-gray-500 shadow-sm"
           />
@@ -196,13 +151,13 @@ export default function CategoriesPage() {
 
       {/* Pagination */}
       <Pagination
-        currentPage={currentPage}
+        currentPage={search.pageNum}
         totalPages={
           categories.length === 0
             ? 1
-            : Math.ceil(categories.length / itemsPerPage)
+            : Math.ceil(categories.length / search.pageSize)
         }
-        setCurrentPage={setCurrentPage}
+        setCurrentPage={(pageNum) => setSearch({...search, pageNum})}
         totalItems={categories.length}
         currentItems={categories.length}
       />

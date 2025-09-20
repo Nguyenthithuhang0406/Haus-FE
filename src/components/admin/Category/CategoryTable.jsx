@@ -2,7 +2,7 @@ import React from "react";
 import { Eye, Edit, Trash } from "lucide-react";
 
 export default function CategoryTable({ data, onEdit, onDelete, onView }) {
-  console.log("CategoryTable data:", data);
+  // console.log("CategoryTable data:", data);
   return (
     <div className="overflow-x-auto border border-gray-200 rounded-2xl shadow-sm">
       <table className="w-full text-left">
@@ -15,7 +15,7 @@ export default function CategoryTable({ data, onEdit, onDelete, onView }) {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">
-          {console.log("CategoryTable rendering rows:", data.length)}
+          {/* {console.log("CategoryTable rendering rows:", data.length)} */}
           {data.map((cat) => (
             <tr key={cat.id} className="hover:bg-[#fdf8f5] transition">
               <td className="p-4 font-medium text-gray-800">
