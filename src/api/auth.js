@@ -1,4 +1,4 @@
-import { request, requestWithToken } from "@/utils/axios/axios-http";
+import { request} from "@/utils/axios/axios-http";
 import { axiosPrivate, axiosPublic } from "@/utils/axios/axiosInstance";
 import { getCookie, removeAllCookies, setCookie } from "@/utils/cookies";
 
@@ -56,9 +56,10 @@ export const login = async (data) => {
       },
     });
 
-    const { accessToken, refreshToken } = response.data.data;
+    const { accessToken, refreshToken, role } = response.data.data;
     setCookie("accessToken", accessToken);
     setCookie("refreshToken", refreshToken);
+    setCookie("role", role);
     
     return response.data;
   } catch (error) {
@@ -70,7 +71,7 @@ export const login = async (data) => {
 export const logout = async () => {
   const token = getCookie("accessToken");
   try {
-    const response = await requestWithToken(axiosPrivate, {
+    const response = await request(axiosPrivate, {
       method: "POST",
       url: "/auth/logout",
       data: {

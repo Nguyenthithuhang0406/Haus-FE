@@ -30,7 +30,7 @@ const Menua = ({ isMenuOpen, activeItem, handleMenuItemClick, isMobile }) => {
       id: "quan-ly-khuyen-mai",
       name: "Quản lý khuyến mãi",
       icon: <MdDiscount className="w-5 h-5" />,
-      path: "/promotion"
+      path: "/admin/managerPromotion"
     },
   ];
 

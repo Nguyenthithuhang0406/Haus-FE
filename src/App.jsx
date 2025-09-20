@@ -6,6 +6,7 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { getCookie } from "./utils/cookies";
 
 const Home = lazy(() => import("@/pages/Home"));
 const AuthForm = lazy(() => import("@/components/auth/AuthForm"));
@@ -16,8 +17,12 @@ const ChangePassword = lazy(() => import("@/pages/ChangePassword"));
 const ViewEditInfor = lazy(() => import("@/pages/ViewEditInfor"));
 const Promotion = lazy(() => import("@/pages/Promotion"));
 const LayoutAdmin = lazy(() => import("@/components/admin/Layouta"));
-const ManagerCategory = lazy(() => import("@/components/admin/Category/CategoriesPage"));
-const ManagerProduct = lazy(() => import("@/components/admin/Product/ProductsPage"));
+const ManagerCategory = lazy(() =>
+  import("@/components/admin/Category/CategoriesPage")
+);
+const ManagerProduct = lazy(() =>
+  import("@/components/admin/Product/ProductsPage")
+);
 const ListProductByCategory = lazy(() =>
   import("@/pages/ListProductByCategory")
 );
@@ -32,6 +37,25 @@ const App = () => {
     });
   }, []);
 
+  const ProtectedRoute = ({ children, allowedRoles }) => {
+    const role = getCookie("role");
+
+    if (!role) {
+      return <Navigate to="/login" replace />;
+    }
+
+    if (!allowedRoles.includes(role)) {
+      return (
+        <div className="text-center text-red-500 text-xl mt-20">
+          {" "}
+          Page not found
+        </div>
+      );
+    }
+
+    return children;
+  };
+
   const routes = useRoutes([
     { path: "/", element: <Home /> },
     { path: "/auth", element: <AuthForm /> },
@@ -43,14 +67,28 @@ const App = () => {
     { path: "/listProductByCategory", element: <ListProductByCategory /> },
     { path: "/detailProduct/:id", element: <DetailProduct /> },
     { path: "/search", element: <Search /> },
-    { path: "/promotion", element: <Promotion /> },
     {
       path: "/admin",
-      element: <LayoutAdmin />,
+      // element: <LayoutAdmin />,
+      element: (
+        <ProtectedRoute allowedRoles={["ADMIN"]}>
+          <LayoutAdmin />
+        </ProtectedRoute>
+      ),
       children: [
         { path: "managerCategory", element: <ManagerCategory /> },
         { path: "managerProduct", element: <ManagerProduct /> },
+        { path: "managerPromotion", element: <Promotion /> },
       ],
+    },
+    {
+      path: "*",
+      element: (
+        <div className="text-center text-red-500 text-xl mt-20">
+          {" "}
+          Page not found
+        </div>
+      ),
     },
   ]);
 

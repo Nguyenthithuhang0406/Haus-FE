@@ -1,9 +1,9 @@
-import { request, requestWithToken } from "@/utils/axios/axios-http";
+import { request} from "@/utils/axios/axios-http";
 import { axiosPrivate, axiosPublic } from "@/utils/axios/axiosInstance";
 
 export const getUserProfile = async () => {
   try {
-    const response = await requestWithToken(axiosPrivate, {
+    const response = await request(axiosPrivate, {
       method: "GET",
       url: "/user/profile",
     });
@@ -39,7 +39,7 @@ export const uploadAvatar = async (data) => {
   formData.append("file", avatar);
 
   try {
-    const response = await requestWithToken(axiosPrivate, {
+    const response = await request(axiosPrivate, {
       method: "POST",
       url: "/user/upload-avatar",
       data: formData,
@@ -66,7 +66,7 @@ export const updateUserProfile = async (data) => {
   } = data;
 
   try {
-    const response = await requestWithToken(axiosPrivate, {
+    const response = await request(axiosPrivate, {
       method: "PUT",
       url: "/user/update-profile",
       data: {
@@ -91,7 +91,7 @@ export const updateUserProfile = async (data) => {
 export const resetPassword = async (data) => {
   const { currentPassword, newPassword } = data;
   try {
-    const response = await requestWithToken(axiosPrivate, {
+    const response = await request(axiosPrivate, {
       method: "PATCH",
       url: "/user/update-password",
       data: {

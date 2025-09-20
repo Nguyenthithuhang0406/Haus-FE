@@ -58,7 +58,7 @@ const AuthenOTP = () => {
       const response = await verifyOTP(data);
       if (response.status === 201) {
         toast.success("Xác thực OTP thành công!");
-        navigate("/");
+        navigate("/auth");
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
