@@ -16,8 +16,12 @@ const ChangePassword = lazy(() => import("@/pages/ChangePassword"));
 const ViewEditInfor = lazy(() => import("@/pages/ViewEditInfor"));
 const Promotion = lazy(() => import("@/pages/Promotion"));
 const LayoutAdmin = lazy(() => import("@/components/admin/Layouta"));
-const ManagerCategory = lazy(() => import("@/components/admin/Category/CategoriesPage"));
-const ManagerProduct = lazy(() => import("@/components/admin/Product/ProductsPage"));
+const ManagerCategory = lazy(() =>
+  import("@/components/admin/Category/CategoriesPage")
+);
+const ManagerProduct = lazy(() =>
+  import("@/components/admin/Product/ProductsPage")
+);
 const ListProductByCategory = lazy(() =>
   import("@/pages/ListProductByCategory")
 );
@@ -32,6 +36,20 @@ const App = () => {
     });
   }, []);
 
+  const ProtectedRoute = ({ children, allowedRoles }) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user) {
+      return <Navigate to="/login" replace />;
+    }
+
+    if (!allowedRoles.includes(user.role)) {
+      return <Navigate to="/" replace />;
+    }
+
+    return children;
+  };
+
   const routes = useRoutes([
     { path: "/", element: <Home /> },
     { path: "/auth", element: <AuthForm /> },
@@ -43,13 +61,18 @@ const App = () => {
     { path: "/listProductByCategory", element: <ListProductByCategory /> },
     { path: "/detailProduct/:id", element: <DetailProduct /> },
     { path: "/search", element: <Search /> },
-    { path: "/promotion", element: <Promotion /> },
     {
       path: "/admin",
       element: <LayoutAdmin />,
+      // element: (
+      //   <ProtectedRoute allowedRoles={["admin"]}>
+      //     <LayoutAdmin />
+      //   </ProtectedRoute>
+      // ),
       children: [
         { path: "managerCategory", element: <ManagerCategory /> },
         { path: "managerProduct", element: <ManagerProduct /> },
+        { path: "managerPromotion", element: <Promotion /> },
       ],
     },
   ]);
