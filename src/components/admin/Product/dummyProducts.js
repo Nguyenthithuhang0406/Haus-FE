@@ -3,8 +3,10 @@ export const dummyProducts = [
     id: 1,
     code: "SP001",
     name: "Ghế có tay vịn BONHOLMEN",
-    image:
+    category: "Kệ lưu trữ & tủ đầu giường",
+    image: [
       "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp20-4.jpg?v=1746439987253",
+    ],
     shortDesc: "Ghế ngoài trời chắc chắn",
     detailDesc: `<p>
          <b>Ghế có tay vịn BONDHOLMEN</b> từ IKEA mang đến sự kết hợp hoàn hảo giữa
@@ -26,13 +28,33 @@ export const dummyProducts = [
       `,
     price: 3500000,
     stock: 11,
+    variants: [
+      {
+        id: 101,
+        color: "Be",
+        price: 3500000,
+        stock: 5,
+        image:
+          "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp20-4.jpg?v=1746439987253",
+      },
+      {
+        id: 102,
+        color: "Đen",
+        price: 3600000,
+        stock: 6,
+        image:
+          "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp18.jpg?v=1746437935323",
+      },
+    ],
   },
   {
     id: 2,
     code: "SP002",
     name: "Ghế có tay vịn TARNO",
-    image:
+    category: "Kệ lưu trữ & tủ đầu giường",
+    image: [
       "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp18.jpg?v=1746437935323",
+    ],
     shortDesc: "Ghế gỗ gấp tiện lợi",
     detailDesc: `<p>
          <b>Ghế có tay vịn BONDHOLMEN</b> từ IKEA mang đến sự kết hợp hoàn hảo giữa
@@ -54,13 +76,33 @@ export const dummyProducts = [
       `,
     price: 1000000,
     stock: 12,
+    variants: [
+      {
+        id: 101,
+        color: "Be",
+        price: 3500000,
+        stock: 5,
+        image:
+          "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp20-4.jpg?v=1746439987253",
+      },
+      {
+        id: 102,
+        color: "Đen",
+        price: 3600000,
+        stock: 6,
+        image:
+          "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp20-4-black.jpg?v=1746439987253",
+      },
+    ],
   },
   {
     id: 3,
     code: "SP003",
     name: "Ghế thư giãn tay vịn",
-    image:
+    category: "Kệ lưu trữ & tủ đầu giường",
+    image: [
       "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp17.jpg?v=1746437602340",
+    ],
     shortDesc: "Ghế thư giãn thoải mái",
     detailDesc: `<p>
          <b>Ghế có tay vịn BONDHOLMEN</b> từ IKEA mang đến sự kết hợp hoàn hảo giữa
@@ -82,13 +124,33 @@ export const dummyProducts = [
       `,
     price: 2500000,
     stock: 0,
+    variants: [
+      {
+        id: 101,
+        color: "Be",
+        price: 3500000,
+        stock: 5,
+        image:
+          "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp20-4.jpg?v=1746439987253",
+      },
+      {
+        id: 102,
+        color: "Đen",
+        price: 3600000,
+        stock: 6,
+        image:
+          "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp20-4-black.jpg?v=1746439987253",
+      },
+    ],
   },
   {
     id: 4,
     code: "SP004",
     name: "Ghế có tay vịn BONHOLMEN",
-    image:
+    category: "Kệ lưu trữ & tủ đầu giường",
+    image: [
       "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp20-4.jpg?v=1746439987253",
+    ],
     shortDesc: "Ghế ngoài trời chắc chắn",
     detailDesc: `<p>
          <b>Ghế có tay vịn BONDHOLMEN</b> từ IKEA mang đến sự kết hợp hoàn hảo giữa
@@ -110,13 +172,33 @@ export const dummyProducts = [
       `,
     price: 3500000,
     stock: 11,
+    variants: [
+      {
+        id: 101,
+        color: "Be",
+        price: 3500000,
+        stock: 5,
+        image:
+          "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp20-4.jpg?v=1746439987253",
+      },
+      {
+        id: 102,
+        color: "Đen",
+        price: 3600000,
+        stock: 6,
+        image:
+          "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp20-4-black.jpg?v=1746439987253",
+      },
+    ],
   },
   {
     id: 5,
     code: "SP005",
     name: "Ghế có tay vịn TARNO",
-    image:
+    category: "Kệ lưu trữ & tủ đầu giường",
+    image: [
       "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp18.jpg?v=1746437935323",
+    ],
     shortDesc: "Ghế gỗ gấp tiện lợi",
     detailDesc: `<p>
          <b>Ghế có tay vịn BONDHOLMEN</b> từ IKEA mang đến sự kết hợp hoàn hảo giữa
@@ -138,13 +220,33 @@ export const dummyProducts = [
       `,
     price: 1000000,
     stock: 12,
+    variants: [
+      {
+        id: 101,
+        color: "Be",
+        price: 3500000,
+        stock: 5,
+        image:
+          "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp20-4.jpg?v=1746439987253",
+      },
+      {
+        id: 102,
+        color: "Đen",
+        price: 3600000,
+        stock: 6,
+        image:
+          "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp20-4-black.jpg?v=1746439987253",
+      },
+    ],
   },
   {
     id: 6,
     code: "SP006",
     name: "Ghế thư giãn tay vịn",
-    image:
+    category: "Giường ngủ",
+    image: [
       "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp17.jpg?v=1746437602340",
+    ],
     shortDesc: "Ghế thư giãn thoải mái",
     detailDesc: `<p>
          <b>Ghế có tay vịn BONDHOLMEN</b> từ IKEA mang đến sự kết hợp hoàn hảo giữa
@@ -166,5 +268,23 @@ export const dummyProducts = [
       `,
     price: 2500000,
     stock: 0,
+    variants: [
+      {
+        id: 101,
+        color: "Be",
+        price: 3500000,
+        stock: 5,
+        image:
+          "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp20-4.jpg?v=1746439987253",
+      },
+      {
+        id: 102,
+        color: "Đen",
+        price: 3600000,
+        stock: 6,
+        image:
+          "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp20-4-black.jpg?v=1746439987253",
+      },
+    ],
   },
 ];

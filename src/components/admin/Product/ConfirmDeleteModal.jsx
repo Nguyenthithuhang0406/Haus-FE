@@ -1,6 +1,8 @@
 import React from "react";
 
 export default function ConfirmDeleteModal({ item, onCancel, onConfirm }) {
+    if (!item) return null;
+
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black/30 z-50">
             <div className="bg-white p-6 rounded-2xl shadow-lg w-[380px]">
@@ -9,8 +11,18 @@ export default function ConfirmDeleteModal({ item, onCancel, onConfirm }) {
                     Bạn có chắc chắn muốn xóa <b>{item.name}</b> không?
                 </p>
                 <div className="flex justify-end gap-2">
-                    <button onClick={onCancel} className="px-4 py-2 border rounded-lg hover:bg-gray-100">Hủy</button>
-                    <button onClick={onConfirm} className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">Xóa</button>
+                    <button
+                        onClick={onCancel}
+                        className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100"
+                    >
+                        Hủy
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                    >
+                        Xóa
+                    </button>
                 </div>
             </div>
         </div>
