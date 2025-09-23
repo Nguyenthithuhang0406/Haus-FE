@@ -6,17 +6,23 @@ import CategoryForm from "./CategoryForm";
 import DeleteModal from "./DeleteModal";
 import ViewModal from "./ViewModal";
 import Pagination from "./Pagination";
-import {
-  deleteCategory,
-  getAllCategory,
-} from "@/api/category";
+import { deleteCategory, getAllCategory } from "@/api/category";
 import axios from "axios";
 import { toast } from "react-toastify";
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState([]);
   const [rooms, setRooms] = useState([]);
-  const [search, setSearch] = useState({pageNum: 1, pageSize: 7, keyword: "", sortByName: ""});
+  const [search, setSearch] = useState({
+    pageNum: 1,
+    pageSize: 7,
+    keyword: "",
+    sortByName: "",
+  });
+  const [pagi, setPagi] = useState({
+    totalPage: 1,
+    totalElement: 1,
+  });
 
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -36,6 +42,10 @@ export default function CategoriesPage() {
           return [...childrens];
         });
         setCategories(flattenedCategories);
+        setPagi({
+          totalPage: response.data.pageCustom.totalPages,
+          totalElement: response.data.pageCustom.totalElement,
+        });
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -54,7 +64,12 @@ export default function CategoriesPage() {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await getAllCategory({ pageNum: 1, pageSize: 100, keyword: "", sortByName: "" });
+        const response = await getAllCategory({
+          pageNum: 1,
+          pageSize: 100,
+          keyword: "",
+          sortByName: "",
+        });
         setRooms(response.data.items || []);
       } catch (error) {
         console.log(error);
@@ -65,8 +80,13 @@ export default function CategoriesPage() {
   }, []);
 
   useEffect(() => {
-    fetchCategories({pageNum: search.pageNum, pageSize: search.pageSize, keyword: search.keyword, sortByName: search.sortByName});
-  }, [showForm]);
+    fetchCategories({
+      pageNum: search.pageNum,
+      pageSize: search.pageSize,
+      keyword: search.keyword,
+      sortByName: search.sortByName,
+    });
+  }, [showForm, editId, deleteItem, viewItem, search.pageNum, search.pageSize]);
 
   const handleAddClick = () => {
     setEditId(null);
@@ -83,7 +103,12 @@ export default function CategoriesPage() {
       const response = await deleteCategory(deleteItem.id);
       if (response.status === 204) {
         toast.success("Xóa danh mục thành công");
-        fetchCategories({pageNum: search.pageNum, pageSize: search.pageSize, keyword: search.keyword, sortByName: search.sortByName});
+        fetchCategories({
+          pageNum: search.pageNum,
+          pageSize: search.pageSize,
+          keyword: search.keyword,
+          sortByName: search.sortByName,
+        });
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -105,7 +130,7 @@ export default function CategoriesPage() {
 
   useEffect(() => {
     if (search.keyword.trim() === "") {
-      fetchCategories({pageNum: 1, pageSize: 7, keyword: "", sortByName: ""});
+      fetchCategories({ pageNum: 1, pageSize: 7, keyword: "", sortByName: "" });
       return;
     }
 
@@ -114,7 +139,7 @@ export default function CategoriesPage() {
     }, 500);
 
     return () => clearTimeout(delayDebounce);
-  }, [search]);
+  }, [search.keyword]);
 
   return (
     <div className="px-6 w-full">
@@ -127,7 +152,7 @@ export default function CategoriesPage() {
             placeholder="Tìm kiếm danh mục..."
             value={search.keyword}
             onChange={(e) => {
-              setSearch({...search, keyword: e.target.value, pageNum: 1});
+              setSearch({ ...search, keyword: e.target.value, pageNum: 1 });
             }}
             className="pl-9 pr-3 py-2 border border-gray-300 rounded-xl w-full focus:ring-2 focus:ring-gray-500 focus:border-gray-500 shadow-sm"
           />
@@ -152,13 +177,9 @@ export default function CategoriesPage() {
       {/* Pagination */}
       <Pagination
         currentPage={search.pageNum}
-        totalPages={
-          categories.length === 0
-            ? 1
-            : Math.ceil(categories.length / search.pageSize)
-        }
-        setCurrentPage={(pageNum) => setSearch({...search, pageNum})}
-        totalItems={categories.length}
+        totalPages={pagi.totalPage}
+        setCurrentPage={(pageNum) => setSearch({ ...search, pageNum })}
+        totalItems={pagi.totalElement}
         currentItems={categories.length}
       />
 

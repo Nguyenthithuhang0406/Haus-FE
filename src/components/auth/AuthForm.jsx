@@ -32,10 +32,10 @@ export default function AuthForm() {
               toast.error("Lỗi hệ thống");
               break;
             case 400:
-              toast.error("Dữ liệu không hợp lệ");
+              toast.error("Email hoặc mật khẩu không đúng.");
               break;
             case 404:
-              toast.error("Email hoặc mật khẩu không đúng");
+              toast.error("Email hoặc mật khẩu không đúng.");
               break;
             default:
               toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");

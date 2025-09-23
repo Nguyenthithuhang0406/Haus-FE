@@ -8,12 +8,12 @@ import axios from "axios";
 const PromotionCreate = ({ setShowAddModal }) => {
   const [selectedType, setSelectedType] = useState("");
   const [formData, setFormData] = useState({
-    promotionType: "",
-    value: "",
+    type: "",
+    discountPercent: "",
     status: "Hoạt động",
-    priceStart: "",
-    priceEnd: "",
-    category: "",
+    minPriceOrder: "",
+    maxPriceOrder: "",
+    categoryId: "",
     startDate: "",
     endDate: "",
   });
@@ -27,10 +27,8 @@ const PromotionCreate = ({ setShowAddModal }) => {
   };
 
   const handleAddPromotion = async () => {
-    //api
-    console.log("formData", formData);
     let data;
-    if (formData.promotionType === "Theo đơn hàng") {
+    if (formData.type === "order") {
       data = {
         promotionCode: `ORDER${Math.floor(100000 + Math.random() * 900000)}`,
         description: "Khuyến mãi theo đơn hàng",
@@ -38,9 +36,9 @@ const PromotionCreate = ({ setShowAddModal }) => {
         status: "active",
         startDate: formData.startDate,
         endDate: formData.endDate,
-        minPriceOrder: formData.priceStart,
-        maxPriceOrder: formData.priceEnd,
-        discountPercent: formData.value,
+        minPriceOrder: formData.minPriceOrder,
+        maxPriceOrder: formData.maxPriceOrder,
+        discountPercent: formData.discountPercent,
       };
     } else {
       data = {
@@ -50,8 +48,8 @@ const PromotionCreate = ({ setShowAddModal }) => {
         status: "active",
         startDate: formData.startDate,
         endDate: formData.endDate,
-        categoryId: formData.category,
-        discountPercent: formData.value,
+        categoryId: formData.categoryId,
+        discountPercent: formData.discountPercent,
       };
     }
 
@@ -64,11 +62,11 @@ const PromotionCreate = ({ setShowAddModal }) => {
         setFormData({
           promotionType: "",
 
-          value: "",
+          discountPercent: "",
           status: "Hoạt động",
-          priceStart: "",
-          priceEnd: "",
-          category: "",
+          minPriceOrder: "",
+          maxPriceOrder: "",
+          categoryId: "",
           startdate: "",
           enddate: "",
         });
@@ -108,8 +106,8 @@ const PromotionCreate = ({ setShowAddModal }) => {
               Kiểu khuyến mãi
             </label>
             <select
-              name="promotionType"
-              value={formData.promotionType}
+              name="type"
+              value={formData.type}
               onChange={(e) => {
                 handleInputChange(e);
                 setSelectedType(e.target.value);
@@ -117,8 +115,8 @@ const PromotionCreate = ({ setShowAddModal }) => {
               className="w-full px-3 py-2 border border-gray-300 rounded-none  focus:outline-none"
             >
               <option value="">-- Chọn loại khuyến mãi --</option>
-              <option value="Theo đơn hàng">Theo đơn hàng</option>
-              <option value="Theo danh mục">Theo danh mục</option>
+              <option value="order">Theo đơn hàng</option>
+              <option value="category">Theo danh mục</option>
             </select>
           </div>
 
