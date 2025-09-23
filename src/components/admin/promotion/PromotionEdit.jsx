@@ -1,9 +1,15 @@
 import React, { useState } from "react";
 import PromotionForm from "./PromotionForm";
 import { X } from "lucide-react";
+import { updatePromotion } from "@/api/promotion";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 const PromotionEdit = ({ setShowEditModal, currentPromotion }) => {
-  const [selectedType, setSelectedType] = useState("");
+  console.log("current:", currentPromotion);
+  const [selectedType, setSelectedType] = useState(
+    currentPromotion.type === "order"
+  );
   const [formData, setFormData] = useState(currentPromotion);
 
   const handleInputChange = (e) => {
@@ -14,8 +20,60 @@ const PromotionEdit = ({ setShowEditModal, currentPromotion }) => {
     }));
   };
 
-  const handleEditPromotion = () => {
-    setShowEditModal(false);
+  const handleEditPromotion = async () => {
+    console.log("formData:", formData);
+    let data;
+    if (formData.type === "order") {
+      data = {
+        promotionId: formData.id,
+        promotionCode: formData.promotionCode,
+        description: formData.description,
+        type: "order",
+        status: formData.status,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        minPriceOrder: formData.minPriceOrder,
+        maxPriceOrder: formData.maxPriceOrder,
+        discountPercent: formData.discountPercent,
+      };
+    } else {
+      data = {
+        promotionId: formData.id,
+        promotionCode: formData.promotionCode,
+        description: formData.description,
+        type: "category",
+        status:
+          formData.status,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        categoryId: formData.categoryId,
+        discountPercent: formData.discountPercent,
+      };
+    }
+    try {
+      const response = await updatePromotion(data);
+      if (response.status === 200) {
+        toast.success("Cập nhật khuyến mãi thành công");
+        setShowEditModal(false);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        switch (error.response.status) {
+          case 500:
+            toast.error("Lỗi hệ thống");
+            break;
+          case 400:
+            toast.error("Không tìm thấy khuyến mãi");
+            break;
+          case 404:
+            toast.error("Không tìm thấy khuyến mãi");
+            break;
+          default:
+            toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
+        }
+      }
+      console.log(error);
+    }
   };
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -36,8 +94,8 @@ const PromotionEdit = ({ setShowEditModal, currentPromotion }) => {
               Kiểu khuyến mãi
             </label>
             <select
-              name="promotionType"
-              value={formData.promotionType}
+              name="type"
+              value={formData.type}
               onChange={(e) => {
                 handleInputChange(e);
                 setSelectedType(e.target.value);
@@ -45,8 +103,8 @@ const PromotionEdit = ({ setShowEditModal, currentPromotion }) => {
               className="w-full px-3 py-2 border border-gray-300 rounded-none  focus:outline-none"
             >
               <option value="">-- Chọn loại khuyến mãi --</option>
-              <option value="Theo đơn hàng">Theo đơn hàng</option>
-              <option value="Theo danh mục">Theo danh mục</option>
+              <option value="order">Theo đơn hàng</option>
+              <option value="category">Theo danh mục</option>
             </select>
           </div>
 
@@ -87,9 +145,9 @@ const PromotionEdit = ({ setShowEditModal, currentPromotion }) => {
               onChange={handleInputChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-none  focus:outline-none"
             >
-              <option value="Hoạt động">Hoạt động</option>
-              <option value="Không hoạt động">Không hoạt động</option>
-              <option value="Hết hạn">Hết hạn</option>
+              <option value="active">Hoạt động</option>
+              <option value="inactive">Không hoạt động</option>
+              <option value="expired">Hết hạn</option>
             </select>
           </div>
 

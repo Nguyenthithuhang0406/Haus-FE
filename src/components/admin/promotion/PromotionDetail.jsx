@@ -2,12 +2,13 @@ import React from "react";
 import { X } from "lucide-react";
 
 const PromotionDetail = ({ currentPromotion, setShowDetailModal }) => {
+  // console.log("current:", currentPromotion);
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-none  p-6 w-full max-w-lg">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">
-            Chi tiết khuyến mãi "{currentPromotion.promotionType}"
+            Chi tiết khuyến mãi "{currentPromotion.type === "order" ? "Theo đơn hàng" : "Theo danh mục"}"
           </h2>
           <button
             onClick={() => setShowDetailModal(false)}
@@ -21,7 +22,7 @@ const PromotionDetail = ({ currentPromotion, setShowDetailModal }) => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <span className="font-medium">Kiểu khuyến mãi:</span>
-              <p className="text-gray-600">{currentPromotion.promotionType}</p>
+              <p className="text-gray-600">{currentPromotion.type === "order" ? "Theo đơn hàng" : "Theo danh mục"}</p>
             </div>
           </div>
 
@@ -39,13 +40,13 @@ const PromotionDetail = ({ currentPromotion, setShowDetailModal }) => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <span className="font-medium">Giá trị:</span>
-              <p className="text-gray-600">{currentPromotion.value}</p>
+              <p className="text-gray-600">{currentPromotion.discountPercent} %</p>
             </div>
             <div>
               <span className="font-medium">Trạng thái:</span>
               <span
                 className={`px-2 py-1 text-xs rounded-full ${
-                  currentPromotion.status === "Hoạt động"
+                  currentPromotion.status === "active"
                     ? "bg-green-100 text-green-800"
                     : "bg-red-100 text-red-800"
                 }`}

@@ -1,7 +1,7 @@
 import React from "react";
 import { Eye, Edit, Trash2 } from "lucide-react";
 
-const ListPromotion = ({promotions, openDetailModal, openEditModal, handleDeletePromotion}) => {
+const ListPromotion = ({promotions, openDetailModal, openEditModal, handleDeletePromotion, pageNum, pageSize}) => {
   return (
     <>
       <div className="hidden lg:block">
@@ -36,16 +36,18 @@ const ListPromotion = ({promotions, openDetailModal, openEditModal, handleDelete
             <tbody className="bg-white divide-y divide-gray-300">
               {promotions.map((promotion, index) => (
                 <tr
-                  key={promotion.stt}
+                  key={promotion.id}
                   className={` bg-gray-100 hover:bg-gray-200 transition-colors ${
                     index % 2 === 0 ? "bg-white" : "bg-gray-25"
                   }`}
                 >
                   <td className="px-4 py-4 text-sm  text-center   font-medium text-gray-900">
-                    {promotion.stt}
+                    {(pageNum - 1) * pageSize + index + 1}
                   </td>
                   <td className="px-4 py-4 text-sm  text-center  text-gray-700">
-                    {promotion.promotionType}
+                    {promotion.type === "order"
+                      ? "Theo đơn hàng"
+                      : "Theo danh mục"}
                   </td>
                   <td className="px-4 py-4 text-sm  text-center  text-gray-700">
                     {promotion.startDate}
@@ -54,19 +56,23 @@ const ListPromotion = ({promotions, openDetailModal, openEditModal, handleDelete
                     {promotion.endDate}
                   </td>
                   <td className="px-4 py-4 text-sm  text-center  font-medium text-gray-900">
-                    {promotion.value}
+                    {promotion.discountPercent}%
                   </td>
                   <td className="px-4 py-4 text-center">
                     <span
                       className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ${
-                        promotion.status === "Hoạt động"
+                        promotion.status === "active"
                           ? "bg-green-100 text-green-800 border border-green-200"
-                          : promotion.status === "Hết hạn"
+                          : promotion.status === "expired"
                           ? "bg-yellow-100 text-yellow-800 border border-yellow-200"
                           : "bg-red-100 text-red-800 border border-red-200"
                       }`}
                     >
-                      {promotion.status}
+                      {promotion.status === "active"
+                        ? "Hoạt động"
+                        : promotion.status === "expired"
+                        ? "Hết hạn"
+                        : "Không hoạt động"}
                     </span>
                   </td>
                   <td className="px-4 py-4 ">
@@ -86,7 +92,7 @@ const ListPromotion = ({promotions, openDetailModal, openEditModal, handleDelete
                         <Edit size={16} />
                       </button>
                       <button
-                        onClick={() => handleDeletePromotion(promotion.stt)}
+                        onClick={() => handleDeletePromotion(promotion.id)}
                         className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-none  transition-all duration-200"
                         title="Xóa"
                       >
@@ -105,35 +111,43 @@ const ListPromotion = ({promotions, openDetailModal, openEditModal, handleDelete
       <div className="lg:hidden">
         {/* Mobile Cards */}
         <div className="divide-y divide-gray-200">
-          {promotions.map((promotion) => (
+          {promotions.map((promotion, index) => (
             <div
-              key={promotion.stt}
+              key={promotion.id}
               className="p-4 hover:bg-gray-50 transition-colors"
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-2">
                     <span className="text-sm font-semibold text-gray-900 bg-gray-100 px-2 py-1 rounded">
-                      #{promotion.stt}
+                      #{(pageNum - 1) * pageSize + index + 1}
                     </span>
                     <span
                       className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
-                        promotion.status === "Hoạt động"
+                        promotion.status === "active"
                           ? "bg-green-100 text-green-800"
-                          : promotion.status === "Hết hạn"
+                          : promotion.status === "expired"
                           ? "bg-yellow-100 text-yellow-800"
                           : "bg-red-100 text-red-800"
                       }`}
                     >
-                      {promotion.status}
+                      {promotion.status === "active"
+                        ? "Hoạt động"
+                        : promotion.status === "expired"
+                        ? "Hết hạn"
+                        : "Không hoạt động"}
                     </span>
                   </div>
                   <h4 className="text-sm font-medium text-gray-900 mb-1">
-                    {promotion.promotionType}
+                    {promotion.type === "order"
+                      ? "Theo đơn hàng"
+                      : "Theo danh mục"}
                   </h4>
                   <p className="text-sm text-gray-600 mb-2">
                     Giá trị:{" "}
-                    <span className="font-medium">{promotion.value}</span>
+                    <span className="font-medium">
+                      {promotion.discountPercent}%
+                    </span>
                   </p>
                   <p className="text-xs text-gray-500">
                     {promotion.startDate} - {promotion.endDate}
@@ -154,7 +168,7 @@ const ListPromotion = ({promotions, openDetailModal, openEditModal, handleDelete
                     <Edit size={16} />
                   </button>
                   <button
-                    onClick={() => handleDeletePromotion(promotion.stt)}
+                    onClick={() => handleDeletePromotion(promotion.id)}
                     className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-none "
                   >
                     <Trash2 size={16} />

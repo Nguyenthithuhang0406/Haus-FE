@@ -1,11 +1,26 @@
-import { request} from "@/utils/axios/axios-http";
+import { request } from "@/utils/axios/axios-http";
 import { axiosPrivate, axiosPublic } from "@/utils/axios/axiosInstance";
 
-export const getAllPromotions = async () => {
+export const getAllPromotions = async (data) => {
   try {
+    const { pageNum, pageSize, sortByPrice, type, startDate, endDate, status } =
+      data;
     const response = await request(axiosPublic, {
       method: "GET",
-      url: "/promotion",
+      url: "/promotion/filter",
+      params: {
+        pageNum,
+        pageSize,
+        sortByPrice,
+        search: [
+          type && `type:${type}`,
+          status && `status:${status}`,
+          startDate && `startDate:${startDate}`,
+          endDate && `endDate:${endDate}`,
+        ]
+          .filter(Boolean)
+          .join(","),
+      },
     });
     return response.data;
   } catch (error) {
@@ -40,7 +55,9 @@ export const createPromotion = async (data) => {
         endDate,
         ...(minPriceOrder !== undefined && { minPriceOrder }),
         ...(maxPriceOrder !== undefined && { maxPriceOrder }),
-        ...(discountPercent !== undefined && { discountPercent }),
+        ...(discountPercent !== undefined && {
+          discountPercent: parseInt(discountPercent, 10),
+        }),
         ...(categoryId !== undefined && { categoryId }),
       },
     });

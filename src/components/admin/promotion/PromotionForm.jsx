@@ -20,7 +20,7 @@ const PromotionForm = ({ selectedType, formData, handleInputChange }) => {
 
   return (
     <>
-      {selectedType === "Theo đơn hàng" ? (
+      {selectedType === "order" ? (
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4"></div>
           <div className="grid grid-cols-2 gap-4">
@@ -32,8 +32,8 @@ const PromotionForm = ({ selectedType, formData, handleInputChange }) => {
               <div className="relative">
                 <input
                   type="number"
-                  name="priceStart"
-                  value={formData.priceStart}
+                  name="minPriceOrder"
+                  value={formData.minPriceOrder}
                   onChange={handleInputChange}
                   placeholder="0"
                   min="0"
@@ -53,8 +53,8 @@ const PromotionForm = ({ selectedType, formData, handleInputChange }) => {
               <div className="relative">
                 <input
                   type="number"
-                  name="priceEnd"
-                  value={formData.priceEnd}
+                  name="maxPriceOrder"
+                  value={formData.maxPriceOrder}
                   onChange={handleInputChange}
                   placeholder="0"
                   min="0"
@@ -75,8 +75,8 @@ const PromotionForm = ({ selectedType, formData, handleInputChange }) => {
             <div className="flex gap-2">
               <input
                 type="text"
-                name="value"
-                value={formData.value}
+                name="discountPercent"
+                value={formData.discountPercent}
                 onChange={handleInputChange}
                 placeholder="Ví dụ: 20% hoặc 50000"
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-none  focus:outline-none"
@@ -95,8 +95,8 @@ const PromotionForm = ({ selectedType, formData, handleInputChange }) => {
               Chọn danh mục <span className="text-red-500">*</span>
             </label>
             <select
-              name="category"
-              value={formData.category}
+              name="categoryId"
+              value={formData.categoryId}
               onChange={handleInputChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-none  focus:outline-none"
               required
@@ -118,8 +118,8 @@ const PromotionForm = ({ selectedType, formData, handleInputChange }) => {
             <div className="flex gap-2">
               <input
                 type="text"
-                name="value"
-                value={formData.value}
+                name="discountPercent"
+                value={formData.discountPercent}
                 onChange={handleInputChange}
                 placeholder="Ví dụ: 15% hoặc 30000"
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-none  focus:outline-none"
