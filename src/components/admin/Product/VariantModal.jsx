@@ -52,8 +52,8 @@ export default function VariantModal({ onClose, onAddVariant, editVariant }) {
     }, [previews]);
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
-            <div className="bg-white rounded-xl shadow-lg w-[400px] p-6">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50 px-4">
+            <div className="bg-white rounded-xl shadow-lg w-full max-w-[400px] max-h-[90vh] overflow-y-auto p-4 sm:p-6">
                 <h2 className="text-lg font-semibold mb-4 text-center">
                     {editVariant ? "Sửa biến thể sản phẩm" : "Thêm biến thể sản phẩm"}
                 </h2>

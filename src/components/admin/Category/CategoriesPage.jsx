@@ -6,12 +6,11 @@ import CategoryTable from "./CategoryTable";
 import CategoryForm from "./CategoryForm";
 import DeleteModal from "./DeleteModal";
 import ViewModal from "./ViewModal";
-import Pagination from "./Pagination";
 
 export default function CategoriesPage() {
     const [categories, setCategories] = useState(dummyData);
     const [search, setSearch] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
+    const [pageNumber, setPageNumber] = useState(0);
     const itemsPerPage = 7;
 
     const [showForm, setShowForm] = useState(false);
@@ -19,13 +18,20 @@ export default function CategoriesPage() {
     const [deleteItem, setDeleteItem] = useState(null);
     const [viewItem, setViewItem] = useState(null);
 
+    // Lọc & phân trang
     const filtered = categories.filter((c) =>
         c.name.toLowerCase().includes(search.toLowerCase())
     );
+    const pageCount = Math.ceil(filtered.length / itemsPerPage);
+    const pagesVisited = pageNumber * itemsPerPage;
+    const currentItems = filtered.slice(
+        pagesVisited,
+        pagesVisited + itemsPerPage
+    );
 
-    const totalPages = Math.ceil(filtered.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const currentItems = filtered.slice(startIndex, startIndex + itemsPerPage);
+    const changePage = ({ selected }) => {
+        setPageNumber(selected);
+    };
 
     const handleAddClick = () => {
         setEditId(null);
@@ -45,16 +51,19 @@ export default function CategoriesPage() {
     return (
         <div className="px-4 w-full">
             {/* Thanh công cụ */}
-            <div className="flex justify-between items-center mb-6 p-4 border border-gray-200 rounded-2xl shadow-sm bg-white">
+            <div className="flex justify-between items-center mb-3 p-4 border border-gray-200 rounded-2xl shadow-sm bg-white">
                 <div className="relative w-1/3">
-                    <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
+                    <Search
+                        className="absolute left-3 top-2.5 text-gray-400"
+                        size={18}
+                    />
                     <input
                         type="text"
                         placeholder="Tìm kiếm danh mục..."
                         value={search}
                         onChange={(e) => {
                             setSearch(e.target.value);
-                            setCurrentPage(1);
+                            setPageNumber(0);
                         }}
                         className="pl-9 pr-3 py-2 border border-gray-100 rounded-xl w-full focus:ring-1 focus:ring-gray-300 focus:border-gray-400 outline-none shadow-sm"
                     />
@@ -68,21 +77,14 @@ export default function CategoriesPage() {
                 </button>
             </div>
 
-            {/* Table */}
+            {/* Table + Pagination */}
             <CategoryTable
                 data={currentItems}
                 onEdit={handleEditClick}
                 onDelete={setDeleteItem}
                 onView={setViewItem}
-            />
-
-            {/* Pagination */}
-            <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                setCurrentPage={setCurrentPage}
-                totalItems={filtered.length}
-                currentItems={currentItems.length}
+                pageCount={pageCount}
+                changePage={changePage}
             />
 
             {/* Form Popup */}
