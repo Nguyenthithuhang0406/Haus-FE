@@ -3,7 +3,7 @@ import { deletePromotion, getAllPromotions } from "@/api/promotion";
 import DeleteModal from "@/components/admin/Category/DeleteModal";
 import FillterPromotion from "@/components/admin/promotion/FillterPromotion";
 import ListPromotion from "@/components/admin/promotion/ListPromotion";
-import Pagination from "@/components/admin/promotion/Pagination";
+import { Pagination } from "antd";
 import PromotionCreate from "@/components/admin/promotion/PromotionCreate";
 import PromotionDetail from "@/components/admin/promotion/PromotionDetail";
 import PromotionEdit from "@/components/admin/promotion/PromotionEdit";
@@ -18,6 +18,7 @@ const Promotion = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [currentPromotion, setCurrentPromotion] = useState(null);
+  const [isAsc, setIsAsc] = useState(true); 
   const [deleteItem, setDeleteItem] = useState({
     isShowConfirm: false,
     id: null,
@@ -46,16 +47,16 @@ const Promotion = () => {
           filters.promotionType === "Theo đơn hàng"
             ? "order"
             : filters.promotionType === "Theo danh mục"
-            ? "category"
-            : "",
+              ? "category"
+              : "",
         status:
           filters.status === "Hoạt động"
             ? "active"
             : filters.status === "Hết hạn"
-            ? "expired"
-            : filters.status === "Không hoạt động"
-            ? "inactive"
-            : "",
+              ? "expired"
+              : filters.status === "Không hoạt động"
+                ? "inactive"
+                : "",
         startDate: filters.startDate || "",
         endDate: filters.endDate || "",
         pageNum: filters.pageNum || 1,
@@ -87,7 +88,7 @@ const Promotion = () => {
   const handleDeletePromotion = async (id) => {
     try {
       const response = await deletePromotion(id);
-      if ((response.status = 200)) {
+      if ((response.status === 200)) {
         toast.success("Xóa khuyến mãi thành công!");
         setDeleteItem({ isShowConfirm: false, id: null });
       }
@@ -121,6 +122,8 @@ const Promotion = () => {
         filteredCount={totalPagi.totalElements}
         filters={filters}
         setFilters={setFilters}
+        isAsc={isAsc}
+        setIsAsc={setIsAsc}
       />
 
       <ListPromotion
@@ -133,8 +136,25 @@ const Promotion = () => {
         pageNum={filters.pageNum}
         pageSize={filters.pageSize}
       />
-
-      <Pagination
+       {totalPagi.totalElements > 0 && (
+        <div className="flex justify-center mb-8">
+          <Pagination
+            current={filters.pageNum}
+            pageSize={filters.pageSize}
+            total={totalPagi.totalElements}
+            showSizeChanger={false}
+            showQuickJumper={false}
+            
+            onChange={(page) =>
+              setFilters(prev => ({
+                ...prev,
+                pageNum: Number(page)
+              }))
+            }
+          />
+        </div>
+      )}
+      {/* <Pagination
         promotions={promotions}
         currentPage={filters.pageNum}
         setCurrentPage={(num) =>
@@ -144,7 +164,7 @@ const Promotion = () => {
           }))
         }
         totalPages={totalPagi.totalPages}
-      />
+      /> */}
 
       {showAddModal && <PromotionCreate setShowAddModal={setShowAddModal} />}
 
@@ -166,6 +186,7 @@ const Promotion = () => {
           item={{ name: `Khuyến mãi ${deleteItem.id}` }}
           onCancel={() => setDeleteItem({ isShowConfirm: false, id: null })}
           onConfirm={() => handleDeletePromotion(deleteItem.id)}
+
         />
       )}
     </div>
