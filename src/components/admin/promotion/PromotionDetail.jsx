@@ -25,7 +25,28 @@ const PromotionDetail = ({ currentPromotion, setShowDetailModal }) => {
               <p className="text-gray-600">{currentPromotion.type === "order" ? "Theo đơn hàng" : "Theo danh mục"}</p>
             </div>
           </div>
+          <div className="space-y-4">
 
+          
+
+            {/* Hiển thị tên thể loại nếu là theo danh mục */}
+            {currentPromotion.type === "category" && (
+              <div>
+                <span className="font-medium">Tên thể loại:</span>
+                <p className="text-gray-600">{currentPromotion.categoryName}</p>
+              </div>
+            )}
+
+            {/* Hiển thị giá trị đơn hàng nếu là theo đơn hàng */}
+            {currentPromotion.type === "order" && (
+              <div>
+                <span className="font-medium">Giá trị đơn hàng:</span>
+                <p className="text-gray-600">
+                  {currentPromotion.orderValue?.toLocaleString()} ₫
+                </p>
+              </div>
+            )}
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <span className="font-medium">Ngày bắt đầu:</span>

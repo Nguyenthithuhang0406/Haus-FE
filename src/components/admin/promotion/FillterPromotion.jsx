@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Plus, X } from "lucide-react";
-import { Search, Filter, ChevronDown } from "lucide-react";
+import { Search, Filter, ChevronDown,ArrowUpDown } from "lucide-react";
 
 const FillterPromotion = ({
   setShowAddModal,
@@ -8,6 +8,8 @@ const FillterPromotion = ({
   filteredCount,
   filters,
   setFilters,
+  isAsc,
+  setIsAsc, 
 }) => {
   const [mobileFilterExpanded, setMobileFilterExpanded] = useState(false);
 
@@ -28,6 +30,8 @@ const FillterPromotion = ({
       endDate: "",
       value: "",
       status: "",
+      pageNum:1,
+      pageSize:5
     });
     setCurrentPage(1);
   };
@@ -135,23 +139,32 @@ const FillterPromotion = ({
             </div>
 
             {/* Value Filter */}
+            
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-black-700">
                 Giá trị
               </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  name="value"
-                  value={filters.value}
-                  onChange={handleFilterChange}
-                  placeholder="Nhập giá trị..."
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg 
-                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                       transition-all duration-200 pr-8"
-                />
-                <Filter className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              </div>
+             <button
+        type="button"
+        onClick={() => setIsAsc((prev) => !prev)}
+        className="
+          flex items-center justify-center
+          px-3 py-2 text-sm
+          border border-gray-300 rounded-lg
+          hover:bg-gray-100
+          transition
+          w-full
+        "
+      >
+        <ArrowUpDown
+          className={`h-4 w-4 mr-1 transition-transform duration-200 ${
+            isAsc ? "rotate-0" : "rotate-180"
+          }`}
+        />
+        <span className="text-gray-700">
+          {isAsc ? "Tăng dần" : "Giảm dần"}
+        </span>
+      </button>
             </div>
 
             {/* Status Filter */}
@@ -275,23 +288,31 @@ const FillterPromotion = ({
 
                 {/* Value Filter */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-black-700">
-                    Giá trị
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      name="value"
-                      value={filters.value}
-                      onChange={handleFilterChange}
-                      placeholder="Nhập giá trị..."
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg 
-                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                       transition-all duration-200 pr-8"
-                    />
-                    <Filter className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  </div>
-                </div>
+              <label className="block text-sm font-semibold text-black-700">
+                Giá trị
+              </label>
+             <button
+        type="button"
+        onClick={() => setIsAsc((prev) => !prev)}
+        className="
+          flex items-center justify-center
+          px-3 py-2 text-sm
+          border border-gray-300 rounded-lg
+          hover:bg-gray-100
+          transition
+          w-full
+        "
+      >
+        <ArrowUpDown
+          className={`h-4 w-4 mr-1 transition-transform duration-200 ${
+            isAsc ? "rotate-0" : "rotate-180"
+          }`}
+        />
+        <span className="text-gray-700">
+          {isAsc ? "Tăng dần" : "Giảm dần"}
+        </span>
+      </button>
+            </div>
 
                 {/* Status Filter */}
                 <div className="space-y-2">

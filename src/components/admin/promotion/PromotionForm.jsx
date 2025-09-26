@@ -1,7 +1,7 @@
 import { getAllCategoryChildren } from "@/api/category";
 import React, { useEffect, useState } from "react";
 
-const PromotionForm = ({ selectedType, formData, handleInputChange }) => {
+const PromotionForm = ({ selectedType, formData, handleInputChange,errors }) => {
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
@@ -43,7 +43,11 @@ const PromotionForm = ({ selectedType, formData, handleInputChange }) => {
                 <span className="absolute right-3 top-2 text-gray-500">
                   VND
                 </span>
+
               </div>
+              {errors.minPriceOrder && (
+  <p className="text-red-500 text-sm mt-1">{errors.minPriceOrder}</p>
+)}
             </div>
             <div>
               <label className="block text-base font-semibold text-black-700 mb-2">
@@ -65,6 +69,9 @@ const PromotionForm = ({ selectedType, formData, handleInputChange }) => {
                   VND
                 </span>
               </div>
+              {errors.maxPriceOrder && (
+  <p className="text-red-500 text-sm mt-1">{errors.maxPriceOrder}</p>
+)}
             </div>
           </div>
           <div>
@@ -78,14 +85,18 @@ const PromotionForm = ({ selectedType, formData, handleInputChange }) => {
                 name="discountPercent"
                 value={formData.discountPercent}
                 onChange={handleInputChange}
-                placeholder="Ví dụ: 20% hoặc 50000"
+                placeholder="Ví dụ: 20"
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-none  focus:outline-none"
                 required
               />
               <div className="text-sm text-gray-500 flex items-center">
-                (% hoặc VND)
+                (%)
               </div>
+              
             </div>
+            {errors.discountPercent && (
+    <p className="text-red-500 text-sm mt-1">{errors.discountPercent}</p>
+  )}
           </div>
         </div>
       ) : (
@@ -121,12 +132,12 @@ const PromotionForm = ({ selectedType, formData, handleInputChange }) => {
                 name="discountPercent"
                 value={formData.discountPercent}
                 onChange={handleInputChange}
-                placeholder="Ví dụ: 15% hoặc 30000"
+                placeholder="Ví dụ: 15"
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-none  focus:outline-none"
                 required
               />
               <div className="text-sm text-gray-500 flex items-center">
-                (% hoặc VND)
+                (%)
               </div>
             </div>
           </div>
