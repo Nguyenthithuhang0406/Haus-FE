@@ -90,7 +90,8 @@ export default function ProductViewModal({
                             <div className="col-span-1 sm:col-span-2">
                                 <b>Mô tả chi tiết:</b>
                                 <div
-                                    className="prose max-w-none mt-1 text-sm text-gray-700"
+                                    className="prose max-w-none mt-1 text-sm text-gray-700 break-words"
+                                    style={{ overflowWrap: "anywhere", wordBreak: "break-word" }}
                                     dangerouslySetInnerHTML={{ __html: item.detailDesc }}
                                 />
                             </div>

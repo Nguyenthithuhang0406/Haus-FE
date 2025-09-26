@@ -4,26 +4,47 @@ import * as Yup from "yup";
 import { X } from "lucide-react";
 import { dummyData } from "../Category/dataCategory";
 
-// Thêm CKEditor
+// CKEditor
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
-// Schema có điều kiện: nếu là thêm mới thì bắt buộc ảnh
+
+const getPlainTextLength = (html) =>
+    html ? html.replace(/<[^>]*>/g, "").trim().length : 0;
+
+
+const getPlainText = (editor) =>
+    editor.getData().replace(/<[^>]*>/g, "").trim();
+
+// Schema có điều kiện
 const ProductSchema = (isEdit) =>
     Yup.object().shape({
         name: Yup.string().required("Tên sản phẩm bắt buộc"),
         category: Yup.string().required("Danh mục bắt buộc"),
         shortDesc: Yup.string()
             .required("Mô tả ngắn bắt buộc")
-            .max(100, "Mô tả ngắn tối đa 1000 ký tự"),
+            .max(100, "Mô tả ngắn tối đa 100 ký tự"),
         detailDesc: Yup.string()
             .required("Mô tả chi tiết bắt buộc")
-            .max(1000, "Mô tả chi tiết tối đa 2000 ký tự"),
-        price: Yup.number().min(1000, "Giá tối thiểu 1000đ").required("Giá bắt buộc"),
-        stock: Yup.number().min(0, "Số lượng không âm").required("Số lượng bắt buộc"),
+            .test(
+                "max-plain-text",
+                "Mô tả chi tiết tối đa 2000 ký tự",
+                (value) => {
+                    if (!value) return false;
+                    return getPlainTextLength(value) <= 2000;
+                }
+            ),
+        price: Yup.number()
+            .min(1000, "Giá tối thiểu 1000đ")
+            .required("Giá bắt buộc"),
+        stock: Yup.number()
+            .min(0, "Số lượng không âm")
+            .required("Số lượng bắt buộc"),
         images: isEdit
-            ? Yup.array() // Khi sửa -> không bắt buộc upload lại
-            : Yup.array().min(2, "Cần ít nhất 2 ảnh cho sản phẩm").required("Ảnh bắt buộc"),
+            ? Yup.array()
+            : Yup.array()
+                .min(2, "Cần ít nhất 2 ảnh cho sản phẩm")
+                .required("Ảnh bắt buộc"),
     });
 
 export default function ProductFormModal({
@@ -36,19 +57,17 @@ export default function ProductFormModal({
     const [previews, setPreviews] = useState([]);
     const fileInputRef = useRef(null);
 
-    // Load ảnh sẵn khi sửa
+    // Load ảnh khi sửa
     useEffect(() => {
         if (editId) {
             const product = products.find((p) => p.id === editId);
-            if (product?.images) {
-                setPreviews(product.images);
-            }
+            if (product?.images) setPreviews(product.images);
         } else {
             setPreviews([]);
         }
     }, [editId, products]);
 
-    // Hàm xóa ảnh
+    // Xóa ảnh
     const removeImage = (idx, setFieldValue) => {
         const newPreviews = previews.filter((_, i) => i !== idx);
         setPreviews(newPreviews);
@@ -73,7 +92,6 @@ export default function ProductFormModal({
                     {editId ? "Sửa sản phẩm" : "Thêm sản phẩm"}
                 </h2>
 
-                {/* Nội dung form */}
                 <div className="h-[calc(95vh-80px)] overflow-y-auto pr-3 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
                     <Formik
                         initialValues={
@@ -86,7 +104,8 @@ export default function ProductFormModal({
                             const finalValues = {
                                 ...values,
                                 images: previews.length > 0 ? previews : values.images,
-                                thumbnail: previews.length > 0 ? previews[0] : values.images[0],
+                                thumbnail:
+                                    previews.length > 0 ? previews[0] : values.images[0],
                             };
 
                             if (editId) {
@@ -148,36 +167,37 @@ export default function ProductFormModal({
                                 </div>
 
                                 {/* Mô tả ngắn */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Mô tả ngắn
-                                    </label>
-                                    <Field
-                                        as="textarea"
-                                        rows={2}
-                                        name="shortDesc"
-                                        className="border border-gray-200 focus:ring-1 focus:ring-gray-300 focus:border-gray-400 outline-none p-3 rounded-xl w-full"
-                                    />
-                                    <div className="flex items-center justify-between mt-1">
-                                        <ErrorMessage
-                                            name="shortDesc"
-                                            component="div"
-                                            className="text-red-500 text-sm"
-                                        />
-                                        <span
-                                            className={`text-sm ml-auto ${values.shortDesc.length > 900
-                                                ? "text-red-500"
-                                                : values.shortDesc.length > 700
-                                                    ? "text-yellow-600"
-                                                    : "text-gray-500"
-                                                }`}
-                                        >
-                                            {values.shortDesc.length} / 100
-                                        </span>
-                                    </div>
-                                </div>
+                                <Field name="shortDesc">
+                                    {({ field, form }) => (
+                                        <div>
+                                            <textarea
+                                                {...field}
+                                                rows={2}
+                                                maxLength={100}
+                                                className="border border-gray-200 focus:ring-1 focus:ring-gray-300 focus:border-gray-400 outline-none p-3 rounded-xl w-full"
+                                            />
+                                            <div className="flex items-center justify-between mt-1">
+                                                <ErrorMessage
+                                                    name="shortDesc"
+                                                    component="div"
+                                                    className="text-red-500 text-sm"
+                                                />
+                                                <span
+                                                    className={`text-sm ml-auto ${form.values.shortDesc.length >= 100
+                                                        ? "text-red-500"
+                                                        : form.values.shortDesc.length >= 80
+                                                            ? "text-yellow-600"
+                                                            : "text-gray-500"
+                                                        }`}
+                                                >
+                                                    {form.values.shortDesc.length} / 100
+                                                </span>
+                                            </div>
+                                        </div>
+                                    )}
+                                </Field>
 
-                                {/* Mô tả chi tiết với CKEditor */}
+                                {/* Mô tả chi tiết */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
                                         Mô tả chi tiết
@@ -201,9 +221,52 @@ export default function ProductFormModal({
                                                 "redo",
                                             ],
                                         }}
+                                        onReady={(editor) => {
+                                            const MAX_LENGTH = 2000;
+
+                                            // Chặn gõ quá giới hạn
+                                            editor.editing.view.document.on(
+                                                "beforeInput",
+                                                (evt, data) => {
+                                                    const plainText = getPlainText(editor);
+                                                    if (
+                                                        plainText.length >= MAX_LENGTH &&
+                                                        data.inputType !== "deleteContentBackward"
+                                                    ) {
+                                                        evt.preventDefault();
+                                                    }
+                                                }
+                                            );
+
+                                            // Chặn paste quá dài, chỉ lấy phần còn thiếu
+                                            editor.editing.view.document.on("paste", (evt, data) => {
+                                                const clipboardText =
+                                                    data.dataTransfer.getData("text/plain");
+                                                const plainText = getPlainText(editor);
+                                                const available = MAX_LENGTH - plainText.length;
+
+                                                if (available <= 0) {
+                                                    evt.preventDefault();
+                                                    return;
+                                                }
+
+                                                if (clipboardText.length > available) {
+                                                    evt.preventDefault();
+                                                    const allowedText = clipboardText.slice(
+                                                        0,
+                                                        available
+                                                    );
+                                                    editor.model.change((writer) => {
+                                                        editor.model.insertContent(
+                                                            writer.createText(allowedText)
+                                                        );
+                                                    });
+                                                }
+                                            });
+                                        }}
                                         onChange={(event, editor) => {
-                                            const data = editor.getData();
-                                            setFieldValue("detailDesc", data);
+                                            // Sync vào Formik
+                                            setFieldValue("detailDesc", editor.getData());
                                         }}
                                     />
                                     <div className="flex items-center justify-between mt-1">
@@ -213,14 +276,14 @@ export default function ProductFormModal({
                                             className="text-red-500 text-sm"
                                         />
                                         <span
-                                            className={`text-sm ml-auto ${values.detailDesc.length > 1800
+                                            className={`text-sm ml-auto ${getPlainTextLength(values.detailDesc) >= 2000
                                                 ? "text-red-500"
-                                                : values.detailDesc.length > 1500
+                                                : getPlainTextLength(values.detailDesc) >= 1600
                                                     ? "text-yellow-600"
                                                     : "text-gray-500"
                                                 }`}
                                         >
-                                            {values.detailDesc.length} / 1000
+                                            {getPlainTextLength(values.detailDesc)} / 2000
                                         </span>
                                     </div>
                                 </div>
@@ -263,7 +326,9 @@ export default function ProductFormModal({
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Hình ảnh minh họa sản phẩm{" "}
-                                        {!editId && <span className="text-red-500">(Tối thiểu 2)</span>}
+                                        {!editId && (
+                                            <span className="text-red-500">(Tối thiểu 2)</span>
+                                        )}
                                     </label>
 
                                     <div

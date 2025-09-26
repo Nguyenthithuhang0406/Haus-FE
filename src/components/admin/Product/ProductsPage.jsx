@@ -10,8 +10,8 @@ import ConfirmDeleteVariantModal from "./ConfirmDeleteVariantModal";
 export default function ProductsPage() {
     const [products, setProducts] = useState(dummyProducts);
     const [search, setSearch] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
+    const [pageNumber, setPageNumber] = useState(0);
+    const itemsPerPage = 4;
 
     const [showForm, setShowForm] = useState(false);
     const [editId, setEditId] = useState(null);
@@ -25,11 +25,16 @@ export default function ProductsPage() {
     const filtered = products.filter((p) =>
         p.name.toLowerCase().includes(search.toLowerCase())
     );
-    const totalPages = Math.ceil(filtered.length / itemsPerPage);
+    const pageCount = Math.ceil(filtered.length / itemsPerPage);
+    const pagesVisited = pageNumber * itemsPerPage;
     const currentItems = filtered.slice(
-        (currentPage - 1) * itemsPerPage,
-        (currentPage - 1) * itemsPerPage + itemsPerPage
+        pagesVisited,
+        pagesVisited + itemsPerPage
     );
+
+    const changePage = ({ selected }) => {
+        setPageNumber(selected);
+    };
 
     // Xoá sản phẩm
     const handleDelete = () => {
@@ -79,15 +84,14 @@ export default function ProductsPage() {
                 search={search}
                 setSearch={setSearch}
                 setShowForm={setShowForm}
-                setCurrentPage={setCurrentPage}
+                setCurrentPage={() => setPageNumber(0)} // reset về trang 1 khi search
             />
 
             {/* Table */}
             <ProductTable
                 products={currentItems}
-                currentPage={currentPage}
-                totalPages={totalPages}
-                setCurrentPage={setCurrentPage}
+                pageCount={pageCount}
+                changePage={changePage}
                 setViewItem={setViewItem}
                 setEditId={setEditId}
                 setShowForm={setShowForm}
@@ -131,7 +135,7 @@ export default function ProductsPage() {
                 />
             )}
 
-            {/* Delete Modal biến thể (nếu có) */}
+            {/* Delete Modal biến thể */}
             {deleteVariant && (
                 <ConfirmDeleteVariantModal
                     item={deleteVariant}
