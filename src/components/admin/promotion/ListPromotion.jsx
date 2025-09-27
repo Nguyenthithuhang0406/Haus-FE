@@ -42,7 +42,7 @@ const ListPromotion = ({promotions, openDetailModal, openEditModal, handleDelete
                   }`}
                 >
                   <td className="px-4 py-4 text-sm  text-center   font-medium text-gray-900">
-                    {(pageNum - 1) * pageSize + index + 1}
+                    {((Number(pageNum) || 1) - 1) * (Number(pageSize) || 5) + index + 1}
                   </td>
                   <td className="px-4 py-4 text-sm  text-center  text-gray-700">
                     {promotion.type === "order"

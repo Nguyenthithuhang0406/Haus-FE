@@ -1,214 +1,146 @@
-import React, { useEffect, useState } from "react";
-import { Search, Plus } from "lucide-react";
+import React, { useState } from "react";
+import { dummyProducts } from "./dummyProducts";
+import Toolbar from "./Toolbar";
+import ProductTable from "./ProductTable";
+import ProductFormModal from "./ProductFormModal";
+import ProductViewModal from "./ProductViewModal";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import ConfirmDeleteVariantModal from "./ConfirmDeleteVariantModal";
 
-import CategoryTable from "./CategoryTable";
-import CategoryForm from "./CategoryForm";
-import DeleteModal from "./DeleteModal";
-import ViewModal from "./ViewModal";
-import Pagination from "./Pagination";
-import { deleteCategory, getAllCategory } from "@/api/category";
-import axios from "axios";
-import { toast } from "react-toastify";
-
-export default function CategoriesPage() {
-  const [categories, setCategories] = useState([]);
-  const [rooms, setRooms] = useState([]);
-  const [search, setSearch] = useState({
-    pageNum: 1,
-    pageSize: 7,
-    keyword: "",
-    sortByName: "",
-  });
-  const [pagi, setPagi] = useState({
-    totalPage: 1,
-    totalElement: 1,
-  });
+export default function ProductsPage() {
+  const [products, setProducts] = useState(dummyProducts);
+  const [search, setSearch] = useState("");
+  const [pageNumber, setPageNumber] = useState(0);
+  const itemsPerPage = 4;
 
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
-  const [deleteItem, setDeleteItem] = useState(null);
   const [viewItem, setViewItem] = useState(null);
+  const [deleteItem, setDeleteItem] = useState(null);
 
-  const fetchCategories = async (data) => {
-    try {
-      const response = await getAllCategory(data);
-      if (response.status === 200) {
-        const flattenedCategories = response.data.items.flatMap((catParent) => {
-          const childrens = catParent.subCategories.map((sub) => ({
-            ...sub,
-            parentName: catParent.categoryName,
-            parentId: catParent.id,
-          }));
-          return [...childrens];
-        });
-        setCategories(flattenedCategories);
-        setPagi({
-          totalPage: response.data.pageCustom.totalPages,
-          totalElement: response.data.pageCustom.totalElement,
-        });
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        switch (error.response.status) {
-          case 500:
-            toast.error("Lỗi hệ thống");
-            break;
-          default:
-            toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
-        }
-      }
-      console.log(error);
-    }
+  const [editVariant, setEditVariant] = useState(null);
+  const [deleteVariant, setDeleteVariant] = useState(null);
+
+  // Lọc & phân trang
+  const filtered = products.filter((p) =>
+    p.name.toLowerCase().includes(search.toLowerCase())
+  );
+  const pageCount = Math.ceil(filtered.length / itemsPerPage);
+  const pagesVisited = pageNumber * itemsPerPage;
+  const currentItems = filtered.slice(
+    pagesVisited,
+    pagesVisited + itemsPerPage
+  );
+
+  const changePage = ({ selected }) => {
+    setPageNumber(selected);
   };
 
-  useEffect(() => {
-    const fetchRooms = async () => {
-      try {
-        const response = await getAllCategory({
-          pageNum: 1,
-          pageSize: 100,
-          keyword: "",
-          sortByName: "",
-        });
-        setRooms(response.data.items || []);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchRooms();
-  }, []);
-
-  useEffect(() => {
-    fetchCategories({
-      pageNum: search.pageNum,
-      pageSize: search.pageSize,
-      keyword: search.keyword,
-      sortByName: search.sortByName,
-    });
-  }, [showForm, editId, deleteItem, viewItem, search.pageNum, search.pageSize]);
-
-  const handleAddClick = () => {
-    setEditId(null);
-    setShowForm(true);
-  };
-
-  const handleEditClick = (cat) => {
-    setEditId(cat.id);
-    setShowForm(true);
-  };
-
-  const handleDelete = async () => {
-    try {
-      const response = await deleteCategory(deleteItem.id);
-      if (response.status === 204) {
-        toast.success("Xóa danh mục thành công");
-        fetchCategories({
-          pageNum: search.pageNum,
-          pageSize: search.pageSize,
-          keyword: search.keyword,
-          sortByName: search.sortByName,
-        });
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        switch (error.response.status) {
-          case 500:
-            toast.error("Lỗi hệ thống");
-            break;
-          case 404:
-            toast.error("Không tìm thấy danh mục");
-            break;
-          default:
-            toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
-        }
-      }
-      console.log(error);
-    }
+  // Xoá sản phẩm
+  const handleDelete = () => {
+    setProducts(products.filter((p) => p.id !== deleteItem.id));
     setDeleteItem(null);
+    setViewItem(null);
   };
 
-  useEffect(() => {
-    if (search.keyword.trim() === "") {
-      fetchCategories({ pageNum: 1, pageSize: 7, keyword: "", sortByName: "" });
-      return;
-    }
+  // Sửa biến thể
+  const handleEditVariant = (updatedVariant) => {
+    setProducts((prev) =>
+      prev.map((p) => {
+        if (p.id === viewItem.id) {
+          return {
+            ...p,
+            variants: p.variants.map((v) =>
+              v.id === updatedVariant.id ? updatedVariant : v
+            ),
+          };
+        }
+        return p;
+      })
+    );
+    setEditVariant(null);
+  };
 
-    const delayDebounce = setTimeout(() => {
-      fetchCategories(search);
-    }, 500);
-
-    return () => clearTimeout(delayDebounce);
-  }, [search.keyword]);
+  // Xoá biến thể
+  const handleDeleteVariant = () => {
+    setProducts((prev) =>
+      prev.map((p) => {
+        if (p.id === viewItem.id) {
+          return {
+            ...p,
+            variants: p.variants.filter((v) => v.id !== deleteVariant.id),
+          };
+        }
+        return p;
+      })
+    );
+    setDeleteVariant(null);
+  };
 
   return (
-    <div className="px-6 w-full">
-      {/* Thanh công cụ */}
-      <div className="flex justify-between items-center mb-6 p-4 border border-gray-200 rounded-2xl shadow-sm bg-white">
-        <div className="relative w-1/3">
-          <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
-          <input
-            type="text"
-            placeholder="Tìm kiếm danh mục..."
-            value={search.keyword}
-            onChange={(e) => {
-              setSearch({ ...search, keyword: e.target.value, pageNum: 1 });
-            }}
-            className="pl-9 pr-3 py-2 border border-gray-300 rounded-xl w-full focus:ring-2 focus:ring-gray-500 focus:border-gray-500 shadow-sm"
-          />
-        </div>
-
-        <button
-          onClick={handleAddClick}
-          className="bg-[#ad7555] hover:bg-[#945f46] text-white px-4 py-2 rounded-xl flex items-center gap-2 shadow-md transition"
-        >
-          <Plus size={18} /> Thêm danh mục
-        </button>
-      </div>
+    <div className="px-4 w-full">
+      {/* Toolbar */}
+      <Toolbar
+        search={search}
+        setSearch={setSearch}
+        setShowForm={setShowForm}
+        setCurrentPage={() => setPageNumber(0)} // reset về trang 1 khi search
+      />
 
       {/* Table */}
-      <CategoryTable
-        data={categories}
-        onEdit={handleEditClick}
-        onDelete={setDeleteItem}
-        onView={setViewItem}
+      <ProductTable
+        products={currentItems}
+        pageCount={pageCount}
+        changePage={changePage}
+        setViewItem={setViewItem}
+        setEditId={setEditId}
+        setShowForm={setShowForm}
+        setDeleteItem={setDeleteItem}
       />
 
-      {/* Pagination */}
-      <Pagination
-        currentPage={search.pageNum}
-        totalPages={pagi.totalPage}
-        setCurrentPage={(pageNum) => setSearch({ ...search, pageNum })}
-        totalItems={pagi.totalElement}
-        currentItems={categories.length}
-      />
-
-      {/* Form Popup */}
+      {/* Form Modal */}
       {showForm && (
-        <CategoryForm
+        <ProductFormModal
+          products={products}
+          setProducts={setProducts}
           editId={editId}
-          rooms={rooms}
-          onClose={() => setShowForm(false)}
+          setEditId={setEditId}
+          setShowForm={setShowForm}
         />
       )}
 
-      {/* Delete Confirm Modal */}
+      {/* View Modal */}
+      {viewItem && (
+        <ProductViewModal
+          item={viewItem}
+          setViewItem={setViewItem}
+          setEditId={setEditId}
+          setShowForm={setShowForm}
+          setDeleteItem={setDeleteItem}
+          editVariant={editVariant}
+          setEditVariant={setEditVariant}
+          deleteVariant={deleteVariant}
+          setDeleteVariant={setDeleteVariant}
+          handleEditVariant={handleEditVariant}
+          handleDeleteVariant={handleDeleteVariant}
+        />
+      )}
+
+      {/* Delete Modal sản phẩm */}
       {deleteItem && (
-        <DeleteModal
+        <ConfirmDeleteModal
           item={deleteItem}
           onCancel={() => setDeleteItem(null)}
           onConfirm={handleDelete}
         />
       )}
 
-      {/* View Detail Modal */}
-      {viewItem && (
-        <ViewModal
-          item={viewItem}
-          onClose={() => setViewItem(null)}
-          categories={categories}
-          setCategories={setCategories}
-          rooms={rooms}
+      {/* Delete Modal biến thể */}
+      {deleteVariant && (
+        <ConfirmDeleteVariantModal
+          item={deleteVariant}
+          onCancel={() => setDeleteVariant(null)}
+          onConfirm={handleDeleteVariant}
         />
       )}
     </div>

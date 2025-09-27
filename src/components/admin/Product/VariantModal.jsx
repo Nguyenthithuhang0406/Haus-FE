@@ -7,16 +7,16 @@ import { toast } from "react-toastify";
 import axios from "axios";
 
 const colors = [
-  "",
-  "Đỏ",
+  "Kem",
+  "Nâu",
+  "Hồng",
+  "Đen",
   "Cam",
   "Vàng",
-  "Tím",
   "Xanh dương",
-  "Xanh da trời",
-  "Be",
-  "Nâu",
-  "Nâu đỏ",
+  "Đỏ",
+  "Xanh lá cây",
+  "Tím,"
 ];
 
 const sizes = ["Nhỏ", "Trung bình", "Lớn"];
