@@ -120,7 +120,7 @@ export default function ProductsPage() {
       />
 
       {total.totalItems > 0 && (
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-end my-8">
           <Pagination
             current={search.pageNum}
             pageSize={search.pageSize}

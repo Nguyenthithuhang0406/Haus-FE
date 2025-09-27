@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { X } from "lucide-react";
 
-// CKEditor
+// Thêm CKEditor
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { ProductSchema } from "@/utils/validation/productValidation";
@@ -178,15 +178,6 @@ export default function ProductFormModal({
     }
   };
 
-  const getPlainText = (editor) =>
-    editor
-      .getData()
-      .replace(/<[^>]*>/g, "")
-      .trim();
-
-  const getPlainTextLength = (html) =>
-    html ? html.replace(/<[^>]*>/g, "").trim().length : 0;
-
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/30 z-50 p-4">
       <div className="bg-white pl-4 py-4 rounded-3xl shadow-2xl w-full max-w-[650px] max-h-[95vh] overflow-hidden animate-[fadeIn_0.25s_ease]">
@@ -299,46 +290,6 @@ export default function ProductFormModal({
                         "redo",
                       ],
                     }}
-                    onReady={(editor) => {
-                      const MAX_LENGTH = 2000;
-
-                      // Chặn gõ quá giới hạn
-                      editor.editing.view.document.on(
-                        "beforeInput",
-                        (evt, data) => {
-                          const plainText = getPlainText(editor);
-                          if (
-                            plainText.length >= MAX_LENGTH &&
-                            data.inputType !== "deleteContentBackward"
-                          ) {
-                            evt.preventDefault();
-                          }
-                        }
-                      );
-
-                      // Chặn paste quá dài, chỉ lấy phần còn thiếu
-                      editor.editing.view.document.on("paste", (evt, data) => {
-                        const clipboardText =
-                          data.dataTransfer.getData("text/plain");
-                        const plainText = getPlainText(editor);
-                        const available = MAX_LENGTH - plainText.length;
-
-                        if (available <= 0) {
-                          evt.preventDefault();
-                          return;
-                        }
-
-                        if (clipboardText.length > available) {
-                          evt.preventDefault();
-                          const allowedText = clipboardText.slice(0, available);
-                          editor.model.change((writer) => {
-                            editor.model.insertContent(
-                              writer.createText(allowedText)
-                            );
-                          });
-                        }
-                      });
-                    }}
                     onChange={(event, editor) => {
                       const data = editor.getData();
                       setFieldValue("detailDescription", data);
@@ -352,14 +303,14 @@ export default function ProductFormModal({
                     />
                     <span
                       className={`text-sm ml-auto ${
-                        getPlainTextLength(values.detailDescription) >= 2000
+                        values.detailDescription.length > 1800
                           ? "text-red-500"
-                          : getPlainTextLength(values.detailDescription) >= 1600
+                          : values.detailDescription.length > 1500
                           ? "text-yellow-600"
                           : "text-gray-500"
                       }`}
                     >
-                      {getPlainTextLength(values.detailDescription)} / 2000
+                      {values.detailDescription?.length || 0} / 1000
                     </span>
                   </div>
                 </div>

@@ -174,7 +174,7 @@ export default function CategoriesPage() {
         onView={setViewItem}
       />
 
-      <div className="flex justify-center mb-8">
+      <div className="flex justify-end my-8">
         <Pagination
           current={search.pageNum}
           pageSize={search.pageSize}
