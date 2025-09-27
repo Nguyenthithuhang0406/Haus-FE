@@ -1,16 +1,32 @@
 import { request } from "@/utils/axios/axios-http";
-import { axiosPublic } from "@/utils/axios/axiosInstance";
+import { axiosPrivate, axiosPublic } from "@/utils/axios/axiosInstance";
 
 export const getAllProducts = async (data) => {
   try {
-    const { keyword, pageNum, pageSize } = data;
+    const {
+      pageNum,
+      pageSize,
+      sortByPrice = "asc",
+      keyword,
+      priceRange,
+      colors,
+      categoryId,
+    } = data;
     const response = await request(axiosPublic, {
       method: "GET",
-      url: "/product/search",
+      url: "/product/filter",
       params: {
         pageNum,
         pageSize,
-        search: keyword || "",
+        sortByPrice,
+        search: [
+          keyword && `keyword:${keyword}`,
+          categoryId && `categoryId:${categoryId}`,
+          priceRange && `priceRange:${priceRange}`,
+          colors && `colors:${colors}`,
+        ]
+          .filter(Boolean)
+          .join(","),
       },
     });
     return response.data;
@@ -20,12 +36,58 @@ export const getAllProducts = async (data) => {
   }
 };
 
-export const createProduct = async () => {};
+export const createProduct = async (data) => {
+  try {
+    const {
+      productName,
+      price,
+      description,
+      detailDescription,
+      categories,
+      images,
+    } = data;
+    const requestData = {
+      productName,
+      price,
+      description,
+      detailDescription,
+      categories,
+    };
+    const formData = new FormData();
+    formData.append("request", JSON.stringify(requestData));
+    images.forEach((image) => {
+      formData.append("images", image);
+    });
+
+    const response = await request(axiosPrivate, {
+      method: "POST",
+      url: "/product",
+      data: formData,
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
 
 export const getProductById = async (id) => {
   try {
     const response = await request(axiosPublic, {
       method: "GET",
+      url: `/product/${id}`,
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const deleteProduct = async (id) => {
+  try {
+    const response = await request(axiosPrivate, {
+      method: "DELETE",
       url: `/product/${id}`,
     });
     return response.data;

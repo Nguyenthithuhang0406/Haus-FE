@@ -7,7 +7,7 @@ import axios from "axios";
 
 const PromotionEdit = ({ setShowEditModal, currentPromotion }) => {
   const [selectedType, setSelectedType] = useState(
-    currentPromotion.type === "order" ? "order" : "category"
+    currentPromotion.type
   );
   const [formData, setFormData] = useState(currentPromotion);
   const [errors, setErrors] = useState({}); // lưu lỗi từng field

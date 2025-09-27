@@ -25,9 +25,9 @@ export const createVariant = async (data) => {
   }
 };
 
-export const editVariant = async (id, data) => {
+export const editVariant = async (data) => {
   try {
-    const { imageFile, color, size, price, inventoryQuantity } = data;
+    const {id, imageFile, color, size, price, inventoryQuantity } = data;
     const formData = new FormData();
     formData.append("imageFile", imageFile);
     formData.append("color", color);
@@ -74,7 +74,7 @@ export const getVarinatById = async (id) => {
   }
 };
 
-export const deleteVariant = async (id) => {
+export const deleteVariantById = async (id) => {
   try {
     const response = await request(axiosPrivate, {
       method: "DELETE",

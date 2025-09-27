@@ -137,7 +137,7 @@ const Promotion = () => {
         pageSize={filters.pageSize}
       />
        {totalPagi.totalElements > 0 && (
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-end my-8">
           <Pagination
             current={filters.pageNum}
             pageSize={filters.pageSize}
@@ -154,17 +154,6 @@ const Promotion = () => {
           />
         </div>
       )}
-      {/* <Pagination
-        promotions={promotions}
-        currentPage={filters.pageNum}
-        setCurrentPage={(num) =>
-          setFilters((prev) => ({
-            ...prev,
-            pageNum: num,
-          }))
-        }
-        totalPages={totalPagi.totalPages}
-      /> */}
 
       {showAddModal && <PromotionCreate setShowAddModal={setShowAddModal} />}
 
