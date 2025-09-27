@@ -6,9 +6,8 @@ import { toast } from "react-toastify";
 import axios from "axios";
 
 const PromotionEdit = ({ setShowEditModal, currentPromotion }) => {
-  console.log("current:", currentPromotion);
   const [selectedType, setSelectedType] = useState(
-    currentPromotion.type === "order"
+    currentPromotion.type
   );
   const [formData, setFormData] = useState(currentPromotion);
 

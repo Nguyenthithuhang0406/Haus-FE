@@ -1,144 +1,153 @@
-import React, { useState } from "react";
-import { dummyProducts } from "./dummyProducts";
+import React, { useEffect, useState } from "react";
 import Toolbar from "./Toolbar";
 import ProductTable from "./ProductTable";
 import ProductFormModal from "./ProductFormModal";
 import ProductViewModal from "./ProductViewModal";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
-import ConfirmDeleteVariantModal from "./ConfirmDeleteVariantModal";
+import { deleteProduct, getAllProducts } from "@/api/product";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 export default function ProductsPage() {
-    const [products, setProducts] = useState(dummyProducts);
-    const [search, setSearch] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
+  const [products, setProducts] = useState([]);
+  const [search, setSearch] = useState({
+    pageNum: 1,
+    pageSize: 5,
+    keyword: "",
+  });
+  const [total, setTotal] = useState({
+    totalItems: 0,
+    totalPages: 0,
+  });
 
-    const [showForm, setShowForm] = useState(false);
-    const [editId, setEditId] = useState(null);
-    const [viewItem, setViewItem] = useState(null);
-    const [deleteItem, setDeleteItem] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [editId, setEditId] = useState(null);
+  const [viewItem, setViewItem] = useState(null);
+  const [deleteItem, setDeleteItem] = useState(null);
 
-    const [editVariant, setEditVariant] = useState(null);
-    const [deleteVariant, setDeleteVariant] = useState(null);
+  const fetchProducts = async (data) => {
+    try {
+      const response = await getAllProducts(data);
+      if (response.status === 200) {
+        setProducts(response.data.items);
+        setTotal({
+          totalItems: response.data.pageCustom.totalElement,
+          totalPages: response.data.pageCustom.totalPages,
+        });
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        switch (error.response.status) {
+          case 500:
+            toast.error("Lỗi hệ thống");
+            break;
+          default:
+            toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
+        }
+      }
+      console.log(error);
+    }
+  };
 
-    // Lọc & phân trang
-    const filtered = products.filter((p) =>
-        p.name.toLowerCase().includes(search.toLowerCase())
-    );
-    const totalPages = Math.ceil(filtered.length / itemsPerPage);
-    const currentItems = filtered.slice(
-        (currentPage - 1) * itemsPerPage,
-        (currentPage - 1) * itemsPerPage + itemsPerPage
-    );
+  useEffect(() => {
+    fetchProducts(search);
+  }, [search.pageNum, search.pageSize, editId, showForm, deleteItem]);
 
-    // Xoá sản phẩm
-    const handleDelete = () => {
-        setProducts(products.filter((p) => p.id !== deleteItem.id));
-        setDeleteItem(null);
-        setViewItem(null);
-    };
+  useEffect(() => {
+    if (search.keyword.trim() === "") {
+      fetchProducts({
+        pageNum: 1,
+        pageSize: 5,
+        keyword: "",
+        sortByPrice: "asc",
+      });
+      return;
+    }
 
-    // Sửa biến thể
-    const handleEditVariant = (updatedVariant) => {
-        setProducts((prev) =>
-            prev.map((p) => {
-                if (p.id === viewItem.id) {
-                    return {
-                        ...p,
-                        variants: p.variants.map((v) =>
-                            v.id === updatedVariant.id ? updatedVariant : v
-                        ),
-                    };
-                }
-                return p;
-            })
-        );
-        setEditVariant(null);
-    };
+    const delayDebounce = setTimeout(() => {
+      fetchProducts(search);
+    }, 500);
 
-    // Xoá biến thể
-    const handleDeleteVariant = () => {
-        setProducts((prev) =>
-            prev.map((p) => {
-                if (p.id === viewItem.id) {
-                    return {
-                        ...p,
-                        variants: p.variants.filter((v) => v.id !== deleteVariant.id),
-                    };
-                }
-                return p;
-            })
-        );
-        setDeleteVariant(null);
-    };
+    return () => clearTimeout(delayDebounce);
+  }, [search.keyword]);
 
-    return (
-        <div className="px-4 w-full">
-            {/* Toolbar */}
-            <Toolbar
-                search={search}
-                setSearch={setSearch}
-                setShowForm={setShowForm}
-                setCurrentPage={setCurrentPage}
-            />
+  // Xoá sản phẩm
+  const handleDelete = async () => {
+    try {
+      const response = await deleteProduct(deleteItem.id);
+      if (response.status === 200) {
+        toast.success("Xoá sản phẩm thành công");
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        switch (error.response.status) {
+          case 500:
+            toast.error("Lỗi hệ thống");
+            break;
+          default:
+            toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
+        }
+      }
+      console.log(error);
+    }
+    setProducts(products.filter((p) => p.id !== deleteItem.id));
+    setDeleteItem(null);
+    setViewItem(null);
+  };
 
-            {/* Table */}
-            <ProductTable
-                products={currentItems}
-                currentPage={currentPage}
-                totalPages={totalPages}
-                setCurrentPage={setCurrentPage}
-                setViewItem={setViewItem}
-                setEditId={setEditId}
-                setShowForm={setShowForm}
-                setDeleteItem={setDeleteItem}
-            />
+  return (
+    <div className="px-4 w-full">
+      {/* Toolbar */}
+      <Toolbar
+        search={search}
+        setSearch={setSearch}
+        setShowForm={setShowForm}
+      />
 
-            {/* Form Modal */}
-            {showForm && (
-                <ProductFormModal
-                    products={products}
-                    setProducts={setProducts}
-                    editId={editId}
-                    setEditId={setEditId}
-                    setShowForm={setShowForm}
-                />
-            )}
+      {/* Table */}
+      <ProductTable
+        products={products}
+        currentPage={search.pageNum}
+        totalPages={total.totalPages}
+        setCurrentPage={(num) =>
+          setSearch((prev) => ({ ...prev, pageNum: num }))
+        }
+        setViewItem={setViewItem}
+        setEditId={setEditId}
+        setShowForm={setShowForm}
+        setDeleteItem={setDeleteItem}
+      />
 
-            {/* View Modal */}
-            {viewItem && (
-                <ProductViewModal
-                    item={viewItem}
-                    setViewItem={setViewItem}
-                    setEditId={setEditId}
-                    setShowForm={setShowForm}
-                    setDeleteItem={setDeleteItem}
-                    editVariant={editVariant}
-                    setEditVariant={setEditVariant}
-                    deleteVariant={deleteVariant}
-                    setDeleteVariant={setDeleteVariant}
-                    handleEditVariant={handleEditVariant}
-                    handleDeleteVariant={handleDeleteVariant}
-                />
-            )}
+      {/* Form Modal */}
+      {showForm && (
+        <ProductFormModal
+          products={products}
+          setProducts={setProducts}
+          editId={editId}
+          setEditId={setEditId}
+          setShowForm={setShowForm}
+        />
+      )}
 
-            {/* Delete Modal sản phẩm */}
-            {deleteItem && (
-                <ConfirmDeleteModal
-                    item={deleteItem}
-                    onCancel={() => setDeleteItem(null)}
-                    onConfirm={handleDelete}
-                />
-            )}
+      {/* View Modal */}
+      {viewItem && (
+        <ProductViewModal
+          itemId={viewItem.id}
+          setViewItem={setViewItem}
+          setEditId={setEditId}
+          setShowForm={setShowForm}
+          setDeleteItem={setDeleteItem}
+        />
+      )}
 
-            {/* Delete Modal biến thể (nếu có) */}
-            {deleteVariant && (
-                <ConfirmDeleteVariantModal
-                    item={deleteVariant}
-                    onCancel={() => setDeleteVariant(null)}
-                    onConfirm={handleDeleteVariant}
-                />
-            )}
-        </div>
-    );
+      {/* Delete Modal sản phẩm */}
+      {deleteItem && (
+        <ConfirmDeleteModal
+          item={deleteItem}
+          onCancel={() => setDeleteItem(null)}
+          onConfirm={handleDelete}
+        />
+      )}
+    </div>
+  );
 }

@@ -29,3 +29,43 @@ export function formatDateForApi(dateStr) {
   const [year, month, day] = dateStr.split("-");
   return `${day}/${month}/${year}`;
 }
+
+// trả về "HH:mm dd/MM/yyyy"
+export function formatDateTime(
+  isoString,
+  { toTimeZone = null, withSeconds = false } = {}
+) {
+  // toTimeZone: null => dùng timezone của environment;
+  // hoặc truyền 'UTC' hoặc 'Asia/Bangkok' để ép timezone.
+  const opts = {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  };
+  if (withSeconds) {
+    opts.second = "2-digit";
+  }
+
+  const dtf = new Intl.DateTimeFormat("en-GB", {
+    ...opts,
+    timeZone: toTimeZone || undefined,
+  });
+  // Intl.DateTimeFormat en-GB trả "dd/mm/yyyy, HH:MM:SS" — ta tách lại cho định dạng mong muốn
+  const parts = dtf.formatToParts(new Date(isoString));
+  const map = {};
+  for (const p of parts) map[p.type] = p.value;
+
+  const hh = map.hour || "00";
+  const mm = map.minute || "00";
+  const ss = map.second || null;
+  const dd = map.day || "01";
+  const MM = map.month || "01";
+  const yyyy = map.year || "1970";
+
+  return withSeconds
+    ? `${hh}:${mm}:${ss} ${dd}/${MM}/${yyyy}`
+    : `${hh}:${mm} ${dd}/${MM}/${yyyy}`;
+}
