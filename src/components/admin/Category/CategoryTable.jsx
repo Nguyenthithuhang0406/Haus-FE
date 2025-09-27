@@ -1,6 +1,5 @@
 import React from "react";
 import { Eye, Edit, Trash } from "lucide-react";
-import ReactPaginate from "react-paginate";
 
 
 export default function CategoryTable({
@@ -8,8 +7,6 @@ export default function CategoryTable({
   onEdit,
   onDelete,
   onView,
-  pageCount,
-  changePage,
 }) {
   return (
     <>
@@ -75,24 +72,6 @@ export default function CategoryTable({
           </tbody>
         </table>
       </div>
-
-      {/* Pagination */}
-      {pageCount > 1 && (
-        <div className="flex justify-end">
-          <ReactPaginate
-            previousLabel={"<"}
-            nextLabel={">"}
-            pageCount={pageCount}
-            onPageChange={changePage}
-            containerClassName="flex justify-center items-center gap-2 mt-6"
-            pageClassName="px-3 py-1 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100 transition cursor-pointer"
-            activeClassName="bg-[#a35a37] text-white border-[#a35a37]"
-            previousClassName="px-3 py-1 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100 transition cursor-pointer"
-            nextClassName="px-3 py-1 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100 transition cursor-pointer"
-            disabledClassName="opacity-40 cursor-not-allowed"
-          />
-        </div>
-      )}
     </>
   );
 }

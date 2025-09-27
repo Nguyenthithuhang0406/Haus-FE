@@ -7,6 +7,7 @@ import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import { deleteProduct, getAllProducts } from "@/api/product";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { Pagination } from "antd";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
@@ -117,6 +118,31 @@ export default function ProductsPage() {
         setShowForm={setShowForm}
         setDeleteItem={setDeleteItem}
       />
+
+      {total.totalItems > 0 && (
+        <div className="flex justify-center mb-8">
+          <Pagination
+            current={search.pageNum}
+            pageSize={search.pageSize}
+            total={total.totalItems}
+            showSizeChanger={false}
+            showQuickJumper={false}
+            onChange={(page) =>
+              setSearch((prev) => ({
+                ...prev,
+                pageNum: Number(page),
+              }))
+            }
+            onPageSizeChange={(current, size) =>
+              setSearch((prev) => ({
+                ...prev,
+                pageSize: Number(size),
+                pageNum: 1,
+              }))
+            }
+          />
+        </div>
+      )}
 
       {/* Form Modal */}
       {showForm && (
