@@ -8,8 +8,8 @@ export default function ProductRow({ product, setViewItem, setEditId, setShowFor
             <td className="p-4 font-medium text-gray-800 min-w-[140px]">
                 <div className="flex items-center gap-2 sm:gap-3">
                     <img
-                        src={product.image[0]}
-                        alt={product.name}
+                        src={product.image?.[0] || product.thumbnail || "/no-image.png"}
+                        alt={product.name || "no-image"}
                         className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 object-cover rounded-lg border border-gray-300"
                     />
                     <div className="truncate">

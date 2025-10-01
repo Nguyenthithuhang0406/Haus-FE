@@ -30,7 +30,7 @@ const colors = [
     "Nâu đỏ",
 ];
 
-export default function VariantModal({ onClose, onAddVariant, editVariant }) {
+export default function VariantModal({ onClose, onAddVariant, editVariant, onLoading }) {
     const normalizedImages =
         editVariant?.images?.map((img) =>
             typeof img === "string" ? img : img.preview
@@ -67,14 +67,25 @@ export default function VariantModal({ onClose, onAddVariant, editVariant }) {
                     }}
                     validationSchema={VariantSchema}
                     enableReinitialize
-                    onSubmit={(values) => {
+                    onSubmit={async (values, { setSubmitting }) => {
                         const finalValues = { ...values, images: previews };
-                        if (editVariant) {
-                            onAddVariant({ ...editVariant, ...finalValues }); // update
-                        } else {
-                            onAddVariant({ ...finalValues, id: Date.now() }); // add
+
+                        try {
+                            onLoading?.(true);
+
+                            if (editVariant) {
+                                await onAddVariant({ ...editVariant, ...finalValues }); // update
+                            } else {
+                                await onAddVariant({ ...finalValues, id: Date.now() }); // add
+                            }
+
+                            onClose();
+                        } catch (err) {
+                            console.error("Lỗi khi thêm/cập nhật:", err);
+                        } finally {
+                            onLoading?.(false);
+                            setSubmitting(false);
                         }
-                        onClose();
                     }}
                 >
                     {({ setFieldValue }) => (

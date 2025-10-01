@@ -105,7 +105,11 @@ export default function ProductFormModal({
                                 ...values,
                                 images: previews.length > 0 ? previews : values.images,
                                 thumbnail:
-                                    previews.length > 0 ? previews[0] : values.images[0],
+                                    previews.length > 0
+                                        ? previews[0]
+                                        : values.images.length > 0
+                                            ? values.images[0]
+                                            : "/no-image.png", // fallback ảnh mặc định trong /public
                             };
 
                             if (editId) {
