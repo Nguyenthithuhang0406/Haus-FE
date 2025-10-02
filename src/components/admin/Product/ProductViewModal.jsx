@@ -129,12 +129,12 @@ export default function ProductViewModal({
                   <b>Trạng thái:</b>
                   <span
                     className={`px-2 py-1 rounded-lg text-xs font-medium ${
-                      item.isDeleted === null
+                      item.isDeleted === false
                         ? "bg-green-100 text-green-600"
                         : "bg-gray-200 text-gray-600"
                     }`}
                   >
-                    {item?.isDeleted === null ? "Hiển thị" : "Ẩn"}
+                    {item?.isDeleted === false ? "Hiển thị" : "Ẩn"}
                   </span>
                 </p>
                 <p className="col-span-1 sm:col-span-2">
@@ -253,7 +253,7 @@ export default function ProductViewModal({
                       >
                         <td className="p-2 border border-gray-300">
                           <img
-                            src={variant.media.url}
+                            src={variant.media?.url}
                             alt="variant"
                             className="w-12 h-12 object-cover rounded border border-gray-300 mx-auto"
                           />

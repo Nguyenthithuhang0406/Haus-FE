@@ -147,7 +147,6 @@ export default function ProductsPage() {
       {/* Form Modal */}
       {showForm && (
         <ProductFormModal
-          products={products}
           setProducts={setProducts}
           editId={editId}
           setEditId={setEditId}
