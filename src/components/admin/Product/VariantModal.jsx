@@ -16,7 +16,11 @@ const colors = [
   "Xanh dương",
   "Đỏ",
   "Xanh lá cây",
-  "Tím,",
+  "Tím",
+  "Trắng",
+  "Xám",
+  "Nhiều màu",
+  "Khác",
 ];
 
 const sizes = ["Nhỏ", "Trung bình", "Lớn"];
