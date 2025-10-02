@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState, useRef, useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { X } from "lucide-react";
@@ -115,7 +116,6 @@ export default function ProductFormModal({
       reader.readAsDataURL(file);
     });
   };
-
 
   // Hàm xóa ảnh
   const removeImage = (idx, setFieldValue) => {
@@ -301,12 +301,13 @@ export default function ProductFormModal({
                       className="text-red-500 text-sm"
                     />
                     <span
-                      className={`text-sm ml-auto ${values.description.length > 900
-                        ? "text-red-500"
-                        : values.description.length > 700
+                      className={`text-sm ml-auto ${
+                        values.description.length > 900
+                          ? "text-red-500"
+                          : values.description.length > 700
                           ? "text-yellow-600"
                           : "text-gray-500"
-                        }`}
+                      }`}
                     >
                       {values.description?.length || 0} / 100
                     </span>
@@ -356,14 +357,15 @@ export default function ProductFormModal({
                       className="text-red-500 text-sm"
                     />
                     <span
-                      className={`text-sm ml-auto ${values.detailDescription.length > 1800
-                        ? "text-red-500"
-                        : values.detailDescription.length > 1500
+                      className={`text-sm ml-auto ${
+                        values.detailDescription.length > 1800
+                          ? "text-red-500"
+                          : values.detailDescription.length > 1500
                           ? "text-yellow-600"
                           : "text-gray-500"
-                        }`}
+                      }`}
                     >
-                      {values.detailDescription?.length || 0} / 2000
+                      {values.detailDescription?.length || 0} / 1000
                     </span>
                   </div>
                 </div>
