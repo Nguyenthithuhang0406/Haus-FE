@@ -71,6 +71,44 @@ export const createProduct = async (data) => {
   }
 };
 
+export const updateProduct = async (data) => {
+  try {
+    const {
+      id,
+      productName,
+      price,
+      description,
+      detailDescription,
+      categories,
+      imageIdsToDelete,
+      images,
+    } = data;
+
+    const requestData = {
+      productName,
+      price,
+      description,
+      detailDescription,
+      categories,
+      imageIdsToDelete,
+    };
+    const formData = new FormData();
+    formData.append("request", JSON.stringify(requestData));
+    images.forEach((image) => {
+      formData.append("images", image);
+    });
+    const response = await request(axiosPrivate, {
+      method: "PUT",
+      url: `/product/${id}`,
+      data: formData,
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export const getProductById = async (id) => {
   try {
     const response = await request(axiosPublic, {

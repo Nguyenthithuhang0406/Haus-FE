@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState, useRef, useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { X } from "lucide-react";
@@ -9,17 +10,20 @@ import { ProductSchema } from "@/utils/validation/productValidation";
 import { getAllCategoryChildren } from "@/api/category";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { createProduct, getProductById } from "@/api/product";
+import { createProduct, getProductById, updateProduct } from "@/api/product";
+import { values } from "lodash";
 
 export default function ProductFormModal({
-  products,
   editId,
   setEditId,
   setShowForm,
+  setLoading,
 }) {
   const [previews, setPreviews] = useState([]);
   const fileInputRef = useRef(null);
   const [categories, setCategories] = useState([]);
+  const [imagesIdDelete, setImagesIdDelete] = useState([]);
+  const [prevImages, setPrevImages] = useState([]);
   const [initialValues, setInitialValues] = useState({
     productName: "",
     categories: "",
@@ -39,11 +43,12 @@ export default function ProductFormModal({
             setInitialValues({
               productName: response.data.productName || "",
               categories: response.data.categoriesName[0] || "",
-              images: imgs,
+              images: [],
               description: response.data.description || "",
               detailDescription: response.data.detailDescription || "",
               price: response.data.price || "",
             });
+            setPrevImages(response.data.medias || []);
             setPreviews(imgs);
           }
         } catch (error) {
@@ -95,18 +100,6 @@ export default function ProductFormModal({
     fetchCategories();
   }, []);
 
-  // Load ảnh sẵn khi sửa
-  useEffect(() => {
-    if (editId) {
-      const product = products.find((p) => p.id === editId);
-      if (product?.images) {
-        setPreviews(product.images);
-      }
-    } else {
-      setPreviews([]);
-    }
-  }, [editId, products]);
-
   const handleFileChange = (e, setFieldValue) => {
     const files = Array.from(e.target.files);
     const tempPreviews = [];
@@ -124,15 +117,21 @@ export default function ProductFormModal({
     });
   };
 
-
   // Hàm xóa ảnh
   const removeImage = (idx, setFieldValue) => {
     const newPreviews = previews.filter((_, i) => i !== idx);
+    const imageUrlToDelete = previews[idx];
+    const imageToDelete = prevImages.find(
+      (img) => img.url === imageUrlToDelete
+    );
+    if (imageToDelete) {
+      setImagesIdDelete((prev) => [...prev, imageToDelete.id]);
+    }
     setPreviews(newPreviews);
-    setFieldValue("images", newPreviews);
   };
 
   const handleCreate = async (values) => {
+    setLoading(true);
     try {
       const data = {
         productName: values.productName,
@@ -167,12 +166,56 @@ export default function ProductFormModal({
       }
       console.log(error);
     }
+    setLoading(false);
+  };
+
+  const handleEdit = async (values) => {
+    const data = {
+      id: editId,
+      productName: values.productName,
+      price: values.price,
+      description: values.description,
+      detailDescription: values.detailDescription,
+      categories: [values.categories],
+      images: values.images,
+      imageIdsToDelete: imagesIdDelete,
+    };
+
+    setLoading(true);
+    try {
+      const response = await updateProduct(data);
+      if (response.status === 200) {
+        toast.success("Sửa sản phẩm thành công!");
+        setEditId(null);
+        setPreviews([]);
+        setImagesIdDelete([]);
+        setShowForm(false);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        switch (error.response.status) {
+          case 500:
+            toast.error("Lỗi hệ thống");
+            break;
+          case 400:
+            toast.error("Dữ liệu không hợp lệ!");
+            break;
+          case 404:
+            toast.error("Sửa sản phẩm thất bại, vui lòng thử lại!");
+            break;
+          default:
+            toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
+        }
+      }
+      console.log(error);
+    }
+    setLoading(false);
   };
 
   const handleSubmit = async (values) => {
-    console.log(values);
+    console.log({ ...values, previews, imagesIdDelete });
     if (editId) {
-      console.log("edit");
+      await handleEdit(values);
     } else {
       await handleCreate(values);
     }
@@ -189,7 +232,7 @@ export default function ProductFormModal({
         <div className="h-[calc(95vh-80px)] overflow-y-auto pr-3 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
           <Formik
             initialValues={initialValues}
-            validationSchema={ProductSchema}
+            validationSchema={ProductSchema(!!editId, previews)}
             onSubmit={handleSubmit}
             enableReinitialize
           >
@@ -244,6 +287,11 @@ export default function ProductFormModal({
                     as="textarea"
                     rows={2}
                     name="description"
+                    onChange={(e) => {
+                      const maxLength = 100;
+                      const value = e.target.value.slice(0, maxLength); // cắt nếu dài hơn
+                      setFieldValue("description", value);
+                    }}
                     className="border border-gray-200 focus:ring-1 focus:ring-gray-300 focus:border-gray-400 outline-none p-3 rounded-xl w-full"
                   />
                   <div className="flex items-center justify-between mt-1">
@@ -253,12 +301,13 @@ export default function ProductFormModal({
                       className="text-red-500 text-sm"
                     />
                     <span
-                      className={`text-sm ml-auto ${values.description.length > 900
-                        ? "text-red-500"
-                        : values.description.length > 700
+                      className={`text-sm ml-auto ${
+                        values.description.length > 900
+                          ? "text-red-500"
+                          : values.description.length > 700
                           ? "text-yellow-600"
                           : "text-gray-500"
-                        }`}
+                      }`}
                     >
                       {values.description?.length || 0} / 100
                     </span>
@@ -290,7 +339,14 @@ export default function ProductFormModal({
                       ],
                     }}
                     onChange={(event, editor) => {
-                      const data = editor.getData();
+                      let data = editor.getData();
+                      const maxLength = 1000;
+
+                      // Nếu vượt quá 1000 ký tự (tính cả HTML) thì cắt chuỗi
+                      if (data.length > maxLength) {
+                        data = data.substring(0, maxLength);
+                      }
+
                       setFieldValue("detailDescription", data);
                     }}
                   />
@@ -301,14 +357,15 @@ export default function ProductFormModal({
                       className="text-red-500 text-sm"
                     />
                     <span
-                      className={`text-sm ml-auto ${values.detailDescription.length > 1800
-                        ? "text-red-500"
-                        : values.detailDescription.length > 1500
+                      className={`text-sm ml-auto ${
+                        values.detailDescription.length > 1800
+                          ? "text-red-500"
+                          : values.detailDescription.length > 1500
                           ? "text-yellow-600"
                           : "text-gray-500"
-                        }`}
+                      }`}
                     >
-                      {values.detailDescription?.length || 0} / 2000
+                      {values.detailDescription?.length || 0} / 1000
                     </span>
                   </div>
                 </div>
@@ -336,9 +393,9 @@ export default function ProductFormModal({
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Hình ảnh minh họa sản phẩm{" "}
-                    {!editId && (
+                    {/* {!editId && (
                       <span className="text-red-500">(Tối thiểu 2)</span>
-                    )}
+                    )} */}
                   </label>
 
                   <div

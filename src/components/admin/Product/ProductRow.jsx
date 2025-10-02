@@ -1,24 +1,29 @@
 import React from "react";
 import { Edit, Trash, Eye } from "lucide-react";
 
-
-export default function ProductRow({ product, setViewItem, setEditId, setShowForm, setDeleteItem }) {
+export default function ProductRow({
+  product,
+  setViewItem,
+  setEditId,
+  setShowForm,
+  setDeleteItem,
+}) {
   return (
     <tr className="hover:bg-[#fdf8f5] transition">
       {/* Tên + mã sản phẩm */}
       <td className="p-4 font-medium text-gray-800 min-w-[140px]">
         <div className="flex items-center gap-2 sm:gap-3">
           <img
-            src={product.image?.[0] || product.thumbnail || "/no-image.png"}
-            alt={product.name || "no-image"}
+            src={product.medias[0]?.url}
+            alt={product.productName}
             className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 object-cover rounded-lg border border-gray-300"
           />
           <div className="truncate">
             <div className="text-gray-800 font-medium text-sm sm:text-base md:text-base truncate">
-              {product.name}
+              {product.productName}
             </div>
             <div className="text-gray-500 text-xs sm:text-sm truncate">
-              {product.code}
+              {product.productCode}
             </div>
           </div>
         </div>
