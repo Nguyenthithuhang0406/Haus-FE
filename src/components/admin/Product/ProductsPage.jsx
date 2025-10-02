@@ -8,6 +8,7 @@ import { deleteProduct, getAllProducts } from "@/api/product";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Pagination } from "antd";
+import Loading from "../Loading";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
@@ -25,6 +26,7 @@ export default function ProductsPage() {
   const [editId, setEditId] = useState(null);
   const [viewItem, setViewItem] = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const fetchProducts = async (data) => {
     try {
@@ -66,6 +68,7 @@ export default function ProductsPage() {
     }
 
     const delayDebounce = setTimeout(() => {
+      setSearch((prev) => ({ ...prev, pageNum: 1 }));
       fetchProducts(search);
     }, 500);
 
@@ -147,6 +150,7 @@ export default function ProductsPage() {
       {/* Form Modal */}
       {showForm && (
         <ProductFormModal
+          setLoading={setLoading}
           setProducts={setProducts}
           editId={editId}
           setEditId={setEditId}
@@ -157,6 +161,7 @@ export default function ProductsPage() {
       {/* View Modal */}
       {viewItem && (
         <ProductViewModal
+          setLoading={setLoading}
           itemId={viewItem.id}
           setViewItem={setViewItem}
           setEditId={setEditId}
@@ -173,6 +178,8 @@ export default function ProductsPage() {
           onConfirm={handleDelete}
         />
       )}
+
+      {loading && <Loading />}
     </div>
   );
 }

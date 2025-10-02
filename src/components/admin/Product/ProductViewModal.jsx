@@ -14,6 +14,7 @@ export default function ProductViewModal({
   setEditId,
   setShowForm,
   setDeleteItem,
+  setLoading,
 }) {
   const [item, setItem] = useState(null);
   const [variants, setVariants] = useState([]);
@@ -323,6 +324,7 @@ export default function ProductViewModal({
         {/* Thêm */}
         {showVariantModal && (
           <VariantModal
+            setLoading={setLoading}
             onClose={() => setShowVariantModal(false)}
             item={item}
           />
@@ -331,6 +333,7 @@ export default function ProductViewModal({
         {/* Sửa */}
         {editVariant && (
           <VariantModal
+            setLoading={setLoading}
             editingVariant={editVariant}
             onClose={() => setEditVariant(null)}
             item={item}

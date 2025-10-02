@@ -17,6 +17,7 @@ export default function ProductFormModal({
   editId,
   setEditId,
   setShowForm,
+  setLoading,
 }) {
   const [previews, setPreviews] = useState([]);
   const fileInputRef = useRef(null);
@@ -130,6 +131,7 @@ export default function ProductFormModal({
   };
 
   const handleCreate = async (values) => {
+    setLoading(true);
     try {
       const data = {
         productName: values.productName,
@@ -164,6 +166,7 @@ export default function ProductFormModal({
       }
       console.log(error);
     }
+    setLoading(false);
   };
 
   const handleEdit = async (values) => {
@@ -178,6 +181,7 @@ export default function ProductFormModal({
       imageIdsToDelete: imagesIdDelete,
     };
 
+    setLoading(true);
     try {
       const response = await updateProduct(data);
       if (response.status === 200) {
@@ -205,6 +209,7 @@ export default function ProductFormModal({
       }
       console.log(error);
     }
+    setLoading(false);
   };
 
   const handleSubmit = async (values) => {
