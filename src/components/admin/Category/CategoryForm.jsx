@@ -133,7 +133,7 @@ export default function CategoryForm({ editId, rooms, onClose }) {
                 <Field
                   name="name"
                   placeholder="Nhập tên danh mục"
-                  className="border border-gray-300 p-3 w-full rounded-xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500 shadow-sm transition"
+                  className="border border-gray-300 p-3 w-full rounded-xl outline-none focus:border-[#ad7555] focus:outline-none shadow-sm transition"
                 />
                 <ErrorMessage
                   name="name"
@@ -150,7 +150,7 @@ export default function CategoryForm({ editId, rooms, onClose }) {
                   <Field
                     as="select"
                     name="room"
-                    className="border border-gray-300 p-3 w-full rounded-xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500 shadow-sm appearance-none pr-10 transition"
+                    className="border border-gray-300 p-3 w-full rounded-xl outline-none focus:border-[#ad7555] focus:outline-none shadow-sm appearance-none pr-10 transition"
                   >
                     {rooms.map((r) => (
                       <option key={r.id} value={r.id}>
@@ -179,7 +179,7 @@ export default function CategoryForm({ editId, rooms, onClose }) {
                   rows={4}
                   name="description"
                   placeholder="Nhập mô tả"
-                  className="border border-gray-300 p-3 w-full rounded-xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500 shadow-sm resize-none transition"
+                  className="border border-gray-300 p-3 w-full rounded-xl outline-none focus:border-[#ad7555] focus:outline-none shadow-sm resize-none transition"
                 />
                 <ErrorMessage
                   name="description"
