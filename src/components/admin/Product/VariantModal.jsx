@@ -16,12 +16,17 @@ const colors = [
   "Xanh dương",
   "Đỏ",
   "Xanh lá cây",
-  "Tím,"
+  "Tím,",
 ];
 
 const sizes = ["Nhỏ", "Trung bình", "Lớn"];
 
-export default function VariantModal({ onClose, item, editingVariant, setLoading }) {
+export default function VariantModal({
+  onClose,
+  item,
+  editingVariant,
+  setLoading,
+}) {
   const normalizedImages = editingVariant?.media?.url;
 
   const [previews, setPreviews] = useState(normalizedImages);
