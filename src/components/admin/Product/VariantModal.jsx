@@ -16,12 +16,21 @@ const colors = [
   "Xanh dương",
   "Đỏ",
   "Xanh lá cây",
-  "Tím,"
+  "Tím",
+  "Trắng",
+  "Xám",
+  "Nhiều màu",
+  "Khác",
 ];
 
 const sizes = ["Nhỏ", "Trung bình", "Lớn"];
 
-export default function VariantModal({ onClose, item, editingVariant }) {
+export default function VariantModal({
+  onClose,
+  item,
+  editingVariant,
+  setLoading,
+}) {
   const normalizedImages = editingVariant?.media?.url;
 
   const [previews, setPreviews] = useState(normalizedImages);
@@ -45,6 +54,7 @@ export default function VariantModal({ onClose, item, editingVariant }) {
   };
 
   const handleAddVariant = async (data) => {
+    setLoading(true);
     try {
       const response = await createVariant(data);
       if (response.status === 201) {
@@ -69,9 +79,11 @@ export default function VariantModal({ onClose, item, editingVariant }) {
       }
       console.log(error);
     }
+    setLoading(false);
   };
 
   const handleEditVariant = async (data) => {
+    setLoading(true);
     try {
       const response = await editVariant(data);
       if (response.status === 200) {
@@ -96,6 +108,7 @@ export default function VariantModal({ onClose, item, editingVariant }) {
       }
       console.log(error);
     }
+    setLoading(false);
   };
 
   const handleSubmit = async (values) => {

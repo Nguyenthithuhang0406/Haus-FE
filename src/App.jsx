@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useEffect } from "react";
-import { useRoutes } from "react-router-dom";
+import { Navigate, useRoutes } from "react-router-dom";
 import "swiper/css";
 import "swiper/css/navigation";
 import AOS from "aos";
