@@ -1,5 +1,5 @@
 import React from "react";
-import { Eye, Edit, Trash2 } from "lucide-react";
+import { Eye, Edit, Trash2,ArrowUpDown } from "lucide-react";
 
 const ListPromotion = ({promotions, openDetailModal, openEditModal, handleDeletePromotion, pageNum, pageSize}) => {
   return (
@@ -8,30 +8,33 @@ const ListPromotion = ({promotions, openDetailModal, openEditModal, handleDelete
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                  STT
-                </th>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                  Kiểu khuyến mãi
-                </th>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                  Ngày bắt đầu
-                </th>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                  Ngày kết thúc
-                </th>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                  Giá trị
-                </th>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                  Trạng thái
-                </th>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                  Hành động
-                </th>
-              </tr>
-            </thead>
+  <tr>
+    <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wide text-center">
+      STT
+    </th>
+    <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wide text-center">
+      Kiểu khuyến mãi
+    </th>
+    <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wide text-center">
+      Ngày bắt đầu
+    </th>
+    <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wide text-center">
+      Ngày kết thúc
+    </th>
+    <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wide text-center">
+      <div className="flex items-center justify-center gap-1">
+        Giá trị
+        <ArrowUpDown className="h-4 w-4 transition-transform duration-200" />
+      </div>
+    </th>
+    <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wide text-center">
+      Trạng thái
+    </th>
+    <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wide text-center">
+      Hành động
+    </th>
+  </tr>
+</thead>
 
             <tbody className="bg-white divide-y divide-gray-300">
               {promotions.map((promotion, index) => (

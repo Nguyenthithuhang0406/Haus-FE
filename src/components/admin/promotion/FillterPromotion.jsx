@@ -86,7 +86,7 @@ const FillterPromotion = ({
 
         {/* Filter Controls */}
         <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Promotion Type Filter */}
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-black-700">
@@ -140,7 +140,7 @@ const FillterPromotion = ({
 
             {/* Value Filter */}
             
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <label className="block text-sm font-semibold text-black-700">
                 Giá trị
               </label>
@@ -165,7 +165,7 @@ const FillterPromotion = ({
           {isAsc ? "Tăng dần" : "Giảm dần"}
         </span>
       </button>
-            </div>
+            </div> */}
 
             {/* Status Filter */}
             <div className="space-y-2">
