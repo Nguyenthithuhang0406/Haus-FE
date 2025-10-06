@@ -21,6 +21,7 @@ const ManagerProduct = lazy(() => import("@/components/admin/Product/ProductsPag
 const ListProductByCategory = lazy(() =>
   import("@/pages/ListProductByCategory")
 );
+const PaymentPage = lazy(() => import("@/components/payment/PaymentPage"))
 const App = () => {
   useEffect(() => {
     AOS.init({
@@ -38,6 +39,7 @@ const App = () => {
     { path: "/change-password", element: <ChangePassword /> },
     { path: "/view-infor", element: <ViewEditInfor /> },
     { path: "/listProductByCategory", element: <ListProductByCategory /> },
+    { path: "/paymentPage", element: <PaymentPage /> },
     { path: "/promotion", element: <Promotion /> },
     {
       path: "/admin",
