@@ -29,6 +29,7 @@ const ListProductByCategory = lazy(() =>
 const DetailProduct = lazy(() => import("@/pages/DetailProduct"));
 const Search = lazy(() => import("@/pages/Search"));
 
+const PaymentPage = lazy(() => import("@/components/payment/PaymentPage"))
 const App = () => {
   useEffect(() => {
     AOS.init({
@@ -67,6 +68,8 @@ const App = () => {
     { path: "/listProductByCategory", element: <ListProductByCategory /> },
     { path: "/detailProduct/:id", element: <DetailProduct /> },
     { path: "/search", element: <Search /> },
+    { path: "/paymentPage", element: <PaymentPage /> },
+    { path: "/promotion", element: <Promotion /> },
     {
       path: "/admin",
       // element: <LayoutAdmin />,
