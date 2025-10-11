@@ -4,7 +4,7 @@ import pc1 from './img/image2.png';
 import pc2 from './img/image3.png';
 
 
-const PaymentMethod = () => {
+const PaymentMethod = ({ selectedAddress }) => {
     const [selected, setSelected] = useState(null);
 
     return (
@@ -40,7 +40,9 @@ const PaymentMethod = () => {
                                     : "border border-gray-200 text-gray-700"
                                     }`}
                             >
-                                ngõ 112/7, Nguyên Xá, Minh Khai, Bắc Từ Liêm, Hà Nội
+                                 {selectedAddress 
+                                    ? selectedAddress.address 
+                                    : "Vui lòng chọn địa chỉ giao hàng"}
                             </span>
                         </div>
                     </div>

@@ -30,6 +30,7 @@ const DetailProduct = lazy(() => import("@/pages/DetailProduct"));
 const Search = lazy(() => import("@/pages/Search"));
 
 const PaymentPage = lazy(() => import("@/components/payment/PaymentPage"))
+const WishList = lazy(()=> import("@/pages/WishList"))
 const App = () => {
   useEffect(() => {
     AOS.init({
@@ -93,6 +94,7 @@ const App = () => {
         </div>
       ),
     },
+    {path:"/wishlist",element:<WishList />},
   ]);
 
   return (

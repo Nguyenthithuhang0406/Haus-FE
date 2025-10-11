@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import DeliveryAddress from './DeliveryAddress'
 import PaymentMethod from './PaymentMethod'
 import ProductPayment from './ProductPayment'
@@ -200,13 +200,15 @@ const dummyProducts = [
 ]
 
 const PaymentPage = () => {
+    const [selectedDeliveryAddress, setSelectedDeliveryAddress] = useState(null);
+
     return (
         <>
             <Header />
             <div className="max-w-[1400px] mx-auto p-5 flex flex-col md:flex-row gap-5 pt-[180px] pb-[50px]">
                 <div className="flex-1 flex flex-col justify-between items-center md:items-start min-w-[300px]">
-                    <DeliveryAddress />
-                    <PaymentMethod />
+                    <DeliveryAddress onAddressSelect={setSelectedDeliveryAddress} />
+                    <PaymentMethod selectedAddress={selectedDeliveryAddress} />
                 </div>
                 <div className="w-full md:w-[500px] flex justify-center items-center">
                     <ProductPayment listProducts={dummyProducts} />
