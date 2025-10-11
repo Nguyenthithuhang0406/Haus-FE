@@ -22,11 +22,6 @@ const PaginationComponent = ({
                 onChange={onPageChange}
                 showSizeChanger={false}
                 showQuickJumper={false}
-                showTotal={(total, range) => (
-                    <span className="text-gray-600 text-sm">
-                        {`${range[0]}-${range[1]} trong ${total} sản phẩm`}
-                    </span>
-                )}
                 locale={{
                     items_per_page: '/ trang',
                     jump_to: 'Đến',
