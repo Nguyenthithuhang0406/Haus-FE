@@ -41,7 +41,7 @@ const App = () => {
     const role = getCookie("role");
 
     if (!role) {
-      return <Navigate to="/login" replace />;
+      return <Navigate to="/auth" replace />;
     }
 
     if (!allowedRoles.includes(role)) {
