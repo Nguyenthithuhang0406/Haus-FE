@@ -1,7 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { MdDashboard, MdManageAccounts, MdInventory, MdShoppingCart, MdDiscount } from "react-icons/md";
 
 const Menua = ({ isMenuOpen, activeItem, handleMenuItemClick, isMobile }) => {
+  const location = useLocation();
+  
   const menuItems = [
     {
       id: "thong-ke",
@@ -24,6 +26,7 @@ const Menua = ({ isMenuOpen, activeItem, handleMenuItemClick, isMobile }) => {
     {
       id: "quan-ly-don-hang",
       name: "Quản lý đơn hàng",
+      path: "/admin/managerOrder",
       icon: <MdShoppingCart className="w-5 h-5" />
     },
     {
@@ -39,7 +42,7 @@ const Menua = ({ isMenuOpen, activeItem, handleMenuItemClick, isMobile }) => {
       className={`
         bg-gradient-to-b from-[#A0522D] to-[#bb8c74] shadow-lg
         ${isMobile
-          ? 'w-64 h-screen' // Full screen height on mobile
+          ? 'w-64 h-screen'
           : `transition-all duration-300 ease-in-out 
              ${isMenuOpen ? "w-64 opacity-100" : "w-0 opacity-0"} 
              overflow-hidden h-full`
@@ -60,26 +63,31 @@ const Menua = ({ isMenuOpen, activeItem, handleMenuItemClick, isMobile }) => {
         {/* Navigation Items */}
         <nav className="p-4 flex-1">
           <ul className="space-y-3">
-            {menuItems.map((item) => (
-              <li key={item.id}>
-                <Link
-                  to={item.path || "#"}
-                  onClick={() => handleMenuItemClick(item.name)}
-                  className={`
-                    w-full flex items-center space-x-3 px-4 py-3 rounded-lg
-                    text-left transition-all duration-200 font-medium border border-[#ad7555]
-                    ${activeItem === item.name
-                      ? 'bg-white text-[#ad7555] shadow-md transform scale-105'
-                      : 'bg-[#d0875f]/50 text-white hover:bg-white hover:text-[#ad7555]'
-                    }
-                    hover:shadow-md hover:transform hover:scale-105
-                  `}
-                >
-                  {item.icon}
-                  <span className="font-medium whitespace-nowrap">{item.name}</span>
-                </Link>
-              </li>
-            ))}
+            {menuItems.map((item) => {
+              // Check if this item is active based on current path
+              const isActive = location.pathname === item.path;
+              
+              return (
+                <li key={item.id}>
+                  <Link
+                    to={item.path || "#"}
+                    onClick={() => handleMenuItemClick(item.name)}
+                    className={`
+                      w-full flex items-center space-x-3 px-4 py-3 rounded-lg
+                      text-left transition-all duration-200 font-medium border border-[#ad7555]
+                      ${isActive
+                        ? 'bg-white text-[#ad7555] shadow-md transform scale-105'
+                        : 'bg-[#d0875f]/50 text-white hover:bg-white hover:text-[#ad7555]'
+                      }
+                      hover:shadow-md hover:transform hover:scale-105
+                    `}
+                  >
+                    {item.icon}
+                    <span className="font-medium whitespace-nowrap">{item.name}</span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 

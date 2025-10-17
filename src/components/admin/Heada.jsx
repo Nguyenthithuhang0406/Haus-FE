@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
-import { ChevronDown,LogOut } from "lucide-react";
+import { ChevronDown, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import Logo from "@/assets/icons/Logo";
 
 const Heada = ({ toggleMenu, activeItem, isMenuOpen }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -21,12 +23,17 @@ const Heada = ({ toggleMenu, activeItem, isMenuOpen }) => {
   }, []);
 
   const handleLogout = () => {
-    console.log("Đăng xuất...");
+    // Xóa token/thông tin đăng nhập nếu có
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    sessionStorage.clear();
+    
+    // Đóng dropdown
     setIsDropdownOpen(false);
+    
+    // Chuyển về trang đăng nhập
+    navigate('/auth');
   };
-
-
-
 
   return (
     <div className="flex items-center justify-between p-4 bg-gradient-to-b from-[#ad7555] to-[#A0522D]">
@@ -66,8 +73,6 @@ const Heada = ({ toggleMenu, activeItem, isMenuOpen }) => {
           {isDropdownOpen && (
             <div className="absolute right-0 mt-2 w-32 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
               <div className="py-2">
-              
-           
                 <button
                   onClick={handleLogout}
                   className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150"
