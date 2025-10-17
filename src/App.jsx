@@ -26,9 +26,10 @@ const ManagerProduct = lazy(() =>
 const ListProductByCategory = lazy(() =>
   import("@/pages/ListProductByCategory")
 );
+const Order = lazy(()=>import("@/pages/OrderManagerment"));
 const DetailProduct = lazy(() => import("@/pages/DetailProduct"));
 const Search = lazy(() => import("@/pages/Search"));
-
+const CartPage = lazy(()=> import("@/pages/CartPage"))
 const PaymentPage = lazy(() => import("@/components/payment/PaymentPage"))
 const WishList = lazy(()=> import("@/pages/WishList"))
 const App = () => {
@@ -83,6 +84,7 @@ const App = () => {
         { path: "managerCategory", element: <ManagerCategory /> },
         { path: "managerProduct", element: <ManagerProduct /> },
         { path: "managerPromotion", element: <Promotion /> },
+        {path:"managerOrder",element:<Order />},
       ],
     },
     {
@@ -95,6 +97,7 @@ const App = () => {
       ),
     },
     {path:"/wishlist",element:<WishList />},
+    {path:"/cart",element:<CartPage />},
   ]);
 
   return (

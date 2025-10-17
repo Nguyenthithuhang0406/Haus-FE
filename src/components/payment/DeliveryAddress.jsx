@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
+import { CiEdit } from "react-icons/ci";
 import AddAddressModal from "./AddAddressForm";
 import EditAddressForm from "./EditAddressForm";
+
 const DeliveryAddress = ({ onAddressSelect }) => {
     const [user, setUser] = useState({
         id: 1,
@@ -37,10 +39,13 @@ const DeliveryAddress = ({ onAddressSelect }) => {
             addresses: [...prev.addresses, addressInfo],
         }));
     };
-const handleDoubleClick = (idx) => {
+
+    const handleEditClick = (e, idx) => {
+        e.stopPropagation();
         setEditingIndex(idx);
         setShowEditForm(true);
     };
+
     const handleUpdateAddress = (updatedAddress) => {
         setUser((prev) => {
             const newAddresses = prev.addresses.map((addr, idx) =>
@@ -90,14 +95,18 @@ const handleDoubleClick = (idx) => {
                             return (
                                 <li
                                     key={addressId}
-                                    className={`p-3 rounded-lg border cursor-pointer ${selectedAddress === addressId
+                                    className={`p-3 rounded-lg border cursor-pointer relative ${selectedAddress === addressId
                                             ? "border-[#ad7555] bg-[#f9f5f3]"
                                             : "border-gray-300"
                                         }`}
                                     onClick={() => handleAddressSelect(addressId, idx)}
-                                     onDoubleClick={() => handleDoubleClick(idx)}
                                 >
-                                    <label className="flex items-center gap-3 cursor-pointer">
+                                    <CiEdit 
+                                        size={24}
+                                        className="absolute top-3 right-3 text-[#ad7555] hover:text-[#8d5d45] cursor-pointer"
+                                        onClick={(e) => handleEditClick(e, idx)}
+                                    />
+                                    <label className="flex items-center gap-3 cursor-pointer pr-8">
                                         <input
                                             type="radio"
                                             name="address"

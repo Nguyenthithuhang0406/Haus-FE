@@ -125,7 +125,9 @@ const Promotion = () => {
         isAsc={isAsc}
         setIsAsc={setIsAsc}
       />
-
+ <div className="max-w-full mx-auto px-8 pb-8">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+     
       <ListPromotion
         promotions={promotions}
         openDetailModal={openDetailModal}
@@ -154,7 +156,8 @@ const Promotion = () => {
           />
         </div>
       )}
-
+</div>
+</div>
       {showAddModal && <PromotionCreate setShowAddModal={setShowAddModal} />}
 
       {showEditModal && (
@@ -179,6 +182,8 @@ const Promotion = () => {
         />
       )}
     </div>
+
+
   );
 };
 

@@ -1,22 +1,44 @@
+// File: components/admin/layout/Layouta.jsx
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Heada from "./Heada";
 import Menua from "./Menua";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 
 const Layouta = ({ children }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(true); // Mặc định MỞ
   const [activeItem, setActiveItem] = useState("Thống kê");
   const menuRef = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
   const toggleRef = useRef(false);
+  const location = useLocation();
+
+  // Menu items mapping để lấy tên từ path
+  const menuItemsMap = {
+    "/": "Thống kê",
+    "/admin/managerCategory": "Quản lý danh mục",
+    "/admin/managerProduct": "Quản lý sản phẩm",
+    "/admin/managerOrder": "Quản lý đơn hàng",
+    "/admin/managerPromotion": "Quản lý khuyến mãi",
+  };
+
+  // Cập nhật activeItem khi route thay đổi
+  useEffect(() => {
+    const currentPath = location.pathname;
+    const newActiveItem = menuItemsMap[currentPath] || "Thống kê";
+    setActiveItem(newActiveItem);
+  }, [location.pathname]);
 
   // Check if screen is mobile size
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-      // Auto close menu on mobile when screen loads
-      if (window.innerWidth < 768) {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      // Đóng menu khi resize về mobile
+      if (mobile) {
         setIsMenuOpen(false);
+      } else {
+        // Mở menu khi resize về desktop
+        setIsMenuOpen(true);
       }
     };
 
@@ -26,12 +48,21 @@ const Layouta = ({ children }) => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Handle click outside to close menu
+  // Handle click outside to close menu - CHỈ trên mobile
   useEffect(() => {
     function handleClickOutside(event) {
+      // Chỉ áp dụng cho mobile
+      if (!isMobile) return;
+
       // Skip if this was triggered by toggle button
       if (toggleRef.current) {
         toggleRef.current = false;
+        return;
+      }
+
+      // Chỉ đóng menu nếu click bên ngoài và không phải click vào menu toggle
+      const isToggleButton = event.target.closest('[data-menu-toggle]');
+      if (isToggleButton) {
         return;
       }
 
@@ -40,33 +71,27 @@ const Layouta = ({ children }) => {
       }
     }
 
-    // Only add listener if menu is open
-    if (isMenuOpen) {
+    // Only add listener if menu is open and on mobile
+    if (isMenuOpen && isMobile) {
       document.addEventListener("mousedown", handleClickOutside);
       return () => {
         document.removeEventListener("mousedown", handleClickOutside);
       };
     }
-  }, [isMenuOpen]);
+  }, [isMenuOpen, isMobile]);
 
   const toggleMenu = useCallback(() => {
-    toggleRef.current = true; // Mark that toggle was clicked
-
-    if (isMenuOpen) {
-      // Nếu menu đang mở, click X sẽ đóng menu
-      setIsMenuOpen(false);
-    } else {
-      // Nếu menu đang đóng, click burger sẽ mở menu
-      setIsMenuOpen(true);
-    }
-  }, [isMenuOpen]);
+    toggleRef.current = true;
+    setIsMenuOpen(prev => !prev);
+  }, []);
 
   const handleMenuItemClick = (item) => {
     setActiveItem(item);
-    // Auto close menu on mobile after selecting item
+    // Chỉ đóng menu trên mobile sau khi chọn item
     if (isMobile) {
       setIsMenuOpen(false);
     }
+    // Trên desktop - KHÔNG đóng menu
   };
 
   return (
@@ -76,7 +101,7 @@ const Layouta = ({ children }) => {
 
       {/* Body */}
       <div className="flex flex-1 overflow-hidden relative">
-        {/* Overlay for mobile */}
+        {/* Overlay for mobile ONLY */}
         {isMenuOpen && isMobile && (
           <div
             className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
