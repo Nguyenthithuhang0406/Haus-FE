@@ -100,6 +100,9 @@ const Menu = () => {
                 <ul className="flex flex-col gap-[10px] list-none w-[200px]">
                   <li
                     key={category.id}
+                    onClick={() =>
+                      navigate(`/listProductByCategory/${category.id}`)
+                    }
                     className="font-medium text-[15px] cursor-pointer hover:text-[#fd8f7c]"
                   >
                     {category.categoryName}
@@ -110,6 +113,9 @@ const Menu = () => {
                         {category.subCategories.map((child) => (
                           <li
                             key={child.id}
+                            onClick={() =>
+                              navigate(`/listProductByCategory/${child.id}`)
+                            }
                             className="text-[15px] cursor-pointer hover:text-[#fd8f7c]"
                           >
                             {child.categoryName}
