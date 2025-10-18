@@ -26,9 +26,12 @@ const ManagerProduct = lazy(() =>
 const ListProductByCategory = lazy(() =>
   import("@/pages/ListProductByCategory")
 );
+const Order = lazy(()=>import("@/pages/OrderManagerment"));
 const DetailProduct = lazy(() => import("@/pages/DetailProduct"));
 const Search = lazy(() => import("@/pages/Search"));
-
+const CartPage = lazy(()=> import("@/pages/CartPage"))
+const PaymentPage = lazy(() => import("@/components/payment/PaymentPage"))
+const WishList = lazy(()=> import("@/pages/WishList"))
 const App = () => {
   useEffect(() => {
     AOS.init({
@@ -67,6 +70,8 @@ const App = () => {
     { path: "/listProductByCategory/:categoryId", element: <ListProductByCategory /> },
     { path: "/detailProduct/:id", element: <DetailProduct /> },
     { path: "/search", element: <Search /> },
+    { path: "/paymentPage", element: <PaymentPage /> },
+    { path: "/promotion", element: <Promotion /> },
     {
       path: "/admin",
       // element: <LayoutAdmin />,
@@ -79,6 +84,7 @@ const App = () => {
         { path: "managerCategory", element: <ManagerCategory /> },
         { path: "managerProduct", element: <ManagerProduct /> },
         { path: "managerPromotion", element: <Promotion /> },
+        {path:"managerOrder",element:<Order />},
       ],
     },
     {
@@ -90,6 +96,8 @@ const App = () => {
         </div>
       ),
     },
+    {path:"/wishlist",element:<WishList />},
+    {path:"/cart",element:<CartPage />},
   ]);
 
   return (

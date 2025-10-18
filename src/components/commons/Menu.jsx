@@ -7,12 +7,16 @@ import { IoHeart } from "react-icons/io5";
 import { MdAccountCircle } from "react-icons/md";
 import { menuListProduct, menuProjects } from "@/utils/contants/Menu";
 import { removeAllCookies } from "@/utils/cookies";
+import { getAllCategory } from "@/api/category";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const Menu = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [productCategorys, setProductCategorys] = useState(menuListProduct);
   const [projectCategorys, setProjectCategorys] = useState(menuProjects);
+  const [categories, setCategories] = useState([]);
 
   const [isLogin, setIsLogin] = useState(false);
   const [isShow, setIsShow] = useState(false);
@@ -44,6 +48,32 @@ const Menu = () => {
     navigate("/");
   };
 
+  const fetchCategories = async (data) => {
+    try {
+      const response = await getAllCategory(data);
+      if (response.status === 200) {
+        setCategories(response.data.items);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        switch (error.response.status) {
+          case 500:
+            toast.error("Lỗi hệ thống");
+            break;
+          default:
+            toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
+        }
+      }
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories({
+      pageNum: 1,
+      pageSize: 200,
+    });
+  }, []);
   return (
     <>
       {/* Menu desktop */}
@@ -66,26 +96,27 @@ const Menu = () => {
               <FaCaretUp className="hidden text-[15px] group-hover:block" />
             </span>
             <div className="hidden absolute top-full left-0 bg-white p-5 rounded shadow-lg z-10 group-hover:flex group-hover:flex-wrap gap-[20px] justify-between w-[900px]">
-              {productCategorys.map((category) => (
+              {categories.map((category) => (
                 <ul className="flex flex-col gap-[10px] list-none w-[200px]">
                   <li
                     key={category.id}
                     className="font-medium text-[15px] cursor-pointer hover:text-[#fd8f7c]"
                   >
-                    {category.title}
+                    {category.categoryName}
                   </li>
-                  {category.childrens && category.childrens.length > 0 && (
-                    <ul className="flex flex-col gap-[10px] list-none">
-                      {category.childrens.map((child) => (
-                        <li
-                          key={child.id}
-                          className="text-[15px] cursor-pointer hover:text-[#fd8f7c]"
-                        >
-                          {child.name}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                  {category.subCategories &&
+                    category.subCategories.length > 0 && (
+                      <ul className="flex flex-col gap-[10px] list-none">
+                        {category.subCategories.map((child) => (
+                          <li
+                            key={child.id}
+                            className="text-[15px] cursor-pointer hover:text-[#fd8f7c]"
+                          >
+                            {child.categoryName}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                 </ul>
               ))}
             </div>
