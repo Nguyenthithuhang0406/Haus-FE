@@ -68,7 +68,7 @@ const RightComponent = ({
         </span>
       </p>
 
-      <div className="flex gap-2">
+      <div className="flex gap-8">
         <p className="text-[24px] font-semibold text-[#ff0000]">
           {formatNumber(
             product?.price * (1 - (product?.discountPercent || 0) / 100)
