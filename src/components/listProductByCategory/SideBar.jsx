@@ -1,20 +1,46 @@
-import {
-  listCategory,
-  listColor,
-  listStyle,
-} from "@/utils/contants/SidebarCategory";
-import React, { useState } from "react";
+import { getAllCategory } from "@/api/category";
+import { listColor, listStyle } from "@/utils/contants/SidebarCategory";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { FaCaretDown } from "react-icons/fa";
 import { FaCaretUp } from "react-icons/fa";
+import { toast } from "react-toastify";
 
-const SideBar = () => {
-  const categories = listCategory;
+const SideBar = ({ filter, setFilter }) => {
+  const [categories, setCategories] = useState([]);
   const [openCategory, setOpenCategory] = useState([]);
   const [openFillterPrice, setOpenFillterPrice] = useState(true);
   const [openFillterColor, setOpenFillterColor] = useState(true);
   const [openFillterStyle, setOpenFillterStyle] = useState(true);
   const colors = listColor;
   const styles = listStyle;
+
+  const fetchCategories = async (data) => {
+    try {
+      const response = await getAllCategory(data);
+      if (response.status === 200) {
+        setCategories(response.data.items);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        switch (error.response.status) {
+          case 500:
+            toast.error("Lỗi hệ thống");
+            break;
+          default:
+            toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
+        }
+      }
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories({
+      pageNum: 1,
+      pageSize: 200,
+    });
+  }, []);
 
   const toggleCategory = (id) => {
     if (openCategory.includes(id)) {
@@ -23,34 +49,48 @@ const SideBar = () => {
       setOpenCategory([...openCategory, id]);
     }
   };
-
   return (
     <div data-aos="fade-right" className="w-full flex flex-col gap-[30px]">
       <div className="w-full border-[1px] border-[#efefef] rounded-[6px] p-[15px]">
         <p className="text-[20px] break-words font-medium leading-[140%] pb-[8px] border-b-[3px] border-[#ad7555] w-fit">
           Danh mục sản phẩm
         </p>
-        {categories.map((category) => (
-          <div key={category.id} className="w-full flex flex-col text-[16px]">
-            <div className="w-full py-[5px] font-medium flex items-end justify-between hover:text-[#ad7555] cursor-pointer">
-              <p className="break-words">{category.name}</p>
-              {openCategory.includes(category.id) ? (
-                <FaCaretUp onClick={() => toggleCategory(category.id)} />
-              ) : (
-                <FaCaretDown onClick={() => toggleCategory(category.id)} />
+        {categories &&
+          categories.length > 0 &&
+          categories.map((category) => (
+            <div key={category.id} className="w-full flex flex-col text-[16px]">
+              <div className="w-full py-[5px] font-medium flex items-end justify-between hover:text-[#ad7555] cursor-pointer">
+                <p
+                  className="break-words"
+                  onClick={() =>
+                    setFilter({ ...filter, categoryId: category.id })
+                  }
+                >
+                  {category.categoryName}
+                </p>
+                {openCategory.includes(category.id) ? (
+                  <FaCaretUp onClick={() => toggleCategory(category.id)} />
+                ) : (
+                  <FaCaretDown onClick={() => toggleCategory(category.id)} />
+                )}
+              </div>
+              {openCategory.includes(category.id) && (
+                <div className="w-full pl-[20px] break-words py-[5px] hover:text-[#ad7555]">
+                  {category.subCategories.map((child) => (
+                    <p
+                      onClick={() =>
+                        setFilter({ ...filter, categoryId: child.id })
+                      }
+                      key={child.id}
+                      className="cursor-pointer font-medium"
+                    >
+                      {child.categoryName}
+                    </p>
+                  ))}
+                </div>
               )}
             </div>
-            {openCategory.includes(category.id) && (
-              <div className="w-full pl-[20px] break-words py-[5px] hover:text-[#ad7555]">
-                {category.children.map((child) => (
-                  <p key={child.id} className="cursor-pointer font-medium">
-                    {child.name}
-                  </p>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
+          ))}
       </div>
 
       <div className="w-full flex flex-col gap-[30px]">
@@ -68,6 +108,13 @@ const SideBar = () => {
               <input
                 type="checkbox"
                 name="price"
+                value={"under_1m"}
+                checked={filter.priceRange === "under_1m"}
+                onChange={(e) =>
+                  filter.priceRange === e.target.value
+                    ? setFilter({ ...filter, priceRange: "" })
+                    : setFilter({ ...filter, priceRange: e.target.value })
+                }
                 className="w-[20px] h-[20px]"
               />
               <p className="font-medium hover:text-[#ad7555]">
@@ -78,6 +125,13 @@ const SideBar = () => {
               <input
                 type="checkbox"
                 name="price"
+                value={"from_1m_to_3m"}
+                checked={filter.priceRange === "from_1m_to_3m"}
+                onChange={(e) =>
+                  filter.priceRange === e.target.value
+                    ? setFilter({ ...filter, priceRange: "" })
+                    : setFilter({ ...filter, priceRange: e.target.value })
+                }
                 className="w-[20px] h-[20px]"
               />
               <p className="font-medium hover:text-[#ad7555]">
@@ -88,6 +142,13 @@ const SideBar = () => {
               <input
                 type="checkbox"
                 name="price"
+                value={"from_3m_to_6m"}
+                checked={filter.priceRange === "from_3m_to_6m"}
+                onChange={(e) =>
+                  filter.priceRange === e.target.value
+                    ? setFilter({ ...filter, priceRange: "" })
+                    : setFilter({ ...filter, priceRange: e.target.value })
+                }
                 className="w-[20px] h-[20px]"
               />
               <p className="font-medium hover:text-[#ad7555]">
@@ -98,6 +159,13 @@ const SideBar = () => {
               <input
                 type="checkbox"
                 name="price"
+                value={"from_6m_to_8m"}
+                checked={filter.priceRange === "from_6m_to_8m"}
+                onChange={(e) =>
+                  filter.priceRange === e.target.value
+                    ? setFilter({ ...filter, priceRange: "" })
+                    : setFilter({ ...filter, priceRange: e.target.value })
+                }
                 className="w-[20px] h-[20px]"
               />
               <p className="font-medium hover:text-[#ad7555]">
@@ -108,6 +176,13 @@ const SideBar = () => {
               <input
                 type="checkbox"
                 name="price"
+                value={"above_8m"}
+                checked={filter.priceRange === "above_8m"}
+                onChange={(e) =>
+                  filter.priceRange === e.target.value
+                    ? setFilter({ ...filter, priceRange: "" })
+                    : setFilter({ ...filter, priceRange: e.target.value })
+                }
                 className="w-[20px] h-[20px]"
               />
               <p className="font-medium hover:text-[#ad7555]">
@@ -131,7 +206,18 @@ const SideBar = () => {
         {openFillterColor && (
           <div className="w-full flex flex-wrap gap-[10px]">
             {colors.map((color) => (
-              <div className="flex items-center gap-[10px] p-[7px] rounded-[8px] border-[1px] border-[#e9e9e9] hover:border-[#ad7555] cursor-pointer">
+              <div
+                className={`flex items-center gap-[10px] p-[7px] rounded-[8px] border-[1px] ${
+                  filter.color === color.title
+                    ? "border-[#ad7555]"
+                    : "border-[#e9e9e9]"
+                } hover:border-[#ad7555] cursor-pointer`}
+                onClick={() =>
+                  filter.color === color.title
+                    ? setFilter({ ...filter, color: "" })
+                    : setFilter({ ...filter, color: color.title })
+                }
+              >
                 <div
                   className="w-[20px] h-[20px] rounded-[8px] "
                   style={{ backgroundColor: color.color }}
@@ -157,7 +243,16 @@ const SideBar = () => {
           <div className="w-full flex flex-col gap-[10px]">
             {styles.map((style) => (
               <div key={style.id} className="flex items-center gap-[10px]">
-                <input type="checkbox" className="w-[20px] h-[20px]" />
+                <input
+                  type="checkbox"
+                  checked={filter.keyword === style.title}
+                  className="w-[20px] h-[20px]"
+                  onClick={() =>
+                    filter.keyword === style.title
+                      ? setFilter({ ...filter, keyword: "" })
+                      : setFilter({ ...filter, keyword: style.title })
+                  }
+                />
                 <p className="font-medium">{style.title}</p>
               </div>
             ))}

@@ -134,3 +134,38 @@ export const deleteProduct = async (id) => {
     throw error;
   }
 };
+
+export const getProductByCategoryId = async (data) => {
+  try {
+    const {
+      categoryId,
+      pageNum,
+      pageSize,
+      sortBy = "asc",
+      keyword,
+      priceRange,
+      color,
+    } = data;
+    const response = await request(axiosPublic, {
+      method: "GET",
+      url: `/product/category-id/${categoryId}`,
+      params: {
+        categoryId,
+        pageNum,
+        pageSize,
+        sortBy,
+        search: [
+          keyword && `keyword:${keyword}`,
+          priceRange && `priceRange:${priceRange}`,
+          color && `color:${color}`,
+        ]
+          .filter(Boolean)
+          .join(","),
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};

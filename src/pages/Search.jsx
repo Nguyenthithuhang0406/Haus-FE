@@ -1,13 +1,44 @@
+/* eslint-disable */
+import { getAllProducts } from "@/api/product";
 import Layout from "@/components/commons/Layout";
 import ProductItem from "@/components/product/ProductItem";
 import { Pagination } from "antd";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const Search = () => {
   const key = useSelector((state) => state.search.keySearch);
-  const listProduct = useSelector((state) => state.search.listSearch);
+  const [listProduct, setListProduct] = useState([]);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [filter, setFilter] = useState({
+    pageNum: 1,
+    pageSize: 8,
+    keyword: "",
+  });
+
+  useEffect(() => {
+    setFilter((prev) => ({
+      ...prev,
+      keyword: key,
+    }));
+  }, [key]);
+
+  const fetchProducts = async (data) => {
+    try {
+      const response = await getAllProducts(data);
+      if (response.status === 200) {
+        setListProduct(response.data.items);
+        setTotalProducts(response.data.pageCustom.totalElement);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts(filter);
+  }, [filter]);
   const navigate = useNavigate();
 
   return (
@@ -30,7 +61,7 @@ const Search = () => {
         </p>
 
         <p data-aos="fade-down" className="flex items-center gap-2">
-          Có {listProduct.length} sản phẩm phù hợp
+          Có {totalProducts} sản phẩm phù hợp
         </p>
 
         <div

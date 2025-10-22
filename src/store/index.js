@@ -1,6 +1,7 @@
 import storage from "redux-persist/lib/storage";
 import { configureStore } from "@reduxjs/toolkit";
-import searchReducer from "./SearchSlice";
+import searchReducer from "./searchSlice";
+import orderReducer from "./orderSlice";
 import {
   persistStore,
   persistReducer,
@@ -18,10 +19,12 @@ const persistConfig = {
 };
 
 const persistedReducer = persistReducer(persistConfig, searchReducer);
+const orderPersistedReducer = persistReducer(persistConfig, orderReducer);
 
 let store = configureStore({
   reducer: {
     search: persistedReducer,
+    order: orderPersistedReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

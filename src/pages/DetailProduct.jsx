@@ -1,15 +1,26 @@
+import { getProductById } from "@/api/product";
 import Layout from "@/components/commons/Layout";
 import InformationComponent from "@/components/product/detailProduct/InformationComponent";
 import LeftComponent from "@/components/product/detailProduct/LeftComponent";
 import RightComponent from "@/components/product/detailProduct/RightComponent";
 import SuggestProducts from "@/components/product/detailProduct/SuggestProducts";
 import { detailProduct } from "@/utils/contants/product";
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 const DetailProduct = () => {
   const fakeProduct = detailProduct;
   const navigate = useNavigate();
+  const productId = useParams().id;
+  const [productDetail, setProductDetail] = useState(null);
+
+  useEffect(() => {
+    const fetchProductById = async () => {
+      if (productId) {
+        const response = await getProductById(productId);
+      }
+    }
+  }, [productId]);
 
   return (
     <Layout>
