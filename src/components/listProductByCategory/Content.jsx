@@ -23,10 +23,10 @@ const Content = ({ products, total, filter, setFilter }) => {
           >
             <Option value="asc">A -&gt; Z</Option>
             <Option value="desc">Z -&gt; A</Option>
-            <Option value="price_desc">Giá giảm dần</Option>
-            <Option value="price_asc">Giá tăng dần</Option>
-            <Option value="createdAt_desc">Hàng mới nhất</Option>
-            <Option value="createdAt_asc">Hàng cũ nhất</Option>
+            <Option value="desc">Giá giảm dần</Option>
+            <Option value="asc">Giá tăng dần</Option>
+            <Option value="created_at_desc">Hàng mới nhất</Option>
+            <Option value="created_at_asc">Hàng cũ nhất</Option>
           </Select>
         </div>
       </div>

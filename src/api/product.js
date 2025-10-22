@@ -6,10 +6,10 @@ export const getAllProducts = async (data) => {
     const {
       pageNum,
       pageSize,
-      sortByPrice = "asc",
+      sortBy = "asc",
       keyword,
       priceRange,
-      colors,
+      color,
       categoryId,
     } = data;
     const response = await request(axiosPublic, {
@@ -18,12 +18,12 @@ export const getAllProducts = async (data) => {
       params: {
         pageNum,
         pageSize,
-        sortByPrice,
+        sortBy,
         search: [
           keyword && `keyword:${keyword}`,
           categoryId && `categoryId:${categoryId}`,
           priceRange && `priceRange:${priceRange}`,
-          colors && `colors:${colors}`,
+          color && `color:${color}`,
         ]
           .filter(Boolean)
           .join(","),
