@@ -74,17 +74,19 @@ const LeftComponent = ({ product }) => {
           }}
           className="w-full h-full rounded-2xl"
         >
-          {product.images.map((image, index) => (
-            <SwiperSlide key={index}>
-              <div className="w-full h-full flex items-center justify-center rounded-2xl">
-                <img
-                  src={image}
-                  alt="product"
-                  className="w-full h-full max-h-[500px] object-cover rounded-2xl"
-                />
-              </div>
-            </SwiperSlide>
-          ))}
+          {product?.medias &&
+            product?.medias?.length > 0 &&
+            product?.medias?.map((image) => (
+              <SwiperSlide key={image.id}>
+                <div className="w-full h-full flex items-center justify-center rounded-2xl">
+                  <img
+                    src={image.url}
+                    alt="product"
+                    className="w-full h-full max-h-[500px] object-cover rounded-2xl"
+                  />
+                </div>
+              </SwiperSlide>
+            ))}
         </Swiper>
 
         {/* Nút next */}
@@ -110,36 +112,38 @@ const LeftComponent = ({ product }) => {
         key={indexImage}
         className="flex w-full gap-2 px-5 max-h-[500px] overflow-y-auto max-[500px]:hidden"
       >
-        {product.images.map((image, index) => (
-          <div
-            key={index}
-            onClick={() => {
-              setIndexImage(index);
-              swiperRef.current?.slideTo(index);
-            }}
-            className={`w-full cursor-pointer rounded-2xl border border-gray-200 shadow-md opacity-60 
+        {product?.medias &&
+          product?.medias?.length > 0 &&
+          product?.medias?.map((image, index) => (
+            <div
+              key={image.id}
+              onClick={() => {
+                setIndexImage(index);
+                swiperRef.current?.slideTo(index);
+              }}
+              className={`w-full cursor-pointer rounded-2xl border border-gray-200 shadow-md opacity-60 
               ${
                 indexImage === index
                   ? "border-[#034c9b] shadow-lg opacity-100"
                   : ""
               }`}
-            style={
-              indexImage === index
-                ? {
-                    boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
-                    opacity: 1,
-                    borderColor: "#9a542c",
-                  }
-                : {}
-            }
-          >
-            <img
-              src={image}
-              alt="product"
-              className="w-full h-[120px] object-cover rounded-2xl shadow"
-            />
-          </div>
-        ))}
+              style={
+                indexImage === index
+                  ? {
+                      boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
+                      opacity: 1,
+                      borderColor: "#9a542c",
+                    }
+                  : {}
+              }
+            >
+              <img
+                src={image.url}
+                alt="product"
+                className="w-full h-[120px] object-cover rounded-2xl shadow"
+              />
+            </div>
+          ))}
       </div>
     </div>
   );

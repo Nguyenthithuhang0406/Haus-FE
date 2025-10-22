@@ -6,12 +6,15 @@ export const createVariant = async (data) => {
     const { imageFile, color, size, price, inventoryQuantity, productId } =
       data;
     const formData = new FormData();
+    const requestData = {
+      color: color,
+      size: size,
+      price: price,
+      inventoryQuantity: inventoryQuantity,
+      productId: productId,
+    };
+    formData.append("request", JSON.stringify(requestData));
     formData.append("imageFile", imageFile);
-    formData.append("color", color);
-    formData.append("size", size);
-    formData.append("price", price);
-    formData.append("inventoryQuantity", inventoryQuantity);
-    formData.append("productId", productId);
     const response = await request(axiosPrivate, {
       method: "POST",
       url: "/product/variation",
@@ -27,7 +30,7 @@ export const createVariant = async (data) => {
 
 export const editVariant = async (data) => {
   try {
-    const {id, imageFile, color, size, price, inventoryQuantity } = data;
+    const { id, imageFile, color, size, price, inventoryQuantity } = data;
     const formData = new FormData();
     formData.append("imageFile", imageFile);
     formData.append("color", color);

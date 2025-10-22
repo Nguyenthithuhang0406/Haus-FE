@@ -75,14 +75,14 @@ const SideBar = ({ filter, setFilter }) => {
                 )}
               </div>
               {openCategory.includes(category.id) && (
-                <div className="w-full pl-[20px] break-words py-[5px] hover:text-[#ad7555]">
+                <div className="w-full pl-[20px] break-words py-[5px]">
                   {category.subCategories.map((child) => (
                     <p
                       onClick={() =>
                         setFilter({ ...filter, categoryId: child.id })
                       }
                       key={child.id}
-                      className="cursor-pointer font-medium"
+                      className="cursor-pointer font-medium hover:text-[#ad7555]"
                     >
                       {child.categoryName}
                     </p>

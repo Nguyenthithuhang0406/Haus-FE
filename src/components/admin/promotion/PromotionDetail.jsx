@@ -1,8 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
+import { getCategoryById } from "@/api/category";
 
 const PromotionDetail = ({ currentPromotion, setShowDetailModal }) => {
-  // console.log("current:", currentPromotion);
+  const [category, setCategory] = useState("");
+
+  useEffect(() => {
+    const fetchCategory = async () => {
+      if (
+        currentPromotion.description === "Khuyến mãi theo danh mục" &&
+        currentPromotion.categoryId
+      ) {
+        const res = await getCategoryById(currentPromotion.categoryId);
+        if (res.status === 200) {
+          setCategory(res.data);
+        }
+      }
+    };
+
+    fetchCategory();
+  }, [currentPromotion]);
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-none  p-6 w-full max-w-lg">
@@ -32,6 +50,14 @@ const PromotionDetail = ({ currentPromotion, setShowDetailModal }) => {
                   : "Theo danh mục"}
               </p>
             </div>
+
+            {currentPromotion.description === "Khuyến mãi theo danh mục" &&
+              currentPromotion.categoryId && (
+                <div>
+                  <span className="font-medium">Danh mục khuyến mãi:</span>
+                  <p className="text-gray-600">{category?.categoryName}</p>
+                </div>
+              )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
