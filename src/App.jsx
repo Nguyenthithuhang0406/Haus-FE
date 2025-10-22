@@ -67,7 +67,7 @@ const App = () => {
     { path: "/update-password", element: <UpdatePassword /> },
     { path: "/change-password", element: <ChangePassword /> },
     { path: "/view-infor", element: <ViewEditInfor /> },
-    { path: "/listProductByCategory", element: <ListProductByCategory /> },
+    { path: "/listProductByCategory/:categoryId", element: <ListProductByCategory /> },
     { path: "/detailProduct/:id", element: <DetailProduct /> },
     { path: "/search", element: <Search /> },
     { path: "/paymentPage", element: <PaymentPage /> },

@@ -11,8 +11,7 @@ import Logo from "@/assets/icons/Logo";
 import { getCookie, removeAllCookies } from "@/utils/cookies";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { setKeySearch, setListSearch } from "@/store/SearchSlice";
-import { listProduct } from "@/utils/contants/product";
+import { setKeySearch } from "@/store/searchSlice";
 
 const Header = () => {
   const [inputText, setInputText] = useState("");
@@ -46,7 +45,6 @@ const Header = () => {
   const handleKeyPress = async (e) => {
     if (e.key === "Enter") {
       dispatch(setKeySearch(inputText));
-      dispatch(setListSearch(listProduct));
       navigate("/search");
     }
   };

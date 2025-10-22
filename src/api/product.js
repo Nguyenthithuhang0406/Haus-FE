@@ -6,10 +6,10 @@ export const getAllProducts = async (data) => {
     const {
       pageNum,
       pageSize,
-      sortByPrice = "asc",
+      sortBy = "asc",
       keyword,
       priceRange,
-      colors,
+      color,
       categoryId,
     } = data;
     const response = await request(axiosPublic, {
@@ -18,12 +18,12 @@ export const getAllProducts = async (data) => {
       params: {
         pageNum,
         pageSize,
-        sortByPrice,
+        sortBy,
         search: [
           keyword && `keyword:${keyword}`,
           categoryId && `categoryId:${categoryId}`,
           priceRange && `priceRange:${priceRange}`,
-          colors && `colors:${colors}`,
+          color && `color:${color}`,
         ]
           .filter(Boolean)
           .join(","),
@@ -127,6 +127,41 @@ export const deleteProduct = async (id) => {
     const response = await request(axiosPrivate, {
       method: "DELETE",
       url: `/product/${id}`,
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const getProductByCategoryId = async (data) => {
+  try {
+    const {
+      categoryId,
+      pageNum,
+      pageSize,
+      sortBy = "asc",
+      keyword,
+      priceRange,
+      color,
+    } = data;
+    const response = await request(axiosPublic, {
+      method: "GET",
+      url: `/product/category-id/${categoryId}`,
+      params: {
+        categoryId,
+        pageNum,
+        pageSize,
+        sortBy,
+        search: [
+          keyword && `keyword:${keyword}`,
+          priceRange && `priceRange:${priceRange}`,
+          color && `color:${color}`,
+        ]
+          .filter(Boolean)
+          .join(","),
+      },
     });
     return response.data;
   } catch (error) {
