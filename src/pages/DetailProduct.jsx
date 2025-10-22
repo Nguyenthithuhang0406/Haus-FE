@@ -13,6 +13,7 @@ const DetailProduct = () => {
   const productId = useParams().id;
   const [productDetail, setProductDetail] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
 
   useEffect(() => {
     const fetchProductById = async () => {
@@ -48,8 +49,16 @@ const DetailProduct = () => {
             </span>
           </p>
           <div className="w-full flex flex-col lg:flex-row gap-10 mb-10">
-            <LeftComponent product={productDetail} />
-            <RightComponent product={productDetail} />
+            <LeftComponent
+              product={productDetail}
+              selectedVariantIndex={selectedVariantIndex}
+              setSelectedVariantIndex={setSelectedVariantIndex}
+            />
+            <RightComponent
+              product={productDetail}
+              setSelectedVariantIndex={setSelectedVariantIndex}
+              selectedVariantIndex={selectedVariantIndex}
+            />
           </div>
           <div className="w-full">
             <InformationComponent product={productDetail} />

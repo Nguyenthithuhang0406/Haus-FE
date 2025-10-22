@@ -8,8 +8,12 @@ import { ImHeadphones } from "react-icons/im";
 import { FiPackage } from "react-icons/fi";
 import { FaTruck } from "react-icons/fa";
 
-const RightComponent = ({ product }) => {
-  const [typeIndex, setTypeIndex] = useState(0);
+const RightComponent = ({
+  product,
+  setSelectedVariantIndex,
+  selectedVariantIndex,
+}) => {
+  // const [typeIndex, setTypeIndex] = useState(0);
   const [count, setCount] = useState(1);
   const [countInCart, setCountInCart] = useState(0);
 
@@ -84,7 +88,7 @@ const RightComponent = ({ product }) => {
             {product?.description}
           </p>
           <p className="font-semibold">
-            Màu sắc: {product?.productVariations[typeIndex]?.color}
+            Màu sắc: {product?.productVariations[selectedVariantIndex]?.color}
           </p>
 
           <div className="w-full flex items-center gap-[10px]">
@@ -92,15 +96,16 @@ const RightComponent = ({ product }) => {
               <div
                 key={type?.id}
                 aria-label={type?.color}
+                onClick={() => setSelectedVariantIndex(index)}
                 className={`w-[40px] h-[40px] rounded-lg border-[1px] p-[2px] cursor-pointer flex items-center justify-center ${
-                  index === typeIndex ? "border-[#9a542c]" : "border-[#e4e4e4]"
+                  index === selectedVariantIndex ? "border-[#9a542c]" : "border-[#e4e4e4]"
                 }`}
               >
                 <img
                   src={type?.media?.url}
                   alt={type?.color}
                   className={`w-full h-full object-cover`}
-                  onClick={() => setTypeIndex(index)}
+                  // onClick={() => setTypeIndex(index)}
                 />
               </div>
             ))}
