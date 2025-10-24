@@ -18,6 +18,7 @@
     "axios": "^1.11.0",
     "formik": "^2.4.6",
     "js-cookie": "^3.0.5",
+    "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
     "lucide-react": "^0.542.0",
     "react": "^19.1.0",

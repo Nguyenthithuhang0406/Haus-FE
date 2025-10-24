@@ -7,6 +7,11 @@ import { formatNumber } from "@/utils/function";
 import { ImHeadphones } from "react-icons/im";
 import { FiPackage } from "react-icons/fi";
 import { FaTruck } from "react-icons/fa";
+import { isLoggedIn } from "@/utils/checkLogin";
+import { useDispatch } from "react-redux";
+import { setLocalCart } from "@/store/orderSlice";
+import { toast } from "react-toastify";
+import { addToCart } from "@/api/cart";
 
 const RightComponent = ({
   product,
@@ -16,6 +21,7 @@ const RightComponent = ({
   // const [typeIndex, setTypeIndex] = useState(0);
   const [count, setCount] = useState(1);
   const [countInCart, setCountInCart] = useState(0);
+  const dispatch = useDispatch();
 
   const benefits = [
     {
@@ -34,6 +40,24 @@ const RightComponent = ({
       desc: "Kể từ ngày giao hàng",
     },
   ];
+
+  const handleAddToCart = async () => {
+    if (isLoggedIn()) {
+      const data = {
+        variantId: product.productVariations[selectedVariantIndex].id,
+        quantity: count,
+      };
+      const response = await addToCart(data);
+      if (response.status === 200) {
+        toast.success("Đã thêm vào giỏ hàng");
+        setCountInCart(countInCart + count);
+      }
+    } else {
+      dispatch(setLocalCart([{ ...product, quantity: count }]));
+      setCountInCart(countInCart + 1);
+      toast.success("Đã thêm vào giỏ hàng");
+    }
+  };
   return (
     <div data-aos="fade-left" className="w-full flex flex-col gap-[20px]">
       <p className="text-[32px] font-semibold leading-[140%]">
@@ -98,7 +122,9 @@ const RightComponent = ({
                 aria-label={type?.color}
                 onClick={() => setSelectedVariantIndex(index)}
                 className={`w-[40px] h-[40px] rounded-lg border-[1px] p-[2px] cursor-pointer flex items-center justify-center ${
-                  index === selectedVariantIndex ? "border-[#9a542c]" : "border-[#e4e4e4]"
+                  index === selectedVariantIndex
+                    ? "border-[#9a542c]"
+                    : "border-[#e4e4e4]"
                 }`}
               >
                 <img
@@ -133,7 +159,10 @@ const RightComponent = ({
           </div>
 
           <div className="w-full flex items-center justify-between gap-[10px]">
-            <button className="w-full px-[8px] py-[14px] font-medium text-[#ad7555] border-[1px] border-[#ad7555] rounded-lg bg-transparent hover:text-white hover:bg-[#ad7555]">
+            <button
+              onClick={() => handleAddToCart()}
+              className="w-full px-[8px] py-[14px] font-medium text-[#ad7555] border-[1px] border-[#ad7555] rounded-lg bg-transparent hover:text-white hover:bg-[#ad7555]"
+            >
               THÊM VÀO GIỎ
             </button>
             <button className="w-[53px] h-[53px] border-[1px] border-[#ad7555] rounded-lg text-[#ad7555] bg-transparent text-[24px] flex items-center justify-center hover:text-white hover:bg-[#ad7555]">

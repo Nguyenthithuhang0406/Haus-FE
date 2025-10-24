@@ -29,7 +29,7 @@ const orderSlice = createSlice({
       state.quantityOfCart = action.payload;
     },
     setLocalCart: (state, action) => {
-      state.localCart = action.payload;
+      state.localCart = [...state.localCart, ...action.payload];
     },
   },
 });
@@ -40,5 +40,6 @@ export const {
   setLoading,
   setError,
   setQuantityOfCart,
+  setLocalCart,
 } = orderSlice.actions;
 export default orderSlice.reducer;

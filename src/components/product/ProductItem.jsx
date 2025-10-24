@@ -4,6 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { FaRegHeart } from "react-icons/fa";
 import { formatNumber } from "@/utils/function";
 import SaleProgressBar from "./SaleProgressBar";
+import { isLoggedIn } from "@/utils/checkLogin";
+import { useDispatch } from "react-redux";
+import { setLocalCart } from "@/store/orderSlice";
+import { toast } from "react-toastify";
+import { addToCart } from "@/api/cart";
 
 const ProductItem = ({ product }) => {
   const [indexImage, setIndexImage] = useState(0);
@@ -12,6 +17,8 @@ const ProductItem = ({ product }) => {
   const [likeProducts, setLikeProducts] = useState(
     JSON.parse(localStorage.getItem("likeProducts")) || []
   );
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setLikeProducts(JSON.parse(localStorage.getItem("likeProducts")) || []);
@@ -32,6 +39,23 @@ const ProductItem = ({ product }) => {
     } else {
       likeProducts.push(product);
       localStorage.setItem("likeProducts", JSON.stringify(likeProducts));
+    }
+  };
+
+  const handleClickAddToCart = async (e) => {
+    e.stopPropagation();
+    if (isLoggedIn()) {
+      const data = {
+        variantId: product.productVariations[0].id,
+        quantity: 1,
+      };
+      const response = await addToCart(data);
+      if (response.status === 200) {
+        toast.success("Đã thêm vào giỏ hàng");
+      }
+    } else {
+      dispatch(setLocalCart([{ ...product, quantity: 1 }]));
+      toast.success("Đã thêm vào giỏ hàng");
     }
   };
 
@@ -69,19 +93,25 @@ const ProductItem = ({ product }) => {
       {/* Button thêm giỏ hàng */}
       <div className="w-full flex items-center justify-center absolute top-[140px] lg:top-[140px] xl:top-[200px] left-0">
         <button
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            product?.soldQuantity !== product?.inventoryQuantity &&
+              (!product?.productVariations ||
+                product?.productVariations.length === 1) &&
+              handleClickAddToCart(e);
+          }}
           className={` w-[70%] z-10 bg-white text-[15px] font-medium px-3 py-2 rounded-xl
           opacity-0 translate-y-6 invisible group-hover:opacity-100 group-hover:translate-y-0 group-hover:visible transition-all duration-300
           hover:bg-[#ad7555] hover:text-white ${
-            product?.sell === product?.inventoryQuantity
+            product?.soldQuantity === product?.inventoryQuantity
               ? "cursor-not-allowed"
               : "cursor-pointer"
           }`}
         >
-          {product?.medias && product?.medias.length > 1
-            ? "Tùy chọn"
-            : product?.sell === product?.inventoryQuantity
+          {product?.soldQuantity === product?.inventoryQuantity
             ? "Hết hàng"
+            : product?.productVariations &&
+              product?.productVariations.length > 1
+            ? "Tùy chọn"
             : "Thêm vào giỏ hàng"}
         </button>
       </div>
