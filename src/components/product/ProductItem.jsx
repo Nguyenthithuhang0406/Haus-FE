@@ -55,12 +55,16 @@ const ProductItem = ({ product }) => {
       const response = await addToCart(data);
       if (response.status === 200) {
         flyToCart(imageUrl, imageRef.current);
-        toast.success("Đã thêm vào giỏ hàng");
+        setTimeout(() => {
+          toast.success("Đã thêm vào giỏ hàng");
+        }, 1300);
       }
     } else {
       dispatch(setLocalCart([{ ...product, quantity: 1 }]));
       flyToCart(imageUrl, imageRef.current);
-      toast.success("Đã thêm vào giỏ hàng");
+      setTimeout(() => {
+        toast.success("Đã thêm vào giỏ hàng");
+      }, 1300);
     }
   };
 

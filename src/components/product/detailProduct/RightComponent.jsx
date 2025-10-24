@@ -53,14 +53,18 @@ const RightComponent = ({
       const response = await addToCart(data);
       if (response.status === 200) {
         flyToCart(imageUrl, addCartBtnRef.current);
-        toast.success("Đã thêm vào giỏ hàng");
         setCountInCart(countInCart + count);
+        setTimeout(() => {
+          toast.success("Đã thêm vào giỏ hàng");
+        }, 1300);
       }
     } else {
       dispatch(setLocalCart([{ ...product, quantity: count }]));
       setCountInCart(countInCart + 1);
       flyToCart(imageUrl, addCartBtnRef.current);
-      toast.success("Đã thêm vào giỏ hàng");
+      setTimeout(() => {
+        toast.success("Đã thêm vào giỏ hàng");
+      }, 1300);
     }
   };
   return (
