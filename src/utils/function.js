@@ -69,3 +69,11 @@ export function formatDateTime(
     ? `${hh}:${mm}:${ss} ${dd}/${MM}/${yyyy}`
     : `${hh}:${mm} ${dd}/${MM}/${yyyy}`;
 }
+
+export function getTargetDate(daysRemaining) {
+  const now = new Date();
+  const targetDate = new Date(now);
+  targetDate.setDate(now.getDate() + daysRemaining); 
+  targetDate.setHours(23, 59, 59, 0); 
+  return targetDate.toISOString().split(".")[0]; 
+}
