@@ -1,15 +1,30 @@
 import React from "react";
-import { Minus, Plus, X } from "lucide-react";
+import { Minus, Plus, X, Check } from "lucide-react";
 
-const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
+const CartItem = ({ item, onUpdateQuantity, onRemove, isSelected, onToggleSelect }) => {
   const formatPrice = (price) => {
     return new Intl.NumberFormat('vi-VN').format(price) + 'đ';
   };
 
   return (
-    <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm mb-4">
+    <div 
+      className={`bg-white rounded-lg p-4 sm:p-6 shadow-sm mb-4 transition-all duration-200 ${
+        isSelected ? 'ring-2 ring-[#ad7555] shadow-md' : ''
+      }`}
+    >
       {/* Mobile Layout */}
-      <div className="flex gap-4 sm:hidden">
+      <div className="flex gap-3 lg:hidden">
+        <button
+          onClick={() => onToggleSelect(item.id)}
+          className={`mt-1 w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
+            isSelected 
+              ? 'bg-[#ad7555] border-[#ad7555]' 
+              : 'bg-white border-gray-300 hover:border-[#ad7555]'
+          }`}
+        >
+          {isSelected && <Check size={14} className="text-white" strokeWidth={3} />}
+        </button>
+        
         <img
           src={item.image}
           alt={item.name}
@@ -29,13 +44,19 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
             </button>
           </div>
           
-          <p className="text-xs text-gray-500 mb-3">{item.category}</p>
+          <p className="text-xs text-gray-500 mb-2">{item.category}</p>
+          
+          <div className="mb-3">
+            <p className="text-sm text-gray-600">
+              Đơn giá: <span className="font-medium text-[#ad7555]">{formatPrice(item.price)}</span>
+            </p>
+          </div>
           
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2 border rounded-lg px-2 py-1">
               <button
                 onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-                className="text-gray-600 hover:text-gray-900 p-1"
+                className="text-gray-600 hover:text-gray-900 p-1 disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={item.quantity <= 1}
               >
                 <Minus size={16} />
@@ -49,15 +70,29 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
               </button>
             </div>
             
-            <p className="text-base font-bold text-[#ad7555]">
-              {formatPrice(item.price * item.quantity)}
-            </p>
+            <div className="text-right">
+              <p className="text-xs text-gray-500">Thành tiền</p>
+              <p className="text-base font-bold text-[#ad7555]">
+                {formatPrice(item.price * item.quantity)}
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Desktop Layout */}
-      <div className="hidden sm:flex items-center gap-6">
+      <div className="hidden lg:flex items-center gap-6">
+        <button
+          onClick={() => onToggleSelect(item.id)}
+          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
+            isSelected 
+              ? 'bg-[#ad7555] border-[#ad7555] scale-110' 
+              : 'bg-white border-gray-300 hover:border-[#ad7555] hover:scale-105'
+          }`}
+        >
+          {isSelected && <Check size={16} className="text-white" strokeWidth={3} />}
+        </button>
+        
         <img
           src={item.image}
           alt={item.name}
@@ -69,10 +104,17 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
           <p className="text-sm text-gray-500">{item.category}</p>
         </div>
 
+        <div className="text-center min-w-[100px]">
+          <p className="text-sm text-gray-500 mb-1">Đơn giá</p>
+          <p className="text-base font-medium text-[#ad7555]">
+            {formatPrice(item.price)}
+          </p>
+        </div>
+
         <div className="flex items-center gap-3 border rounded-lg px-3 py-2">
           <button
             onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-            className="text-gray-600 hover:text-gray-900"
+            className="text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={item.quantity <= 1}
           >
             <Minus size={18} />
@@ -86,7 +128,8 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
           </button>
         </div>
 
-        <div className="text-right min-w-[120px]">
+        <div className="text-center min-w-[120px]">
+          <p className="text-sm text-gray-500 mb-1">Thành tiền</p>
           <p className="text-lg font-bold text-[#ad7555]">
             {formatPrice(item.price * item.quantity)}
           </p>
