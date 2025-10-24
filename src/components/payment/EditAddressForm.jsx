@@ -10,7 +10,7 @@ const validationSchema = Yup.object({
     address: Yup.string().required('Vui lòng nhập địa chỉ')
 });
 
-const EditAddressForm = ({ addressData, onUpdate, onDelete, onClose }) => {
+const EditAddressForm = ({ addressData, onUpdate, onClose }) => {
     const handleSubmit = (values) => {
         onUpdate({
             name: values.name,
@@ -18,13 +18,6 @@ const EditAddressForm = ({ addressData, onUpdate, onDelete, onClose }) => {
             address: values.address
         });
         onClose();
-    };
-
-    const handleDelete = () => {
-        if (window.confirm('Bạn có chắc chắn muốn xóa địa chỉ này?')) {
-            onDelete();
-            onClose();
-        }
     };
 
     return (
@@ -89,13 +82,7 @@ const EditAddressForm = ({ addressData, onUpdate, onDelete, onClose }) => {
 
                             {/* Buttons */}
                             <div className="flex flex-col md:flex-row justify-between gap-3 mt-3">
-                                <button
-                                    type="button"
-                                    onClick={handleDelete}
-                                    className="px-4 py-2.5 border bg-red-500 text-white hover:bg-red-50 hover:border-red-500 hover:text-red-500 rounded-xl transition shadow-sm text-sm md:text-base"
-                                >
-                                    Xóa
-                                </button>
+                                
                                 <div className="flex flex-col md:flex-row gap-3">
                                     <button
                                         type="button"
