@@ -167,16 +167,14 @@ const Materials = () => {
               loop={true}
               className="w-full flex items-center justify-center"
             >
-              <div className="w-full flex items-center !justify-center">
-                {products.map((product, index) => (
-                  <SwiperSlide
-                    className="flex items-center justify-center"
-                    key={index}
-                  >
-                    <ProductItem product={product} />
-                  </SwiperSlide>
-                ))}
-              </div>
+              {products.map((product, index) => (
+                <SwiperSlide
+                  className="flex items-center justify-center"
+                  key={index}
+                >
+                  <ProductItem product={product} />
+                </SwiperSlide>
+              ))}
             </Swiper>
             <button
               ref={nextRef}

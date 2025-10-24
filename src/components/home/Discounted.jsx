@@ -139,16 +139,14 @@ const Discounted = () => {
               slidesOffsetAfter={0}
               className="w-full flex justify-center items-center"
             >
-              <div className="w-full flex justify-center items-center">
-                {listDiscountedProduct.map((product, index) => (
-                  <SwiperSlide
-                    key={index}
-                    className="!mr-0 last:!mr-0 w-full flex justify-center"
-                  >
-                    <ProductItem product={product} />
-                  </SwiperSlide>
-                ))}
-              </div>
+              {listDiscountedProduct.map((product, index) => (
+                <SwiperSlide
+                  key={index}
+                  className="!mr-0 last:!mr-0 w-full flex justify-center"
+                >
+                  <ProductItem product={product} />
+                </SwiperSlide>
+              ))}
             </Swiper>
           </div>
         </div>

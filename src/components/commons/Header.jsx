@@ -158,6 +158,7 @@ const Header = () => {
           </div>
           <div
             // onClick={() => navigate("/cart")}
+            id="cart-icon"
             className="flex flex-col items-center cursor-pointer text-[#efefef] hover:text-[#9a542c] relative"
           >
             <GrCart className="w-[30px] h-[30px]" />

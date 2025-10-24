@@ -1,9 +1,9 @@
 /* eslint-disable*/
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { FaStar, FaRegStar, FaRegStarHalfStroke } from "react-icons/fa6";
 import { CiHeart } from "react-icons/ci";
 import { IoIosFlash } from "react-icons/io";
-import { formatNumber } from "@/utils/function";
+import { flyToCart, formatNumber } from "@/utils/function";
 import { ImHeadphones } from "react-icons/im";
 import { FiPackage } from "react-icons/fi";
 import { FaTruck } from "react-icons/fa";
@@ -22,6 +22,7 @@ const RightComponent = ({
   const [count, setCount] = useState(1);
   const [countInCart, setCountInCart] = useState(0);
   const dispatch = useDispatch();
+  const addCartBtnRef = useRef(null);
 
   const benefits = [
     {
@@ -42,6 +43,8 @@ const RightComponent = ({
   ];
 
   const handleAddToCart = async () => {
+    const imageUrl = product.productVariations[selectedVariantIndex].media?.url;
+
     if (isLoggedIn()) {
       const data = {
         variantId: product.productVariations[selectedVariantIndex].id,
@@ -49,12 +52,14 @@ const RightComponent = ({
       };
       const response = await addToCart(data);
       if (response.status === 200) {
+        flyToCart(imageUrl, addCartBtnRef.current);
         toast.success("Đã thêm vào giỏ hàng");
         setCountInCart(countInCart + count);
       }
     } else {
       dispatch(setLocalCart([{ ...product, quantity: count }]));
       setCountInCart(countInCart + 1);
+      flyToCart(imageUrl, addCartBtnRef.current);
       toast.success("Đã thêm vào giỏ hàng");
     }
   };
@@ -128,6 +133,7 @@ const RightComponent = ({
                 }`}
               >
                 <img
+                  ref={addCartBtnRef}
                   src={type?.media?.url}
                   alt={type?.color}
                   className={`w-full h-full object-cover`}

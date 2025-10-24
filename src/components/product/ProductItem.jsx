@@ -1,8 +1,8 @@
 /* eslint-disable */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaRegHeart } from "react-icons/fa";
-import { formatNumber } from "@/utils/function";
+import { flyToCart, formatNumber } from "@/utils/function";
 import SaleProgressBar from "./SaleProgressBar";
 import { isLoggedIn } from "@/utils/checkLogin";
 import { useDispatch } from "react-redux";
@@ -19,6 +19,7 @@ const ProductItem = ({ product }) => {
   );
 
   const dispatch = useDispatch();
+  const imageRef = useRef(null);
 
   useEffect(() => {
     setLikeProducts(JSON.parse(localStorage.getItem("likeProducts")) || []);
@@ -44,6 +45,8 @@ const ProductItem = ({ product }) => {
 
   const handleClickAddToCart = async (e) => {
     e.stopPropagation();
+    const imageUrl = product.productVariations[0].media?.url;
+
     if (isLoggedIn()) {
       const data = {
         variantId: product.productVariations[0].id,
@@ -51,10 +54,12 @@ const ProductItem = ({ product }) => {
       };
       const response = await addToCart(data);
       if (response.status === 200) {
+        flyToCart(imageUrl, imageRef.current);
         toast.success("Đã thêm vào giỏ hàng");
       }
     } else {
       dispatch(setLocalCart([{ ...product, quantity: 1 }]));
+      flyToCart(imageUrl, imageRef.current);
       toast.success("Đã thêm vào giỏ hàng");
     }
   };
@@ -131,6 +136,7 @@ const ProductItem = ({ product }) => {
               }`}
             >
               <img
+                ref={imageRef}
                 src={image?.url}
                 alt={product?.productName}
                 className="w-full h-full rounded-full"
