@@ -22,7 +22,7 @@ const ProductPayment = ({ listProducts }) => {
     };
 
     const subtotal = products.reduce(
-        (sum, item) => sum + item.variants[0].price * item.quantity,
+        (sum, item) => sum + (item.variants[0].price * item.quantity) * ((100 - item.discount) / 100),
         0
     );
 
@@ -47,7 +47,7 @@ const ProductPayment = ({ listProducts }) => {
                                 <div className="flex-1 mt-3">
                                     <h3 className="font-medium">{item.name}</h3>
                                     <p className="text-gray-500">Màu: {item.variants[0].color}</p>
-                                    <div className="flex justify-between items-center mt-2">
+                                    <div className="flex justify-between items-center my-2">
                                         <div className="flex items-center border border-gray-100 gap-1">
                                             <button
                                                 onClick={() => decreaseQuantity(index)}
@@ -63,8 +63,14 @@ const ProductPayment = ({ listProducts }) => {
                                                 +
                                             </button>
                                         </div>
-                                        <p className="font-medium">
+                                        <p className="font-medium line-through text-gray-500 text-[15px]">
                                             {(item.variants[0].price * item.quantity).toLocaleString()} đ
+                                        </p>
+                                    </div>
+                                    <div className='flex justify-between'>
+                                        <p className="text-gray-500">Giảm giá: {item.discount}%</p>
+                                        <p className="font-medium">
+                                            {((item.variants[0].price * item.quantity) * ((100 - item.discount) / 100)).toLocaleString()} đ
                                         </p>
                                     </div>
                                 </div>

@@ -34,6 +34,7 @@ const dummyProducts = [
       `,
         price: 3500000,
         stock: 11,
+        discount: 10,
         variants: [
             {
                 id: 101,
@@ -82,6 +83,7 @@ const dummyProducts = [
       `,
         price: 1000000,
         stock: 12,
+        discount: 12,
         variants: [
             {
                 id: 101,
@@ -130,6 +132,7 @@ const dummyProducts = [
       `,
         price: 1000000,
         stock: 12,
+        discount: 15,
         variants: [
             {
                 id: 101,
@@ -178,6 +181,7 @@ const dummyProducts = [
       `,
         price: 1000000,
         stock: 12,
+        discount: 17,
         variants: [
             {
                 id: 101,
