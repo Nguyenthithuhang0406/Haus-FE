@@ -37,13 +37,13 @@ const ProductItem = ({ product }) => {
 
   return (
     <div
-      onClick={() => navigate("/detailProduct/2")}
+      onClick={() => navigate(`/detailProduct/${product?.id}`)}
       className="relative w-[200px] h-[350px] lg:w-[260px] lg:h-[370px] xl:w-[300px] xl:h-[400px] bg-white rounded-xl shadow cursor-pointer overflow-hidden group transition-all duration-300"
     >
       {/* Giảm giá */}
-      {product?.discount ? (
+      {product?.discountPercent ? (
         <button className="absolute top-2 left-2 z-10 bg-[#ad7555] text-white text-[15px] px-2 py-1 rounded-lg">
-          - {product?.discount}%
+          - {product?.discountPercent}%
         </button>
       ) : null}
 
@@ -60,8 +60,8 @@ const ProductItem = ({ product }) => {
       {/* Ảnh sản phẩm */}
       <div className="absolute top-0 left-0 w-full h-[184px] lg:h-[185px] xl:h-[245px] overflow-hidden">
         <img
-          src={product?.image[indexImage]}
-          alt={product?.name}
+          src={product?.medias ? product?.medias[indexImage]?.url : ""}
+          alt={product?.productName}
           className="w-full h-full object-cover rounded-t-xl transform scale-110 group-hover:scale-100 transition-transform duration-300"
         />
       </div>
@@ -73,14 +73,14 @@ const ProductItem = ({ product }) => {
           className={` w-[70%] z-10 bg-white text-[15px] font-medium px-3 py-2 rounded-xl
           opacity-0 translate-y-6 invisible group-hover:opacity-100 group-hover:translate-y-0 group-hover:visible transition-all duration-300
           hover:bg-[#ad7555] hover:text-white ${
-            product?.sell === product?.total
+            product?.sell === product?.inventoryQuantity
               ? "cursor-not-allowed"
               : "cursor-pointer"
           }`}
         >
-          {product?.image.length > 1
+          {product?.medias && product?.medias.length > 1
             ? "Tùy chọn"
-            : product?.sell === product?.total
+            : product?.sell === product?.inventoryQuantity
             ? "Hết hàng"
             : "Thêm vào giỏ hàng"}
         </button>
@@ -88,45 +88,52 @@ const ProductItem = ({ product }) => {
 
       {/* List thumbnail */}
       <div className="absolute top-[190px] lg:top-[190px] xl:top-[250px] flex gap-2 px-5 items-center z-10">
-        {product?.image.map((image, index) => (
-          <div
-            onMouseEnter={() => setIndexImage(index)}
-            key={index}
-            className={`w-[30px] h-[30px] rounded-lg overflow-hidden p-[2px] border 
+        {product?.medias &&
+          product?.medias.map((image, index) => (
+            <div
+              onMouseEnter={() => setIndexImage(index)}
+              key={index}
+              className={`w-[30px] h-[30px] rounded-lg overflow-hidden p-[2px] border 
               ${
                 index === indexImage
                   ? "border-[#ad7555] shadow-md z-10"
                   : "border-gray-300"
               }`}
-          >
-            <img
-              src={image}
-              alt={product?.name}
-              className="w-full h-full rounded-full"
-            />
-          </div>
-        ))}
+            >
+              <img
+                src={image?.url}
+                alt={product?.productName}
+                className="w-full h-full rounded-full"
+              />
+            </div>
+          ))}
       </div>
 
       {/* Tên sản phẩm */}
       <p
         className="absolute top-[220px] lg:top-[220px] xl:top-[280px] px-5 text-[15px] font-medium line-clamp-2"
-        title={product?.name}
+        title={product?.productName}
       >
-        {product?.name}
+        {product?.productName}
       </p>
 
       {/* Đã bán */}
       <div className="absolute hidden lg:block bottom-[50px] w-full px-5">
-        <SaleProgressBar sold={product?.sell} total={product?.total} />
+        <SaleProgressBar
+          sold={product?.sell || 0}
+          total={product?.inventoryQuantity}
+        />
       </div>
 
       {/* Giá */}
       <div className="absolute bottom-[20px] w-full px-5 flex flex-col lg:flex-row justify-between lg:items-center text-[15px] font-medium">
         <p className="text-[#ff6347] font-medium">
-          {formatNumber(product?.price * (1 - product?.discount / 100))}đ
+          {formatNumber(
+            product?.price * (1 - (product?.discountPercent ?? 0) / 100)
+          )}
+          đ
         </p>
-        {product?.discount > 0 && (
+        {product?.discountPercent > 0 && (
           <p className="line-through text-gray-400">
             {formatNumber(product?.price)} đ
           </p>

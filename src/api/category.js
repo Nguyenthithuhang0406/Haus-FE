@@ -4,7 +4,7 @@ import { axiosPrivate, axiosPublic } from "@/utils/axios/axiosInstance";
 export const getAllCategory = async (data) => {
   try {
     const { keyword, sortByName, pageNum, pageSize } = data;
-    const response = await request(axiosPrivate, {
+    const response = await request(axiosPublic, {
       method: "GET",
       url: "/category/search",
       params: {

@@ -5,13 +5,29 @@ import { GrFormPrevious, GrFormNext } from "react-icons/gr";
 import { Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
-const LeftComponent = ({ product }) => {
+const LeftComponent = ({
+  product,
+  selectedVariantIndex,
+  setSelectedVariantIndex,
+}) => {
   const prevRef = useRef(null);
   const nextRef = useRef(null);
   const swiperRef = useRef(null);
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
   const [indexImage, setIndexImage] = useState(0);
+
+  const displayMedias = React.useMemo(() => {
+    const base = product?.medias || [];
+    const variantMedias =
+      product?.productVariations?.map((v) => v.media)?.filter(Boolean) || [];
+
+    const all = [...base, ...variantMedias];
+    const unique = all.filter(
+      (item, index, self) => index === self.findIndex((t) => t.url === item.url)
+    );
+    return unique;
+  }, [product]);
 
   const updateNavigation = useCallback(() => {
     if (swiperRef.current) {
@@ -36,6 +52,40 @@ const LeftComponent = ({ product }) => {
   useEffect(() => {
     console.log(indexImage);
   }, [indexImage]);
+
+  useEffect(() => {
+    if (!swiperRef.current || !product?.productVariations) return;
+
+    const variantMedia =
+      product?.productVariations[selectedVariantIndex]?.media?.url;
+    if (!variantMedia) return;
+
+    const variantIndex = displayMedias.findIndex((m) => m.url === variantMedia);
+
+    if (variantIndex >= 0) {
+      swiperRef.current.slideTo(variantIndex);
+      setIndexImage(variantIndex);
+    }
+  }, [selectedVariantIndex, product, displayMedias]);
+
+  const handleClickThumbnail = (image, index) => {
+    setIndexImage(index);
+    swiperRef.current?.slideTo(index);
+
+    // Kiểm tra ảnh thuộc variant nào
+    const foundVariantIndex = product?.productVariations?.findIndex(
+      (v) => v.media?.url === image.url
+    );
+
+    // Nếu ảnh thuộc variant nào đó → set lại selectedVariantIndex
+    if (
+      foundVariantIndex !== -1 &&
+      typeof setSelectedVariantIndex === "function"
+    ) {
+      setSelectedVariantIndex(foundVariantIndex);
+    }
+  };
+
   return (
     <div
       data-aos="fade-right"
@@ -74,11 +124,11 @@ const LeftComponent = ({ product }) => {
           }}
           className="w-full h-full rounded-2xl"
         >
-          {product.images.map((image, index) => (
-            <SwiperSlide key={index}>
+          {displayMedias.map((image) => (
+            <SwiperSlide key={image.id}>
               <div className="w-full h-full flex items-center justify-center rounded-2xl">
                 <img
-                  src={image}
+                  src={image.url}
                   alt="product"
                   className="w-full h-full max-h-[500px] object-cover rounded-2xl"
                 />
@@ -110,13 +160,10 @@ const LeftComponent = ({ product }) => {
         key={indexImage}
         className="flex w-full gap-2 px-5 max-h-[500px] overflow-y-auto max-[500px]:hidden"
       >
-        {product.images.map((image, index) => (
+        {displayMedias.map((image, index) => (
           <div
-            key={index}
-            onClick={() => {
-              setIndexImage(index);
-              swiperRef.current?.slideTo(index);
-            }}
+            key={image.id}
+            onClick={() => handleClickThumbnail(image, index)}
             className={`w-full cursor-pointer rounded-2xl border border-gray-200 shadow-md opacity-60 
               ${
                 indexImage === index
@@ -134,7 +181,7 @@ const LeftComponent = ({ product }) => {
             }
           >
             <img
-              src={image}
+              src={image.url}
               alt="product"
               className="w-full h-[120px] object-cover rounded-2xl shadow"
             />

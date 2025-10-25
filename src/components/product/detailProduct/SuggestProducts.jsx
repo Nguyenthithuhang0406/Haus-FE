@@ -1,14 +1,62 @@
-import { listProduct } from "@/utils/contants/product";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import { GrFormPrevious, GrFormNext } from "react-icons/gr";
 import ProductItem from "../ProductItem";
+import { getAllCategory } from "@/api/category";
+import { getProductByCategoryId } from "@/api/product";
 
-const SuggestProducts = () => {
-  const products = listProduct;
+const SuggestProducts = ({ product }) => {
+  const [categoryId, setCategoryId] = useState(null);
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchCategoryId = async () => {
+      if (
+        product &&
+        product?.categoriesName &&
+        product?.categoriesName.length > 0
+      ) {
+        const categoryName = product?.categoriesName[0];
+        const categories = await getAllCategory({ pageNum: 1, pageSize: 1000 });
+        const flatMap = (categories) => {
+          let result = [];
+          categories.forEach((category) => {
+            result.push(category);
+            if (category.subCategories && category.subCategories.length > 0) {
+              result = result.concat(flatMap(category.subCategories));
+            }
+          });
+          return result;
+        };
+        const allCategories = flatMap(categories.data.items);
+        const matchedCategory = allCategories.find(
+          (cat) => cat.categoryName === categoryName
+        );
+
+        setCategoryId(matchedCategory ? matchedCategory.id : null);
+      }
+    };
+    fetchCategoryId();
+  }, [product]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      if (categoryId) {
+        const response = await getProductByCategoryId({
+          categoryId,
+          pageNum: 1,
+          pageSize: 100,
+        });
+        if (response.status === 200) {
+          setProducts(response.data.items);
+        }
+      }
+    };
+    fetchProducts();
+  }, [categoryId]);
 
   // Chia nhóm sản phẩm theo 4 sp/slide
   const chunkSize = 4;
@@ -19,7 +67,9 @@ const SuggestProducts = () => {
 
   return (
     <div>
-      <p className="text-[25px] md:text-[30px] lg:text-[32px] font-semibold text-center">Sản phẩm liên quan</p>
+      <p className="text-[25px] md:text-[30px] lg:text-[32px] font-semibold text-center">
+        Sản phẩm liên quan
+      </p>
 
       <div
         data-aos="fade-up"

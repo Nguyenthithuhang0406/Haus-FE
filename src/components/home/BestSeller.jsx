@@ -1,6 +1,7 @@
 import { sofas } from "@/utils/contants/sofaFake";
 import React, { useEffect, useState } from "react";
 import ProductItem from "../product/ProductItem";
+import { getAllProducts } from "@/api/product";
 
 const BestSeller = () => {
   const [category, setCategory] = useState("sofa");
@@ -30,7 +31,20 @@ const BestSeller = () => {
   ];
 
   useEffect(() => {
-    setData(sofas);
+    const fetchData = async () => {
+      const request = {
+        pageNum: 1,
+        pageSize: 8,
+        sortBy: "sold_quantity_desc",
+        keyword: category,
+      };
+      const res = await getAllProducts(request);
+      if (res.status === 200) {
+        setData(res.data.items);
+      }
+    };
+
+    fetchData();
   }, [category]);
 
   return (
@@ -62,7 +76,7 @@ const BestSeller = () => {
 
       <div
         data-aos="fade-up"
-        className="flex flex-wrap items-center justify-center gap-5 w-full"
+        className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 justify-items-center"
       >
         {data?.map((item, index) => (
           <ProductItem key={index} product={item} />

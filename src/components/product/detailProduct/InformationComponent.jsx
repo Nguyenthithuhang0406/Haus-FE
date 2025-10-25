@@ -1,13 +1,13 @@
-import { policy } from "@/utils/contants/product";
+import { detailProduct, policy } from "@/utils/contants/product";
 import React, { useState } from "react";
 import { FaStar, FaRegStar, FaRegStarHalfStroke } from "react-icons/fa6";
-import CommentForm from "./CommentForm";
 import CommentModal from "./CommentModal";
 
 const InformationComponent = ({ product }) => {
   const [activeTab, setActiveTab] = useState("info");
   const [isShowAddComment, setIsShowAddComment] = useState(false);
   const poly = policy;
+  const fakeProduct = detailProduct;
   return (
     <div
       data-aos="fade-up"
@@ -50,7 +50,7 @@ const InformationComponent = ({ product }) => {
         <div
           data-aos="fade-up"
           className="prose max-w-none leading-[150%]"
-          dangerouslySetInnerHTML={{ __html: product.description }}
+          dangerouslySetInnerHTML={{ __html: product?.detailDescription }}
         />
       )}
 
@@ -88,7 +88,7 @@ const InformationComponent = ({ product }) => {
                 </span>
               </p>
 
-              <p>({product.comments.length} đánh giá)</p>
+              <p>({fakeProduct.comments.length} đánh giá)</p>
 
               <button
                 className="bg-[#80BB35] text-white px-[17px] py-[7px] flex items-center justify-center border-[1px] border-[#80BB35] hover:text-[#80BB35] hover:bg-transparent rounded-md"
@@ -100,7 +100,7 @@ const InformationComponent = ({ product }) => {
           </div>
 
           <div className="w-full flex flex-col gap-[20px]">
-            {product.comments.map((review, index) => (
+            {fakeProduct.comments.map((review, index) => (
               <div
                 key={index}
                 className="w-full flex flex-col items-start gap-[10px]"
@@ -145,7 +145,7 @@ const InformationComponent = ({ product }) => {
         <CommentModal
           isOpen={isShowAddComment}
           onClose={() => setIsShowAddComment(false)}
-          product={product}
+          product={fakeProduct}
         />
       )}
     </div>

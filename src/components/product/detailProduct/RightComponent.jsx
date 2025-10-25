@@ -8,8 +8,12 @@ import { ImHeadphones } from "react-icons/im";
 import { FiPackage } from "react-icons/fi";
 import { FaTruck } from "react-icons/fa";
 
-const RightComponent = ({ product }) => {
-  const [typeIndex, setTypeIndex] = useState(0);
+const RightComponent = ({
+  product,
+  setSelectedVariantIndex,
+  selectedVariantIndex,
+}) => {
+  // const [typeIndex, setTypeIndex] = useState(0);
   const [count, setCount] = useState(1);
   const [countInCart, setCountInCart] = useState(0);
 
@@ -32,34 +36,46 @@ const RightComponent = ({ product }) => {
   ];
   return (
     <div data-aos="fade-left" className="w-full flex flex-col gap-[20px]">
-      <p className="text-[32px] font-semibold leading-[140%]">{product.name}</p>
+      <p className="text-[32px] font-semibold leading-[140%]">
+        {product?.productName}
+      </p>
       <p className="flex items-center gap-1">
         <span className="flex items-center gap-1 text-[#ffbe00]">
-          {Array.from({ length: Math.floor(product.rating) }, (_, i) => (
+          {Array.from({ length: Math.floor(product?.rating || 0) }, (_, i) => (
             <FaStar key={i} />
           ))}
-          {product.rating % 1 !== 0 && <FaRegStarHalfStroke />}
-          {Array.from({ length: 5 - Math.ceil(product.rating) }, (_, i) => (
-            <FaRegStar key={i} />
-          ))}
+          {product?.rating % 1 !== 0 && <FaRegStarHalfStroke />}
+          {Array.from(
+            { length: 5 - Math.ceil(product?.rating || 0) },
+            (_, i) => (
+              <FaRegStar key={i} />
+            )
+          )}
         </span>
       </p>
       <p>
         <span className="font-semibold">Tình trạng: </span>
         <span
           className={`${
-            product?.sell !== product?.total ? "text-[#28a745]" : "text-red-500"
+            product?.soldQuantity !== product?.inventoryQuantity
+              ? "text-[#28a745]"
+              : "text-red-500"
           }`}
         >
-          {product?.sell !== product?.total ? "Còn hàng" : "Hết hàng"}
+          {product?.soldQuantity !== product?.inventoryQuantity
+            ? "Còn hàng"
+            : "Hết hàng"}
         </span>
       </p>
 
-      <div className="flex gap-2">
+      <div className="flex gap-8">
         <p className="text-[24px] font-semibold text-[#ff0000]">
-          {formatNumber(product?.price * (1 - product?.discount / 100))}đ
+          {formatNumber(
+            product?.price * (1 - (product?.discountPercent || 0) / 100)
+          )}
+          đ
         </p>
-        {product?.discount > 0 && (
+        {product?.discountPercent > 0 && (
           <p className="text-[18px] text-[#929292] font-medium line-through">
             {formatNumber(product?.price)} đ
           </p>
@@ -69,26 +85,27 @@ const RightComponent = ({ product }) => {
       <div className="border-t-[1px] border-[#e4e4e4] py-[20px] flex flex-col gap-[20px] lg:flex-row lg:justify-between lg:items-start">
         <div className="w-full lg:w-2/3 flex flex-col gap-[20px]">
           <p className="word-break w-full leading-[140%]">
-            {product.sortDescription}
+            {product?.description}
           </p>
           <p className="font-semibold">
-            Màu sắc: {product.types[typeIndex].color}
+            Màu sắc: {product?.productVariations[selectedVariantIndex]?.color}
           </p>
 
           <div className="w-full flex items-center gap-[10px]">
-            {product.types.map((type, index) => (
+            {product?.productVariations?.map((type, index) => (
               <div
-                key={type.id}
-                aria-label={type.color}
+                key={type?.id}
+                aria-label={type?.color}
+                onClick={() => setSelectedVariantIndex(index)}
                 className={`w-[40px] h-[40px] rounded-lg border-[1px] p-[2px] cursor-pointer flex items-center justify-center ${
-                  index === typeIndex ? "border-[#9a542c]" : "border-[#e4e4e4]"
+                  index === selectedVariantIndex ? "border-[#9a542c]" : "border-[#e4e4e4]"
                 }`}
               >
                 <img
-                  src={type.image}
-                  alt={type.color}
+                  src={type?.media?.url}
+                  alt={type?.color}
                   className={`w-full h-full object-cover`}
-                  onClick={() => setTypeIndex(index)}
+                  // onClick={() => setTypeIndex(index)}
                 />
               </div>
             ))}
