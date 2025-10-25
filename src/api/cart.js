@@ -1,7 +1,8 @@
 import { request } from "@/utils/axios/axios-http";
 import { axiosPrivate } from "@/utils/axios/axiosInstance";
 
-export const addToCart = async (variantId, quantity = 1) => {
+export const addToCart = async (data) => {
+  const { variantId, quantity } = data;
   try {
     const response = await request(axiosPrivate, {
       method: "POST",
