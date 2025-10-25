@@ -64,7 +64,7 @@ const CartPage = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(3);
-
+  const [selectedItems, setSelectedItems] = useState([]);
   useEffect(() => {
     loadCartItems();
     setLoading(false);
@@ -73,7 +73,20 @@ const CartPage = () => {
   const loadCartItems = () => {
     setCartItems(dummyCartItems);
   };
-
+  const handleToggleSelect = (itemId) => {
+    setSelectedItems(prev =>
+      prev.includes(itemId)
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId]
+    );
+  };
+  const handleSelectAll = () => {
+    if (selectedItems.length === cartItems.length) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(cartItems.map(item => item.id));
+    }
+  };
   const handleUpdateQuantity = (id, newQuantity) => {
     if (newQuantity < 1) return;
     setCartItems(items =>
@@ -86,22 +99,25 @@ const CartPage = () => {
   const handleRemoveItem = (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
       setCartItems(items => items.filter(item => item.id !== id));
+      setSelectedItems(selected => selected.filter(itemId => itemId !== id));
     }
   };
 
   const handleClearAll = () => {
     if (window.confirm("Bạn có chắc chắn muốn xóa tất cả sản phẩm?")) {
       setCartItems([]);
+      setSelectedItems([]);
     }
   };
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const calculateTotal = () => {
-    return cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    return cartItems
+      .filter(item => selectedItems.includes(item.id))
+      .reduce((sum, item) => sum + (item.price * item.quantity), 0);
   };
 
   useEffect(() => {
@@ -130,9 +146,12 @@ const CartPage = () => {
   return (
     <Layout>
       <div className="max-w-[1400px] mx-auto mt-[120px] px-4 py-8">
-        <CartHeader 
+        <CartHeader
           totalItems={cartItems.length}
+          selectedCount={selectedItems.length}
           onClearAll={handleClearAll}
+          onSelectAll={handleSelectAll}
+          allSelected={cartItems.length > 0 && selectedItems.length === cartItems.length}  // Thêm
         />
 
         {cartItems.length === 0 ? (
@@ -144,6 +163,8 @@ const CartPage = () => {
                 <CartItem
                   key={item.id}
                   item={item}
+                  isSelected={selectedItems.includes(item.id)}
+                  onToggleSelect={handleToggleSelect}
                   onUpdateQuantity={handleUpdateQuantity}
                   onRemove={handleRemoveItem}
                 />
@@ -159,6 +180,7 @@ const CartPage = () => {
             <div>
               <CartSummary
                 total={calculateTotal()}
+                selectedCount={selectedItems.length}
                 onContinue={() => navigate('/')}
                 onCheckout={() => navigate('/paymentPage')}
               />

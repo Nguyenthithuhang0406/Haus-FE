@@ -1,6 +1,6 @@
 import React from "react";
 
-const CartSummary = ({ total, onContinue, onCheckout }) => {
+const CartSummary = ({ total, selectedCount, onContinue, onCheckout }) => {
   const formatPrice = (price) => {
     return new Intl.NumberFormat('vi-VN').format(price) + 'đ';
   };
@@ -10,9 +10,15 @@ const CartSummary = ({ total, onContinue, onCheckout }) => {
       <h3 className="text-xl font-bold mb-6">Tổng đơn hàng</h3>
       
       <div className="space-y-3 mb-6 pb-6 border-b">
+        {selectedCount > 0 && (
+          <div className="flex justify-between text-sm text-gray-600 mb-2">
+            <span>Số sản phẩm đã chọn:</span>
+            <span className="font-medium">{selectedCount}</span>
+          </div>
+        )}
         <div className="flex justify-between text-gray-600">
           <span>Tổng tiền:</span>
-          <span className="font-bold text-2xl text-pink-600">
+          <span className="font-bold text-2xl text-[#ad7555]">
             {formatPrice(total)}
           </span>
         </div>
@@ -21,9 +27,10 @@ const CartSummary = ({ total, onContinue, onCheckout }) => {
       <div className="space-y-3">
         <button
           onClick={onCheckout}
-          className="w-full bg-[#ad7555] text-white py-3 rounded-lg hover:bg-[#9d6545] transition-colors font-medium"
+          disabled={selectedCount === 0}
+          className="w-full bg-[#ad7555] text-white py-3 rounded-lg hover:bg-[#9d6545] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Thanh toán ngay
+          Thanh toán ({selectedCount})
         </button>
         <button
           onClick={onContinue}
@@ -35,5 +42,4 @@ const CartSummary = ({ total, onContinue, onCheckout }) => {
     </div>
   );
 };
-
 export default CartSummary;

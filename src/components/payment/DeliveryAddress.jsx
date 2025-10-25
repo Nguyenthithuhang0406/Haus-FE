@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { CiEdit } from "react-icons/ci";
 import AddAddressModal from "./AddAddressForm";
 import EditAddressForm from "./EditAddressForm";
@@ -18,16 +18,16 @@ const DeliveryAddress = ({ onAddressSelect }) => {
 
     const [selectedAddress, setSelectedAddress] = useState(null);
     const [showModal, setShowModal] = useState(false);
-    const [showEditForm, setShowEditForm] = useState(false); 
+    const [showEditForm, setShowEditForm] = useState(false);
     const [editingIndex, setEditingIndex] = useState(null);
-   useEffect(() => {
+    useEffect(() => {
         if (user.addresses.length > 0 && !selectedAddress) {
             const firstAddressId = `${user.id}-0`;
             setSelectedAddress(firstAddressId);
             onAddressSelect && onAddressSelect(user.addresses[0]);
         }
     }, []);
-     const handleAddressSelect = (addressId, idx) => {
+    const handleAddressSelect = (addressId, idx) => {
         setSelectedAddress(addressId);
         if (onAddressSelect && user.addresses[idx]) {
             onAddressSelect(user.addresses[idx]);
@@ -54,33 +54,37 @@ const DeliveryAddress = ({ onAddressSelect }) => {
             if (selectedAddress === `${prev.id}-${editingIndex}`) {
                 onAddressSelect && onAddressSelect(updatedAddress);
             }
-            
+
             return {
                 ...prev,
                 addresses: newAddresses
             };
         });
     };
-  const handleDeleteAddress = () => {
-        const wasSelected = selectedAddress === `${user.id}-${editingIndex}`;
-        
-        setUser((prev) => {
-            const newAddresses = prev.addresses.filter((_, idx) => idx !== editingIndex);
-            
-            if (wasSelected && newAddresses.length > 0) {
-                const firstAddressId = `${prev.id}-0`;
-                setSelectedAddress(firstAddressId);
-                onAddressSelect && onAddressSelect(newAddresses[0]);
-            } else if (newAddresses.length === 0) {
-                setSelectedAddress(null);
-                onAddressSelect && onAddressSelect(null);
-            }
-            
-            return {
-                ...prev,
-                addresses: newAddresses
-            };
-        });
+    const handleDeleteClick = (e, idx) => {
+        e.stopPropagation();
+
+        if (window.confirm('Bạn có chắc chắn muốn xóa địa chỉ này?')) {
+            const wasSelected = selectedAddress === `${user.id}-${idx}`;
+
+            setUser((prev) => {
+                const newAddresses = prev.addresses.filter((_, i) => i !== idx);
+
+                if (wasSelected && newAddresses.length > 0) {
+                    const firstAddressId = `${prev.id}-0`;
+                    setSelectedAddress(firstAddressId);
+                    onAddressSelect && onAddressSelect(newAddresses[0]);
+                } else if (newAddresses.length === 0) {
+                    setSelectedAddress(null);
+                    onAddressSelect && onAddressSelect(null);
+                }
+
+                return {
+                    ...prev,
+                    addresses: newAddresses
+                };
+            });
+        }
     };
     return (
         <div className="max-w-[600px] w-full">
@@ -101,12 +105,21 @@ const DeliveryAddress = ({ onAddressSelect }) => {
                                         }`}
                                     onClick={() => handleAddressSelect(addressId, idx)}
                                 >
-                                    <CiEdit 
-                                        size={24}
-                                        className="absolute top-3 right-3 text-[#ad7555] hover:text-[#8d5d45] cursor-pointer"
-                                        onClick={(e) => handleEditClick(e, idx)}
-                                    />
-                                    <label className="flex items-center gap-3 cursor-pointer pr-8">
+
+                                    <div className="absolute top-3 right-3 flex gap-2">
+                                        <CiEdit
+                                            size={24}
+                                            className="text-[#ad7555] hover:text-[#8d5d45] cursor-pointer transition"
+                                            onClick={(e) => handleEditClick(e, idx)}
+                                        />
+                                        <Trash2
+                                            size={20}
+                                            className="text-[#8d5d45] hover:text-red-700 cursor-pointer transition"
+                                            onClick={(e) => handleDeleteClick(e, idx)}
+                                        />
+                                    </div>
+
+                                    <label className="flex items-center gap-3 cursor-pointer pr-16">
                                         <input
                                             type="radio"
                                             name="address"
@@ -151,12 +164,11 @@ const DeliveryAddress = ({ onAddressSelect }) => {
                 <EditAddressForm
                     addressData={user.addresses[editingIndex]}
                     onUpdate={handleUpdateAddress}
-                    onDelete={handleDeleteAddress}
                     onClose={() => {
                         setShowEditForm(false);
                         setEditingIndex(null);
                     }}
-                     />
+                />
             )}
         </div>
     );
