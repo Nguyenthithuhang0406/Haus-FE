@@ -5,8 +5,8 @@ import { FaRegHeart } from "react-icons/fa";
 import { flyToCart, formatNumber } from "@/utils/function";
 import SaleProgressBar from "./SaleProgressBar";
 import { isLoggedIn } from "@/utils/checkLogin";
-import { useDispatch } from "react-redux";
-import { setLocalCart } from "@/store/orderSlice";
+import { useDispatch, useSelector} from "react-redux";
+import { setLocalCart, setQuantityOfCart } from "@/store/orderSlice";
 import { toast } from "react-toastify";
 import { addToCart } from "@/api/cart";
 
@@ -43,6 +43,7 @@ const ProductItem = ({ product }) => {
     }
   };
 
+  const quantityOfCart = useSelector((state) => state.order.quantityOfCart);
   const handleClickAddToCart = async (e) => {
     e.stopPropagation();
     const imageUrl = product.productVariations[0].media?.url;
@@ -55,13 +56,26 @@ const ProductItem = ({ product }) => {
       const response = await addToCart(data);
       if (response.status === 200) {
         flyToCart(imageUrl, imageRef.current);
+        dispatch(setQuantityOfCart(quantityOfCart + 1));
         setTimeout(() => {
           toast.success("Đã thêm vào giỏ hàng");
         }, 1300);
       }
     } else {
-      dispatch(setLocalCart([{ ...product, quantity: 1 }]));
+      dispatch(
+        setLocalCart({
+          ...product,
+          productVariations: [
+            {
+              ...product.productVariations[0],
+              isSelected: true,
+              cartQuantity: 1,
+            },
+          ],
+        })
+      );
       flyToCart(imageUrl, imageRef.current);
+      dispatch(setQuantityOfCart(quantityOfCart + 1));
       setTimeout(() => {
         toast.success("Đã thêm vào giỏ hàng");
       }, 1300);

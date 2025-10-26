@@ -29,7 +29,35 @@ const orderSlice = createSlice({
       state.quantityOfCart = action.payload;
     },
     setLocalCart: (state, action) => {
-      state.localCart = [...state.localCart, ...action.payload];
+      const newItem = action.payload;
+
+      // Tìm variant được chọn trong sản phẩm mới
+      const selectedVariant = newItem.productVariations.find(
+        (variant) => variant.isSelected
+      );
+      if (!selectedVariant) return;
+
+      const variantId = selectedVariant.id;
+
+      // Tìm xem variant đó đã có trong giỏ chưa
+      const existedItem = state.localCart.find((item) =>
+        item.productVariations.some(
+          (variant) => variant.isSelected && variant.id === variantId
+        )
+      );
+
+      if (existedItem) {
+        // Tìm đúng variant trong sản phẩm cũ và cộng thêm số lượng
+        const existedVariant = existedItem.productVariations.find(
+          (variant) => variant.id === variantId
+        );
+        if (existedVariant) {
+          existedVariant.cartQuantity += selectedVariant.cartQuantity;
+        }
+      } else {
+        // Nếu chưa có, thêm sản phẩm mới vào giỏ
+        state.localCart.push(newItem);
+      }
     },
   },
 });

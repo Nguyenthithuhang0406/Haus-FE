@@ -10,20 +10,25 @@ import { removeAllCookies } from "@/utils/cookies";
 import { getAllCategory } from "@/api/category";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { isLoggedIn } from "@/utils/checkLogin";
+import { getCart } from "@/api/cart";
+import { useDispatch, useSelector } from "react-redux";
+import { setQuantityOfCart } from "@/store/orderSlice";
 
 const Menu = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [productCategorys, setProductCategorys] = useState(menuListProduct);
   const [projectCategorys, setProjectCategorys] = useState(menuProjects);
   const [categories, setCategories] = useState([]);
 
-  const [isLogin, setIsLogin] = useState(false);
+  const [isLogin, setIsLogin] = useState(isLoggedIn());
   const [isShow, setIsShow] = useState(false);
   const [isShowMenuMb, setIsShowMenuMb] = useState(false);
 
   const childRef = useRef(null);
   const menuMbRef = useRef(null);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -74,6 +79,53 @@ const Menu = () => {
       pageSize: 200,
     });
   }, []);
+
+  // const productsOfCartInLocal = useSelector((state) => state.order.localCart);
+  // const isQuantityInitialized = useRef(false);
+
+  // useEffect(() => {
+  //   const fetchProductOfCart = async () => {
+  //     if (isQuantityInitialized.current) return;
+  //     if (isLoggedIn()) {
+  //       try {
+  //         const response = await getCart();
+  //         if (response.status === 200) {
+  //           dispatch(
+  //             setQuantityOfCart(
+  //               response.data.cartItems.reduce(
+  //                 (total, item) =>
+  //                   total +
+  //                   (item?.productVariants?.find(
+  //                     (variant) => variant?.isSelected
+  //                   )?.cartQuantity || 0),
+  //                 0
+  //               )
+  //             )
+  //           );
+  //         }
+  //       } catch (error) {
+  //         console.log(error);
+  //       }
+  //     } else {
+  //       dispatch(
+  //         setQuantityOfCart(
+  //           productsOfCartInLocal.reduce(
+  //             (total, item) =>
+  //               total +
+  //               (item?.productVariants?.find((variant) => variant?.isSelected)
+  //                 ?.cartQuantity || 0),
+  //             0
+  //           )
+  //         )
+  //       );
+  //     }
+  //     isQuantityInitialized.current = true;
+  //   };
+  //   fetchProductOfCart();
+  // }, [productsOfCartInLocal, isLogin, dispatch]);
+
+  const quantityOfProducts = useSelector((state) => state.order.quantityOfCart);
+
   return (
     <>
       {/* Menu desktop */}
@@ -268,8 +320,16 @@ const Menu = () => {
               </p>
             </div>
           )}
-          <li className="text-white text-center cursor-pointer">
+          <li
+            onClick={() => navigate("/cart")}
+            className="text-white text-center cursor-pointer relative"
+          >
             <FaShoppingCart className="w-5 h-5 mx-auto" />
+            {quantityOfProducts > 0 && (
+              <span className="text-red-500 bg-lime-50 w-[20px] h-[20px] rounded-full flex items-center justify-center absolute -top-2 right-0 text-[14px]">
+                {quantityOfProducts}
+              </span>
+            )}
             <p className="text-[15px]">Giỏ hàng</p>
           </li>
         </ul>

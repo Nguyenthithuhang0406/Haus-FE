@@ -10,27 +10,30 @@ import { GrCart } from "react-icons/gr";
 import Logo from "@/assets/icons/Logo";
 import { getCookie, removeAllCookies } from "@/utils/cookies";
 import { toast } from "react-toastify";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setKeySearch } from "@/store/searchSlice";
+import { isLoggedIn } from "@/utils/checkLogin";
+import { getCart } from "@/api/cart";
+import { setQuantityOfCart } from "@/store/orderSlice";
 
 const Header = () => {
   const [inputText, setInputText] = useState("");
   const [isShow, setIsShow] = useState(false);
-  const [isLogin, setIsLogin] = useState(false);
+  const [isLogin, setIsLogin] = useState(isLoggedIn());
   const childRef = useRef(null);
 
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    const accessToken = getCookie("accessToken");
-    if (accessToken) {
-      setIsLogin(true);
-    } else {
-      setIsLogin(false);
-    }
-  }, []);
+  // useEffect(() => {
+  //   const accessToken = getCookie("accessToken");
+  //   if (accessToken) {
+  //     setIsLogin(true);
+  //   } else {
+  //     setIsLogin(false);
+  //   }
+  // }, []);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -56,19 +59,50 @@ const Header = () => {
     navigate("/");
   };
 
+  // const productsOfCartInLocal = useSelector((state) => state.order.localCart);
+  const quantityOfProducts = useSelector((state) => state.order.quantityOfCart);
+  // const isQuantityInitialized = useRef(false);
+
   // useEffect(() => {
   //   const fetchProductOfCart = async () => {
-  //     try {
-  //       const response = await getProductsInCart();
-  //       dispatch(setQuantityOfCart(response.data.items.length));
-  //     } catch (error) {
-  //       console.log(error);
+  //     if (isQuantityInitialized.current) return; // đã tính rồi, skip
+
+  //     if (isLoggedIn()) {
+  //       try {
+  //         const response = await getCart();
+  //         dispatch(
+  //           setQuantityOfCart(
+  //             response.data.cartItems.reduce(
+  //               (total, item) =>
+  //                 total +
+  //                 (item?.productVariants?.find((variant) => variant.isSelected)
+  //                   ?.cartQuantity || 0),
+  //               0
+  //             )
+  //           )
+  //         );
+  //       } catch (error) {
+  //         console.log(error);
+  //       }
+  //     } else {
+  //       // console.log("local:", productsOfCartInLocal);
+  //       // console.log("quantity:", quantityOfProducts);
+  //       dispatch(
+  //         setQuantityOfCart(
+  //           productsOfCartInLocal.reduce(
+  //             (total, item) =>
+  //               total +
+  //               (item?.productVariants?.find((variant) => variant?.isSelected)
+  //                 ?.cartQuantity || 0),
+  //             0
+  //           )
+  //         )
+  //       );
   //     }
+  //     isQuantityInitialized.current = true;
   //   };
   //   fetchProductOfCart();
-  // }, []);
-
-  // const quantityOfProducts = useSelector((state) => state.order.quantityOfCart);
+  // }, [productsOfCartInLocal, isLogin, dispatch]);
 
   return (
     <div
@@ -157,16 +191,16 @@ const Header = () => {
             )}
           </div>
           <div
-            // onClick={() => navigate("/cart")}
+            onClick={() => navigate("/cart")}
             id="cart-icon"
             className="flex flex-col items-center cursor-pointer text-[#efefef] hover:text-[#9a542c] relative"
           >
             <GrCart className="w-[30px] h-[30px]" />
-            {/* {quantityOfProducts > 0 && (
+            {quantityOfProducts > 0 && (
               <span className="text-red-500 bg-lime-50 w-[20px] h-[20px] rounded-full flex items-center justify-center absolute -top-2 right-0 text-[14px]">
                 {quantityOfProducts}
               </span>
-            )} */}
+            )}
             <p className="text-[15px]">Giỏ hàng</p>
           </div>
         </div>

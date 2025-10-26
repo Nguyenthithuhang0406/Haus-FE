@@ -6,77 +6,41 @@ import EmptyCart from "@/components/cart/EmptyCart";
 import CartSummary from "@/components/cart/CartSummary";
 import PaginationComponent from "@/components/cart/Pagination";
 import { useNavigate } from "react-router-dom";
-
-const dummyCartItems = [
-  {
-    id: 1,
-    name: "Sofa 3 chỗ ngồi phong cách hiện đại tối giản",
-    category: "Kem",
-    image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400",
-    price: 9500000,
-    quantity: 1,
-  },
-  {
-    id: 2,
-    name: "Bàn trang điểm IKEA NORDKISA",
-    category: "Tre tự nhiên",
-    image: "https://images.unsplash.com/photo-1506898667547-42e22a46e125?w=400",
-    price: 1000000,
-    quantity: 1,
-  },
-  {
-    id: 3,
-    name: "Ghế làm việc ergonomic",
-    category: "Đen",
-    image: "https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=400",
-    price: 3500000,
-    quantity: 1,
-  },
-  {
-    id: 4,
-    name: "Tủ quần áo 3 cánh",
-    category: "Gỗ sồi",
-    image: "https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=400",
-    price: 7200000,
-    quantity: 1,
-  },
-  {
-    id: 5,
-    name: "Giường ngủ queen size",
-    category: "Xám nhạt",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400",
-    price: 12000000,
-    quantity: 1,
-  },
-  {
-    id: 6,
-    name: "Bàn ăn 6 chỗ",
-    category: "Gỗ tự nhiên",
-    image: "https://images.unsplash.com/photo-1617806118233-18e1de247200?w=400",
-    price: 8500000,
-    quantity: 1,
-  },
-];
+import { isLoggedIn } from "@/utils/checkLogin";
+import { useSelector } from "react-redux";
+import { getCart } from "@/api/cart";
 
 const CartPage = () => {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(3);
+  const [loading, setLoading] = useState(false);
+  // const [currentPage, setCurrentPage] = useState(1);
+  // const [pageSize] = useState(3);
   const [selectedItems, setSelectedItems] = useState([]);
+  const cartItemsInRedux = useSelector((state) => state.order.localCart);
+
   useEffect(() => {
-    loadCartItems();
-    setLoading(false);
+    const fetchCartItems = async () => {
+      if (!isLoggedIn()) {
+        setLoading(true);
+        setCartItems(cartItemsInRedux);
+        setLoading(false);
+      } else {
+        setLoading(true);
+        const response = await getCart();
+        if (response.status === 200) {
+          setCartItems(response.data.cartItems || []);
+          setLoading(false);
+        }
+      }
+    };
+    fetchCartItems();
   }, []);
 
-  const loadCartItems = () => {
-    setCartItems(dummyCartItems);
-  };
   const handleToggleSelect = (itemId) => {
-    setSelectedItems(prev =>
+    setSelectedItems((prev) =>
       prev.includes(itemId)
-        ? prev.filter(id => id !== itemId)
+        ? prev.filter((id) => id !== itemId)
         : [...prev, itemId]
     );
   };
@@ -84,13 +48,13 @@ const CartPage = () => {
     if (selectedItems.length === cartItems.length) {
       setSelectedItems([]);
     } else {
-      setSelectedItems(cartItems.map(item => item.id));
+      setSelectedItems(cartItems.map((item) => item.id));
     }
   };
   const handleUpdateQuantity = (id, newQuantity) => {
     if (newQuantity < 1) return;
-    setCartItems(items =>
-      items.map(item =>
+    setCartItems((items) =>
+      items.map((item) =>
         item.id === id ? { ...item, quantity: newQuantity } : item
       )
     );
@@ -98,8 +62,10 @@ const CartPage = () => {
 
   const handleRemoveItem = (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
-      setCartItems(items => items.filter(item => item.id !== id));
-      setSelectedItems(selected => selected.filter(itemId => itemId !== id));
+      setCartItems((items) => items.filter((item) => item.id !== id));
+      setSelectedItems((selected) =>
+        selected.filter((itemId) => itemId !== id)
+      );
     }
   };
 
@@ -109,27 +75,27 @@ const CartPage = () => {
       setSelectedItems([]);
     }
   };
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  // const handlePageChange = (page) => {
+  //   setCurrentPage(page);
+  //   window.scrollTo({ top: 0, behavior: "smooth" });
+  // };
 
   const calculateTotal = () => {
     return cartItems
-      .filter(item => selectedItems.includes(item.id))
-      .reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      .filter((item) => selectedItems.includes(item.id))
+      .reduce((sum, item) => sum + item.price * item.quantity, 0);
   };
 
-  useEffect(() => {
-    const totalPages = Math.ceil(cartItems.length / pageSize);
-    if (currentPage > totalPages && totalPages > 0) {
-      setCurrentPage(totalPages);
-    }
-  }, [cartItems, currentPage, pageSize]);
+  // useEffect(() => {
+  //   const totalPages = Math.ceil(cartItems.length / pageSize);
+  //   if (currentPage > totalPages && totalPages > 0) {
+  //     setCurrentPage(totalPages);
+  //   }
+  // }, [cartItems, currentPage, pageSize]);
 
-  const indexOfLastItem = currentPage * pageSize;
-  const indexOfFirstItem = indexOfLastItem - pageSize;
-  const currentItems = cartItems.slice(indexOfFirstItem, indexOfLastItem);
+  // const indexOfLastItem = currentPage * pageSize;
+  // const indexOfFirstItem = indexOfLastItem - pageSize;
+  // const currentItems = cartItems.slice(indexOfFirstItem, indexOfLastItem);
 
   if (loading) {
     return (
@@ -151,7 +117,9 @@ const CartPage = () => {
           selectedCount={selectedItems.length}
           onClearAll={handleClearAll}
           onSelectAll={handleSelectAll}
-          allSelected={cartItems.length > 0 && selectedItems.length === cartItems.length}  // Thêm
+          allSelected={
+            cartItems.length > 0 && selectedItems.length === cartItems.length
+          } // Thêm
         />
 
         {cartItems.length === 0 ? (
@@ -159,7 +127,7 @@ const CartPage = () => {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
-              {currentItems.map((item) => (
+              {cartItems.map((item) => (
                 <CartItem
                   key={item.id}
                   item={item}
@@ -169,20 +137,20 @@ const CartPage = () => {
                   onRemove={handleRemoveItem}
                 />
               ))}
-              <PaginationComponent
+              {/* <PaginationComponent
                 currentPage={currentPage}
                 totalItems={cartItems.length}
                 pageSize={pageSize}
                 onPageChange={handlePageChange}
-              />
+              /> */}
             </div>
 
             <div>
               <CartSummary
                 total={calculateTotal()}
                 selectedCount={selectedItems.length}
-                onContinue={() => navigate('/')}
-                onCheckout={() => navigate('/paymentPage')}
+                onContinue={() => navigate("/")}
+                onCheckout={() => navigate("/paymentPage")}
               />
             </div>
           </div>

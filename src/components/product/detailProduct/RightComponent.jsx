@@ -8,21 +8,22 @@ import { ImHeadphones } from "react-icons/im";
 import { FiPackage } from "react-icons/fi";
 import { FaTruck } from "react-icons/fa";
 import { isLoggedIn } from "@/utils/checkLogin";
-import { useDispatch } from "react-redux";
-import { setLocalCart } from "@/store/orderSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { setLocalCart, setQuantityOfCart } from "@/store/orderSlice";
 import { toast } from "react-toastify";
 import { addToCart } from "@/api/cart";
+import { useNavigate } from "react-router-dom";
 
 const RightComponent = ({
   product,
   setSelectedVariantIndex,
   selectedVariantIndex,
 }) => {
-  // const [typeIndex, setTypeIndex] = useState(0);
   const [count, setCount] = useState(1);
   const [countInCart, setCountInCart] = useState(0);
   const dispatch = useDispatch();
   const addCartBtnRef = useRef(null);
+  const navigate = useNavigate();
 
   const benefits = [
     {
@@ -42,6 +43,8 @@ const RightComponent = ({
     },
   ];
 
+  const quantityOfCart = useSelector((state) => state.order.quantityOfCart);
+  
   const handleAddToCart = async () => {
     const imageUrl = product.productVariations[selectedVariantIndex].media?.url;
 
@@ -53,19 +56,37 @@ const RightComponent = ({
       const response = await addToCart(data);
       if (response.status === 200) {
         flyToCart(imageUrl, addCartBtnRef.current);
+        dispatch(setQuantityOfCart(quantityOfCart + count));
         setCountInCart(countInCart + count);
         setTimeout(() => {
           toast.success("Đã thêm vào giỏ hàng");
         }, 1300);
       }
     } else {
-      dispatch(setLocalCart([{ ...product, quantity: count }]));
+      dispatch(
+        setLocalCart({
+          ...product,
+          productVariations: product.productVariations.map(
+            (variation, index) => ({
+              ...variation,
+              isSelected: index === selectedVariantIndex,
+              cartQuantity: index === selectedVariantIndex ? count : 0,
+            })
+          ),
+        })
+      );
       setCountInCart(countInCart + 1);
       flyToCart(imageUrl, addCartBtnRef.current);
+      dispatch(setQuantityOfCart(quantityOfCart + count));
       setTimeout(() => {
         toast.success("Đã thêm vào giỏ hàng");
       }, 1300);
     }
+  };
+
+  const handleClickBuyNow = () => {
+    handleAddToCart();
+    navigate("/cart");
   };
   return (
     <div data-aos="fade-left" className="w-full flex flex-col gap-[20px]">
@@ -180,7 +201,10 @@ const RightComponent = ({
             </button>
           </div>
 
-          <button className="w-full px-[8px] py-[14px] bg-[#ad7555] text-white font-medium border-[1px] border-[#ad7555] hover:text-[#ad7555] hover:bg-transparent rounded-lg">
+          <button
+            onClick={handleClickBuyNow}
+            className="w-full px-[8px] py-[14px] bg-[#ad7555] text-white font-medium border-[1px] border-[#ad7555] hover:text-[#ad7555] hover:bg-transparent rounded-lg"
+          >
             MUA NGAY
           </button>
 
