@@ -59,6 +59,9 @@ const orderSlice = createSlice({
         state.localCart.push(newItem);
       }
     },
+    updateLocalCart: (state, action) => {
+      state.localCart = action.payload;
+    },
   },
 });
 
@@ -69,5 +72,6 @@ export const {
   setError,
   setQuantityOfCart,
   setLocalCart,
+  updateLocalCart,
 } = orderSlice.actions;
 export default orderSlice.reducer;

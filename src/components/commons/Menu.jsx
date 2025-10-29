@@ -5,15 +5,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { FaCaretDown, FaBars, FaShoppingCart, FaCaretUp } from "react-icons/fa";
 import { IoHeart } from "react-icons/io5";
 import { MdAccountCircle } from "react-icons/md";
-import { menuListProduct, menuProjects } from "@/utils/contants/Menu";
+import { menuProjects } from "@/utils/contants/Menu";
 import { removeAllCookies } from "@/utils/cookies";
 import { getAllCategory } from "@/api/category";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { isLoggedIn } from "@/utils/checkLogin";
-import { getCart } from "@/api/cart";
-import { useDispatch, useSelector } from "react-redux";
-import { setQuantityOfCart } from "@/store/orderSlice";
+import { useSelector } from "react-redux";
 
 const Menu = () => {
   const navigate = useNavigate();
@@ -27,8 +25,6 @@ const Menu = () => {
 
   const childRef = useRef(null);
   const menuMbRef = useRef(null);
-
-  const dispatch = useDispatch();
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -79,50 +75,6 @@ const Menu = () => {
       pageSize: 200,
     });
   }, []);
-
-  // const productsOfCartInLocal = useSelector((state) => state.order.localCart);
-  // const isQuantityInitialized = useRef(false);
-
-  // useEffect(() => {
-  //   const fetchProductOfCart = async () => {
-  //     if (isQuantityInitialized.current) return;
-  //     if (isLoggedIn()) {
-  //       try {
-  //         const response = await getCart();
-  //         if (response.status === 200) {
-  //           dispatch(
-  //             setQuantityOfCart(
-  //               response.data.cartItems.reduce(
-  //                 (total, item) =>
-  //                   total +
-  //                   (item?.productVariants?.find(
-  //                     (variant) => variant?.isSelected
-  //                   )?.cartQuantity || 0),
-  //                 0
-  //               )
-  //             )
-  //           );
-  //         }
-  //       } catch (error) {
-  //         console.log(error);
-  //       }
-  //     } else {
-  //       dispatch(
-  //         setQuantityOfCart(
-  //           productsOfCartInLocal.reduce(
-  //             (total, item) =>
-  //               total +
-  //               (item?.productVariants?.find((variant) => variant?.isSelected)
-  //                 ?.cartQuantity || 0),
-  //             0
-  //           )
-  //         )
-  //       );
-  //     }
-  //     isQuantityInitialized.current = true;
-  //   };
-  //   fetchProductOfCart();
-  // }, [productsOfCartInLocal, isLogin, dispatch]);
 
   const quantityOfProducts = useSelector((state) => state.order.quantityOfCart);
 

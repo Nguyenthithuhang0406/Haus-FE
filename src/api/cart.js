@@ -32,14 +32,16 @@ export const getCart = async () => {
   }
 };
 
-export const updateCartItem = async (variantId, quantity) => {
+export const updateCartItem = async (data) => {
   try {
+    const { newVariantId, quantity, oldVariantId } = data;
     const response = await request(axiosPrivate, {
       method: "PATCH",
       url: `/cart`,
       data: {
-        variantId: variantId,
-        quantity: quantity,
+        oldVariantId: oldVariantId,
+        ...(newVariantId && { newVariantId: newVariantId }),
+        ...addToCart(quantity && { quantity: quantity }),
       },
     });
     return response.data;

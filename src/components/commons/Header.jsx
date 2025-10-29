@@ -8,13 +8,11 @@ import { MdFlipCameraIos, MdOutlineAccountCircle } from "react-icons/md";
 import { AiOutlineHeart } from "react-icons/ai";
 import { GrCart } from "react-icons/gr";
 import Logo from "@/assets/icons/Logo";
-import { getCookie, removeAllCookies } from "@/utils/cookies";
+import {removeAllCookies } from "@/utils/cookies";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { setKeySearch } from "@/store/searchSlice";
 import { isLoggedIn } from "@/utils/checkLogin";
-import { getCart } from "@/api/cart";
-import { setQuantityOfCart } from "@/store/orderSlice";
 
 const Header = () => {
   const [inputText, setInputText] = useState("");
@@ -25,15 +23,6 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-
-  // useEffect(() => {
-  //   const accessToken = getCookie("accessToken");
-  //   if (accessToken) {
-  //     setIsLogin(true);
-  //   } else {
-  //     setIsLogin(false);
-  //   }
-  // }, []);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -59,51 +48,7 @@ const Header = () => {
     navigate("/");
   };
 
-  // const productsOfCartInLocal = useSelector((state) => state.order.localCart);
   const quantityOfProducts = useSelector((state) => state.order.quantityOfCart);
-  // const isQuantityInitialized = useRef(false);
-
-  // useEffect(() => {
-  //   const fetchProductOfCart = async () => {
-  //     if (isQuantityInitialized.current) return; // đã tính rồi, skip
-
-  //     if (isLoggedIn()) {
-  //       try {
-  //         const response = await getCart();
-  //         dispatch(
-  //           setQuantityOfCart(
-  //             response.data.cartItems.reduce(
-  //               (total, item) =>
-  //                 total +
-  //                 (item?.productVariants?.find((variant) => variant.isSelected)
-  //                   ?.cartQuantity || 0),
-  //               0
-  //             )
-  //           )
-  //         );
-  //       } catch (error) {
-  //         console.log(error);
-  //       }
-  //     } else {
-  //       // console.log("local:", productsOfCartInLocal);
-  //       // console.log("quantity:", quantityOfProducts);
-  //       dispatch(
-  //         setQuantityOfCart(
-  //           productsOfCartInLocal.reduce(
-  //             (total, item) =>
-  //               total +
-  //               (item?.productVariants?.find((variant) => variant?.isSelected)
-  //                 ?.cartQuantity || 0),
-  //             0
-  //           )
-  //         )
-  //       );
-  //     }
-  //     isQuantityInitialized.current = true;
-  //   };
-  //   fetchProductOfCart();
-  // }, [productsOfCartInLocal, isLogin, dispatch]);
-
   return (
     <div
       className={`w-full ${

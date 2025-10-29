@@ -7,23 +7,25 @@ import CartSummary from "@/components/cart/CartSummary";
 import PaginationComponent from "@/components/cart/Pagination";
 import { useNavigate } from "react-router-dom";
 import { isLoggedIn } from "@/utils/checkLogin";
-import { useSelector } from "react-redux";
-import { getCart } from "@/api/cart";
+import { useDispatch, useSelector } from "react-redux";
+import { getCart, updateCartItem } from "@/api/cart";
+import { setQuantityOfCart, updateLocalCart } from "@/store/orderSlice";
 
 const CartPage = () => {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  // const [currentPage, setCurrentPage] = useState(1);
-  // const [pageSize] = useState(3);
   const [selectedItems, setSelectedItems] = useState([]);
   const cartItemsInRedux = useSelector((state) => state.order.localCart);
+  const dispatch = useDispatch();
+  const quantityOfCart = useSelector((state) => state.order.quantityOfCart);
 
   useEffect(() => {
     const fetchCartItems = async () => {
       if (!isLoggedIn()) {
         setLoading(true);
         setCartItems(cartItemsInRedux);
+        console.log("cart in redux:", cartItemsInRedux);
         setLoading(false);
       } else {
         setLoading(true);
@@ -48,21 +50,158 @@ const CartPage = () => {
     if (selectedItems.length === cartItems.length) {
       setSelectedItems([]);
     } else {
-      setSelectedItems(cartItems.map((item) => item.id));
+      setSelectedItems(
+        cartItems.map(
+          (item) =>
+            item?.productVariations?.find((variant) => variant?.isSelected)?.id
+        )
+      );
     }
   };
-  const handleUpdateQuantity = (id, newQuantity) => {
+  const handleUpdateQuantity = async (id, newQuantity) => {
     if (newQuantity < 1) return;
-    setCartItems((items) =>
-      items.map((item) =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
+    if (isLoggedIn()) {
+      try {
+        const data = {
+          oldVariantId: id,
+          quantity: newQuantity,
+        };
+        const response = await updateCartItem(data);
+        if (response.status === 200) {
+          setCartItems((items) =>
+            items.map((item) => {
+              const updatedVariants = item.productVariations.map((variant) =>
+                variant.id === id
+                  ? { ...variant, cartQuantity: newQuantity } // ✅ gắn quantity vào variant
+                  : variant
+              );
+
+              return {
+                ...item,
+                productVariations: updatedVariants,
+              };
+            })
+          );
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      setCartItems((items) =>
+        items.map((item) => {
+          const updatedVariants = item.productVariations.map((variant) =>
+            variant.id === id
+              ? { ...variant, cartQuantity: newQuantity } // ✅ gắn quantity vào variant
+              : variant
+          );
+
+          return {
+            ...item,
+            productVariations: updatedVariants,
+          };
+        })
+      );
+      dispatch(updateLocalCart(cartItems));
+    }
+  };
+
+  const handleChangeVariant = async (
+    itemId,
+    newVariantId,
+    oldVariantId,
+    quantity
+  ) => {
+    const newId = parseInt(newVariantId);
+    const oldId = parseInt(oldVariantId);
+
+    const updatedVariants = cartItems.map((item) => {
+      // Chỉ xử lý item có id trùng với itemId
+      if (item.id !== itemId) return item;
+
+      // Kiểm tra nếu variant cũ tồn tại trong item
+      if (
+        item.productVariations.some(
+          (variant) => variant.isSelected && variant.id === oldId
+        )
+      ) {
+        const updatedVariant = item.productVariations.map((variant) => {
+          if (variant.id === oldId) {
+            return { ...variant, isSelected: false };
+          } else if (variant.id === newId) {
+            return { ...variant, isSelected: true, cartQuantity: quantity };
+          }
+          return variant;
+        });
+        return { ...item, productVariations: updatedVariant };
+      }
+      return item;
+    });
+
+    const uniqueVariants = [];
+    updatedVariants.forEach((item) => {
+      const selectedVariant = item.productVariations.find(
+        (variant) => variant.isSelected
+      );
+      if (!selectedVariant) return;
+
+      const existedIdx = uniqueVariants.findIndex((i) =>
+        i.productVariations.some(
+          (v) => v.isSelected && v.id === selectedVariant.id
+        )
+      );
+      if (existedIdx !== -1) {
+        // Cập nhật số lượng thành số lượng mới
+        uniqueVariants[existedIdx] = {
+          ...uniqueVariants[existedIdx],
+          productVariations: uniqueVariants[existedIdx].productVariations.map(
+            (v) =>
+              v.id === selectedVariant.id
+                ? {
+                    ...v,
+                    cartQuantity:
+                      parseInt(v.cartQuantity) +
+                      parseInt(selectedVariant.cartQuantity),
+                  }
+                : { ...v }
+          ),
+        };
+      } else {
+        uniqueVariants.push(item);
+      }
+    });
+
+    setCartItems(uniqueVariants);
+    setSelectedItems((prev) =>
+      prev.includes(oldId)
+        ? prev
+            .filter((id) => id !== oldId) // bỏ id cũ
+            .concat(newId) // thêm id mới
+        : prev
     );
+    dispatch(updateLocalCart(uniqueVariants));
   };
 
   const handleRemoveItem = (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
-      setCartItems((items) => items.filter((item) => item.id !== id));
+      const itemDeleteing = cartItems?.find((item) =>
+        item?.productVariations?.some(
+          (variant) => variant?.isSelected && variant?.id === id
+        )
+      );
+
+      const variantDeleteing = itemDeleteing?.productVariations?.filter(
+        (variant) => variant?.isSelected && variant?.id === id
+      );
+      dispatch(
+        setQuantityOfCart(quantityOfCart - variantDeleteing?.cartQuantity || 1)
+      );
+      const updateItems = cartItems.filter(
+        (item) =>
+          item?.productVariations?.find((variant) => variant?.isSelected)
+            ?.id !== id
+      );
+      setCartItems(updateItems);
+      dispatch(updateLocalCart(updateItems));
       setSelectedItems((selected) =>
         selected.filter((itemId) => itemId !== id)
       );
@@ -75,28 +214,33 @@ const CartPage = () => {
       setSelectedItems([]);
     }
   };
-  // const handlePageChange = (page) => {
-  //   setCurrentPage(page);
-  //   window.scrollTo({ top: 0, behavior: "smooth" });
-  // };
 
   const calculateTotal = () => {
+    // console.log(cartItems);
     return cartItems
-      .filter((item) => selectedItems.includes(item.id))
-      .reduce((sum, item) => sum + item.price * item.quantity, 0);
+      .map((item) => {
+        const selectedVariant = item.productVariations.find(
+          (variant) => variant.isSelected && selectedItems.includes(variant.id)
+        );
+        if (!selectedVariant) return 0;
+
+        let price = selectedVariant.price ?? item.price ?? 0;
+        const discount = selectedVariant.discountPercent ?? 0;
+        price = price - (price * discount) / 100;
+        const quantity = selectedVariant.cartQuantity ?? 1; // ✅ Lấy từ variant
+
+        return price * quantity;
+      })
+      .reduce((sum, val) => sum + val, 0);
   };
 
   // useEffect(() => {
-  //   const totalPages = Math.ceil(cartItems.length / pageSize);
-  //   if (currentPage > totalPages && totalPages > 0) {
-  //     setCurrentPage(totalPages);
-  //   }
-  // }, [cartItems, currentPage, pageSize]);
+  //   console.log("selectedItems: ", selectedItems);
+  // }, [selectedItems]);
 
-  // const indexOfLastItem = currentPage * pageSize;
-  // const indexOfFirstItem = indexOfLastItem - pageSize;
-  // const currentItems = cartItems.slice(indexOfFirstItem, indexOfLastItem);
-
+  // useEffect(() => {
+  //   console.log("cartItems: ", cartItems);
+  // }, [cartItems]);
   if (loading) {
     return (
       <Layout>
@@ -129,11 +273,20 @@ const CartPage = () => {
             <div className="lg:col-span-2">
               {cartItems.map((item) => (
                 <CartItem
-                  key={item.id}
+                  key={
+                    item?.productVariations?.find(
+                      (variant) => variant.isSelected
+                    )?.id
+                  }
                   item={item}
-                  isSelected={selectedItems.includes(item.id)}
+                  isSelected={selectedItems.includes(
+                    item?.productVariations?.find(
+                      (variant) => variant.isSelected
+                    )?.id
+                  )}
                   onToggleSelect={handleToggleSelect}
                   onUpdateQuantity={handleUpdateQuantity}
+                  handleChangeVariant={handleChangeVariant}
                   onRemove={handleRemoveItem}
                 />
               ))}
