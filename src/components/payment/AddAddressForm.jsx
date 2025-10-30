@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 
-// Mock data tạm thời
 const mockProvinces = [
     { code: "01", name: "Hà Nội" },
     { code: "79", name: "TP. Hồ Chí Minh" },
@@ -159,7 +158,6 @@ const AddAddressModal = ({ user, onAdd, onClose }) => {
                     {({ errors, touched, setFieldValue }) => (
                         <Form className="max-h-[70vh] overflow-y-auto pr-2">
                             <div className="space-y-5">
-                                {/* Hàng 1: Tên và Số điện thoại */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-gray-700 font-medium mb-2">
@@ -188,7 +186,6 @@ const AddAddressModal = ({ user, onAdd, onClose }) => {
                                     </div>
                                 </div>
 
-                                {/* Hàng 2: Tỉnh/TP, Quận/Huyện, Phường/Xã */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-gray-700 font-medium mb-2">
@@ -268,7 +265,6 @@ const AddAddressModal = ({ user, onAdd, onClose }) => {
                                     </div>
                                 </div>
 
-                                {/* Hàng 3: Địa chỉ chi tiết */}
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
                                         Địa chỉ chi tiết
@@ -283,7 +279,6 @@ const AddAddressModal = ({ user, onAdd, onClose }) => {
                                 </div>
                             </div>
 
-                            {/* Buttons */}
                             <div className="flex flex-col md:flex-row justify-end gap-3 mt-6 sticky bottom-0 bg-white pt-3">
                                 <button
                                     type="button"

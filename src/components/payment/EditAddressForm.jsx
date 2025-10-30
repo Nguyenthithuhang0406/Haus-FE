@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 
-// Mock data tạm thời
 const mockProvinces = [
     { code: "01", name: "Hà Nội" },
     { code: "79", name: "TP. Hồ Chí Minh" },
@@ -161,7 +160,6 @@ const EditAddressForm = ({ addressData, onUpdate, onClose }) => {
                     {({ errors, touched, setFieldValue }) => (
                         <Form className="max-h-[70vh] overflow-y-auto pr-2">
                            <div className="space-y-5">
-                                {/* Hàng 1: Tên và Số điện thoại */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-gray-700 font-medium mb-2">
@@ -269,7 +267,6 @@ const EditAddressForm = ({ addressData, onUpdate, onClose }) => {
                                     </div>
                                 </div>
 
-                                {/* Hàng 3: Địa chỉ chi tiết */}
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
                                         Địa chỉ chi tiết
@@ -283,7 +280,6 @@ const EditAddressForm = ({ addressData, onUpdate, onClose }) => {
                                     <ErrorMessage name="detailedAddress" component="div" className="text-red-500 text-sm mt-1.5" />
                                 </div>
                             </div>
-                                {/* Buttons */}
                                 <div className="flex flex-col md:flex-row justify-end gap-3 mt-3 sticky bottom-0 bg-white pt-3">
                                     <button
                                         type="button"
