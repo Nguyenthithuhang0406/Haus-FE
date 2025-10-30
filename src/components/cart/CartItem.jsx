@@ -57,15 +57,15 @@ const CartItem = ({
         </button>
 
         <img
-          src={variantSelected?.media?.url || item.medias[0]?.url}
-          alt={item.productName}
+          src={variantSelected?.media?.url || item?.medias?.[0]?.url}
+          alt={item?.productName}
           className="w-20 h-20 object-cover rounded flex-shrink-0"
         />
 
         <div className="flex-1 min-w-0">
           <div className="flex justify-between items-start mb-2">
             <h3 className="font-semibold text-base text-gray-900 line-clamp-2 pr-2">
-              {item.productName}
+              {item?.productName}
             </h3>
             <button
               onClick={() => onRemove(variantSelected?.id)}
@@ -108,7 +108,7 @@ const CartItem = ({
               <button
                 onClick={() => {
                   onUpdateQuantity(
-                    variantSelected.id,
+                    variantSelected?.id,
                     variantSelected?.cartQuantity - 1
                   );
                   dispatch(setQuantityOfCart(Math.max(0, quantityOfCart - 1)));
@@ -119,12 +119,12 @@ const CartItem = ({
                 <Minus size={16} />
               </button>
               <span className="w-6 text-center font-medium text-sm">
-                {variantSelected?.cartQuantity}
+                {variantSelected?.cartQuantity || 1}
               </span>
               <button
                 onClick={() => {
                   onUpdateQuantity(
-                    variantSelected.id,
+                    variantSelected?.id,
                     variantSelected?.cartQuantity + 1
                   );
                   dispatch(setQuantityOfCart(quantityOfCart + 1));
@@ -139,7 +139,7 @@ const CartItem = ({
               {variantSelected?.discountPercent > 0 && (
                 <p className="text-xs text-gray-500 flex items-center justify-center gap-2">
                   <span className="line-through">
-                    {formatPrice(variantSelected?.price)}
+                    {formatPrice(variantSelected?.price || 0)}
                   </span>{" "}
                   <span className="text-[#ad7555]">
                     - {variantSelected?.discountPercent}%
@@ -149,7 +149,7 @@ const CartItem = ({
               <p className="text-base font-bold text-[#ad7555]">
                 {formatPrice(
                   (variantSelected?.price *
-                    (100 - variantSelected?.discountPercent)) /
+                    (100 - (variantSelected?.discountPercent || 0))) /
                     100
                 )}
               </p>
@@ -161,7 +161,7 @@ const CartItem = ({
       {/* Desktop Layout */}
       <div className="hidden lg:flex items-center gap-6">
         <button
-          onClick={() => onToggleSelect(variantSelected.id)}
+          onClick={() => onToggleSelect(variantSelected?.id)}
           className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
             isSelected
               ? "bg-[#ad7555] border-[#ad7555] scale-110"
@@ -174,14 +174,14 @@ const CartItem = ({
         </button>
 
         <img
-          src={variantSelected?.media?.url || item.medias[0]?.url}
-          alt={item.productName}
+          src={variantSelected?.media?.url || item?.medias?.[0]?.url}
+          alt={item?.productName}
           className="w-24 h-24 object-cover rounded"
         />
 
         <div className="flex-1">
           <h3 className="font-semibold text-lg text-gray-900 mb-1">
-            {item.productName}
+            {item?.productName}
           </h3>
           <select
             className="border border-[#cecece] px-2 py-1 rounded-md outline-none focus:border-[#ad7555]"
@@ -214,7 +214,7 @@ const CartItem = ({
           <button
             onClick={() => {
               onUpdateQuantity(
-                variantSelected.id,
+                variantSelected?.id,
                 variantSelected?.cartQuantity - 1
               );
               dispatch(setQuantityOfCart(Math.max(0, quantityOfCart - 1)));
@@ -225,12 +225,12 @@ const CartItem = ({
             <Minus size={18} />
           </button>
           <span className="w-8 text-center font-medium">
-            {variantSelected?.cartQuantity}
+            {variantSelected?.cartQuantity || 1}
           </span>
           <button
             onClick={() => {
               onUpdateQuantity(
-                variantSelected.id,
+                variantSelected?.id,
                 variantSelected?.cartQuantity + 1
               );
               dispatch(setQuantityOfCart(quantityOfCart + 1));
@@ -245,17 +245,17 @@ const CartItem = ({
           {variantSelected?.discountPercent > 0 && (
             <p className="text-sm text-gray-500 mb-1 flex items-center justify-center gap-2">
               <span className="line-through">
-                {formatPrice(variantSelected?.price)}
+                {formatPrice(variantSelected?.price || 0)}
               </span>{" "}
               <span className="text-[#ad7555]">
-                - {variantSelected?.discountPercent}%
+                - {variantSelected?.discountPercent || 0}%
               </span>
             </p>
           )}
           <p className="text-lg font-bold text-[#ad7555]">
             {formatPrice(
-              (variantSelected?.price *
-                (100 - variantSelected?.discountPercent)) /
+              ((variantSelected?.price || 0) *
+                (100 - (variantSelected?.discountPercent || 0))) /
                 100
             )}
           </p>

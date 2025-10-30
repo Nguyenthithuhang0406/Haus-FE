@@ -41,7 +41,7 @@ export const updateCartItem = async (data) => {
       data: {
         oldVariantId: oldVariantId,
         ...(newVariantId && { newVariantId: newVariantId }),
-        ...addToCart(quantity && { quantity: quantity }),
+        ...(quantity && { quantity: quantity }),
       },
     });
     return response.data;
