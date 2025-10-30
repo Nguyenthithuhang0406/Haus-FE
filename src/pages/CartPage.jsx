@@ -28,6 +28,17 @@ const CartPage = () => {
   const cartItemsInRedux = useSelector((state) => state.order.localCart);
   const dispatch = useDispatch();
   const quantityOfCart = useSelector((state) => state.order.quantityOfCart);
+  const orderListItems = useSelector((state) => state.order.orderList);
+
+  useEffect(() => {
+    if (orderListItems) {
+      setSelectedItems(
+        orderListItems.map(
+          (item) => item.productVariations.find((v) => v.isSelected).id
+        )
+      );
+    }
+  }, []);
 
   useEffect(() => {
     const fetchCartItems = async () => {
@@ -293,7 +304,11 @@ const CartPage = () => {
     );
 
     dispatch(setOrderList(itemSelecteds));
-    navigate("/paymentPage");
+    if (isLoggedIn()) {
+      navigate("/paymentPage");
+    } else {
+      navigate("/auth");
+    }
   };
 
   if (loading) {

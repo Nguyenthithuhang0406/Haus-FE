@@ -20,7 +20,7 @@ const PaymentPage = () => {
           <PaymentMethod selectedAddress={selectedDeliveryAddress} />
         </div>
         <div className="w-full md:w-[500px] flex justify-center items-center">
-          {/* <ProductPayment listProducts={itemsPayment} /> */}
+          <ProductPayment listProducts={itemsPayment} />
         </div>
       </div>
       <Footer />
