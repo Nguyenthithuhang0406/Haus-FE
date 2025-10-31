@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 
-// Mock data tạm thời
 const mockProvinces = [
     { code: "01", name: "Hà Nội" },
     { code: "79", name: "TP. Hồ Chí Minh" },
@@ -141,7 +140,7 @@ const EditAddressForm = ({ addressData, onUpdate, onClose }) => {
     }, [selectedDistrict]);
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black/30 z-50 px-4">
-            <div className="bg-white p-6 md:p-8 rounded-2xl md:rounded-3xl shadow-2xl w-full max-w-md md:max-w-lg animate-[fadeIn_0.25s_ease]">
+            <div className="bg-white p-6 md:p-8 rounded-2xl md:rounded-3xl shadow-2xl w-full max-w-xl animate-[fadeIn_0.25s_ease]">
                 <h2 className="text-xl md:text-2xl font-semibold mb-6 text-gray-800 text-center">
                     Chỉnh sửa địa chỉ
                 </h2>
@@ -159,145 +158,144 @@ const EditAddressForm = ({ addressData, onUpdate, onClose }) => {
                     onSubmit={handleSubmit}
                 >
                     {({ errors, touched, setFieldValue }) => (
-                        <Form className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
-                            {/* Tên người nhận */}
-                            <div>
-                                <label className="block text-gray-700 font-medium mb-1">
-                                    Tên người nhận
-                                </label>
-                                <Field
-                                    type="text"
-                                    name="name"
-                                    placeholder="Nhập tên người nhận..."
-                                    className={`border ${errors.name && touched.name ? 'border-red-500' : 'border-[#ad7555]'} p-3 w-full rounded-xl focus:ring-1 focus:ring-gray-300 focus:border-gray-400 outline-none shadow-sm text-sm md:text-base transition`}
-                                />
-                                <ErrorMessage name="name" component="div" className="text-red-500 text-sm mt-1" />
-                            </div>
+                        <Form className="max-h-[70vh] overflow-y-auto pr-2">
+                           <div className="space-y-5">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-gray-700 font-medium mb-2">
+                                            Tên người nhận
+                                        </label>
+                                        <Field
+                                            type="text"
+                                            name="name"
+                                            placeholder="Nhập tên người nhận..."
+                                            className={`border ${errors.name && touched.name ? 'border-red-500' : 'border-[#ad7555]'} p-3 w-full rounded-xl focus:ring-2 focus:ring-[#ad7555]/30 focus:border-[#ad7555] outline-none shadow-sm text-sm md:text-base transition`}
+                                        />
+                                        <ErrorMessage name="name" component="div" className="text-red-500 text-sm mt-1.5" />
+                                    </div>
 
-                            {/* Số điện thoại */}
-                            <div>
-                                <label className="block text-gray-700 font-medium mb-1">
-                                    Số điện thoại
-                                </label>
-                                <Field
-                                    type="text"
-                                    name="phoneNumber"
-                                    placeholder="Nhập số điện thoại..."
-                                    className={`border ${errors.phoneNumber && touched.phoneNumber ? 'border-red-500' : 'border-[#ad7555]'} p-3 w-full rounded-xl focus:ring-1 focus:ring-gray-300 focus:border-gray-400 outline-none shadow-sm text-sm md:text-base transition`}
-                                />
-                                <ErrorMessage name="phoneNumber" component="div" className="text-red-500 text-sm mt-1" />
-                            </div>
+                                    <div>
+                                        <label className="block text-gray-700 font-medium mb-2">
+                                            Số điện thoại
+                                        </label>
+                                        <Field
+                                            type="text"
+                                            name="phoneNumber"
+                                            placeholder="Nhập số điện thoại..."
+                                            className={`border ${errors.phoneNumber && touched.phoneNumber ? 'border-red-500' : 'border-[#ad7555]'} p-3 w-full rounded-xl focus:ring-2 focus:ring-[#ad7555]/30 focus:border-[#ad7555] outline-none shadow-sm text-sm md:text-base transition`}
+                                        />
+                                        <ErrorMessage name="phoneNumber" component="div" className="text-red-500 text-sm mt-1.5" />
+                                    </div>
+                                </div>
 
-                            {/* Tỉnh/Thành phố */}
-                            <div>
-                                <label className="block text-gray-700 font-medium mb-1">
-                                    Tỉnh/Thành phố
-                                </label>
-                                <Field as="select"
-                                    name="province"
-                                    onChange={(e) => {
-                                        const value = e.target.value;
-                                        setFieldValue('province', value);
-                                        setFieldValue('district', '');
-                                        setFieldValue('ward', '');
-                                        setSelectedProvince(value);
-                                        setSelectedDistrict("");
-                                        setSelectedWard("");
-                                    }}
-                                    className={`border ${errors.province && touched.province ? 'border-red-500' : 'border-[#ad7555]'} p-3 w-full rounded-xl focus:ring-1 focus:ring-gray-300 focus:border-gray-400 outline-none shadow-sm text-sm md:text-base transition`}
-                                >
-                                    <option value="">Chọn tỉnh/thành phố</option>
-                                    {provinces.map((province) => (
-                                        <option key={province.code} value={province.code}>
-                                            {province.name}
-                                        </option>
-                                    ))}
-                                </Field>
-                                <ErrorMessage name="province" component="div" className="text-red-500 text-sm mt-1" />
-                            </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-gray-700 font-medium mb-2">
+                                            Tỉnh/Thành phố
+                                        </label>
+                                        <Field as="select"
+                                            name="province"
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                setFieldValue('province', value);
+                                                setFieldValue('district', '');
+                                                setFieldValue('ward', '');
+                                                setSelectedProvince(value);
+                                                setSelectedDistrict("");
+                                                setSelectedWard("");
+                                            }}
+                                            className={`border ${errors.province && touched.province ? 'border-red-500' : 'border-[#ad7555]'} p-3 w-full rounded-xl focus:ring-2 focus:ring-[#ad7555]/30 focus:border-[#ad7555] outline-none shadow-sm text-sm md:text-base transition`}
+                                        >
+                                            <option value="">Chọn tỉnh/thành phố</option>
+                                            {provinces.map((province) => (
+                                                <option key={province.code} value={province.code}>
+                                                    {province.name}
+                                                </option>
+                                            ))}
+                                        </Field>
+                                        <ErrorMessage name="province" component="div" className="text-red-500 text-sm mt-1.5" />
+                                    </div>
 
-                            {/* Quận/Huyện */}
-                            <div>
-                                <label className="block text-gray-700 font-medium mb-1">
-                                    Quận/Huyện
-                                </label>
-                                <Field as="select"
-                                    name="district"
-                                    onChange={(e) => {
-                                        const value = e.target.value;
-                                        setFieldValue('district', value);
-                                        setFieldValue('ward', '');
-                                        setSelectedDistrict(value);
-                                        setSelectedWard("");
-                                    }}
-                                    disabled={!selectedProvince}
-                                    className={`border ${errors.district && touched.district ? 'border-red-500' : 'border-[#ad7555]'} p-3 w-full rounded-xl focus:ring-1 focus:ring-gray-300 focus:border-gray-400 outline-none shadow-sm text-sm md:text-base transition disabled:bg-gray-100`}
-                                >
-                                    <option value="">Chọn quận/huyện</option>
-                                    {districts.map((district) => (
-                                        <option key={district.code} value={district.code}>
-                                            {district.name}
-                                        </option>
-                                    ))}
-                                </Field>
-                                <ErrorMessage name="district" component="div" className="text-red-500 text-sm mt-1" />
-                            </div>
+                                    <div>
+                                        <label className="block text-gray-700 font-medium mb-2">
+                                            Quận/Huyện
+                                        </label>
+                                        <Field as="select"
+                                            name="district"
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                setFieldValue('district', value);
+                                                setFieldValue('ward', '');
+                                                setSelectedDistrict(value);
+                                                setSelectedWard("");
+                                            }}
+                                            disabled={!selectedProvince}
+                                            className={`border ${errors.district && touched.district ? 'border-red-500' : 'border-[#ad7555]'} p-3 w-full rounded-xl focus:ring-2 focus:ring-[#ad7555]/30 focus:border-[#ad7555] outline-none shadow-sm text-sm md:text-base transition disabled:bg-gray-100 disabled:cursor-not-allowed`}
+                                        >
+                                            <option value="">Chọn quận/huyện</option>
+                                            {districts.map((district) => (
+                                                <option key={district.code} value={district.code}>
+                                                    {district.name}
+                                                </option>
+                                            ))}
+                                        </Field>
+                                        <ErrorMessage name="district" component="div" className="text-red-500 text-sm mt-1.5" />
+                                    </div>
 
-                            {/* Phường/Xã */}
-                            <div>
-                                <label className="block text-gray-700 font-medium mb-1">
-                                    Phường/Xã
-                                </label>
-                                <Field as="select"
-                                    name="ward"
-                                    onChange={(e) => {
-                                        const value = e.target.value;
-                                        setFieldValue('ward', value);
-                                        setSelectedWard(value);
-                                    }}
-                                    disabled={!selectedDistrict}
-                                    className={`border ${errors.ward && touched.ward ? 'border-red-500' : 'border-[#ad7555]'} p-3 w-full rounded-xl focus:ring-1 focus:ring-gray-300 focus:border-gray-400 outline-none shadow-sm text-sm md:text-base transition disabled:bg-gray-100`}
-                                >
-                                    <option value="">Chọn phường/xã</option>
-                                    {wards.map((ward) => (
-                                        <option key={ward.code} value={ward.code}>
-                                            {ward.name}
-                                        </option>
-                                    ))}
-                                </Field>
-                                <ErrorMessage name="ward" component="div" className="text-red-500 text-sm mt-1" />
-                            </div>
+                                    <div>
+                                        <label className="block text-gray-700 font-medium mb-2">
+                                            Phường/Xã
+                                        </label>
+                                        <Field as="select"
+                                            name="ward"
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                setFieldValue('ward', value);
+                                                setSelectedWard(value);
+                                            }}
+                                            disabled={!selectedDistrict}
+                                            className={`border ${errors.ward && touched.ward ? 'border-red-500' : 'border-[#ad7555]'} p-3 w-full rounded-xl focus:ring-2 focus:ring-[#ad7555]/30 focus:border-[#ad7555] outline-none shadow-sm text-sm md:text-base transition disabled:bg-gray-100 disabled:cursor-not-allowed`}
+                                        >
+                                            <option value="">Chọn phường/xã</option>
+                                            {wards.map((ward) => (
+                                                <option key={ward.code} value={ward.code}>
+                                                    {ward.name}
+                                                </option>
+                                            ))}
+                                        </Field>
+                                        <ErrorMessage name="ward" component="div" className="text-red-500 text-sm mt-1.5" />
+                                    </div>
+                                </div>
 
-                            {/* Địa chỉ chi tiết */}
-                            <div>
-                                <label className="block text-gray-700 font-medium mb-1">
-                                    Địa chỉ chi tiết
-                                </label>
-                                <Field as="textarea"
-                                    name="detailedAddress"
-                                    placeholder="Nhập số nhà, tên đường..."
-                                    rows="3"
-                                    className={`border ${errors.detailedAddress && touched.detailedAddress ? 'border-red-500' : 'border-[#ad7555]'} p-3 w-full rounded-xl focus:ring-1 focus:ring-gray-300 focus:border-gray-400 outline-none shadow-sm text-sm md:text-base transition resize-none`}
-                                />
-                                <ErrorMessage name="detailedAddress" component="div" className="text-red-500 text-sm mt-1" />
+                                <div>
+                                    <label className="block text-gray-700 font-medium mb-2">
+                                        Địa chỉ chi tiết
+                                    </label>
+                                    <Field as="textarea"
+                                        name="detailedAddress"
+                                        placeholder="Nhập số nhà, tên đường..."
+                                        rows="3"
+                                        className={`border ${errors.detailedAddress && touched.detailedAddress ? 'border-red-500' : 'border-[#ad7555]'} p-3 w-full rounded-xl focus:ring-2 focus:ring-[#ad7555]/30 focus:border-[#ad7555] outline-none shadow-sm text-sm md:text-base transition resize-none`}
+                                    />
+                                    <ErrorMessage name="detailedAddress" component="div" className="text-red-500 text-sm mt-1.5" />
+                                </div>
                             </div>
-
-                            {/* Buttons */}
-                            <div className="flex flex-col md:flex-row justify-end gap-3 mt-3 sticky bottom-0 bg-white pt-3">
-                                <button
-                                    type="button"
-                                    onClick={onClose}
-                                    className="px-4 py-2.5 border border-gray-400 rounded-xl hover:bg-gray-100 transition shadow-sm text-sm md:text-base"
-                                >
-                                    Hủy
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="px-4 py-2.5 bg-[#ad7555] text-white rounded-xl shadow-md hover:bg-[#945f46] hover:shadow-lg hover:scale-[1.02] transition text-sm md:text-base"
-                                >
-                                    Lưu
-                                </button>
-                            </div>
+                                <div className="flex flex-col md:flex-row justify-end gap-3 mt-3 sticky bottom-0 bg-white pt-3">
+                                    <button
+                                        type="button"
+                                        onClick={onClose}
+                                        className="px-4 py-2.5 border border-gray-400 rounded-xl hover:bg-gray-100 transition shadow-sm text-sm md:text-base"
+                                    >
+                                        Hủy
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="px-4 py-2.5 bg-[#ad7555] text-white rounded-xl shadow-md hover:bg-[#945f46] hover:shadow-lg hover:scale-[1.02] transition text-sm md:text-base"
+                                    >
+                                        Lưu
+                                    </button>
+                                </div>
+                            
                         </Form>
                     )}
                 </Formik>
