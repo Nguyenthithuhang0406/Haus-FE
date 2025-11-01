@@ -53,21 +53,23 @@ const ProductPayment = ({ listProducts }) => {
         const response = await getAllPromotions(data);
         if (response.status === 200) {
           const promotions = response.data.items || [];
+          
+          const today = new Date();
 
           // Lọc các promotion thỏa điều kiện subtotal
           const validPromotions = promotions.filter((promo) => {
             const { minPriceOrder, maxPriceOrder, startDate, endDate, status } =
               promo;
-            const now = new Date();
-            const start = new Date(startDate);
-            const end = new Date(endDate);
+            
+             const start = new Date(startDate);
+             const end = new Date(endDate);
 
             return (
               status === "active" &&
               subtotal >= (minPriceOrder || 0) &&
               subtotal <= (maxPriceOrder || Infinity) &&
-              now >= start &&
-              now <= end
+              today >= start &&
+              today <= end
             );
           });
 
