@@ -6,77 +6,63 @@ import EmptyCart from "@/components/cart/EmptyCart";
 import CartSummary from "@/components/cart/CartSummary";
 import PaginationComponent from "@/components/cart/Pagination";
 import { useNavigate } from "react-router-dom";
-
-const dummyCartItems = [
-  {
-    id: 1,
-    name: "Sofa 3 chỗ ngồi phong cách hiện đại tối giản",
-    category: "Kem",
-    image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400",
-    price: 9500000,
-    quantity: 1,
-  },
-  {
-    id: 2,
-    name: "Bàn trang điểm IKEA NORDKISA",
-    category: "Tre tự nhiên",
-    image: "https://images.unsplash.com/photo-1506898667547-42e22a46e125?w=400",
-    price: 1000000,
-    quantity: 1,
-  },
-  {
-    id: 3,
-    name: "Ghế làm việc ergonomic",
-    category: "Đen",
-    image: "https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=400",
-    price: 3500000,
-    quantity: 1,
-  },
-  {
-    id: 4,
-    name: "Tủ quần áo 3 cánh",
-    category: "Gỗ sồi",
-    image: "https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=400",
-    price: 7200000,
-    quantity: 1,
-  },
-  {
-    id: 5,
-    name: "Giường ngủ queen size",
-    category: "Xám nhạt",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400",
-    price: 12000000,
-    quantity: 1,
-  },
-  {
-    id: 6,
-    name: "Bàn ăn 6 chỗ",
-    category: "Gỗ tự nhiên",
-    image: "https://images.unsplash.com/photo-1617806118233-18e1de247200?w=400",
-    price: 8500000,
-    quantity: 1,
-  },
-];
+import { isLoggedIn } from "@/utils/checkLogin";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  clearCart,
+  getCart,
+  removeProductFromCart,
+  updateCartItem,
+} from "@/api/cart";
+import {
+  setOrderList,
+  setQuantityOfCart,
+  updateLocalCart,
+} from "@/store/orderSlice";
 
 const CartPage = () => {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(3);
+  const [loading, setLoading] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
+  const cartItemsInRedux = useSelector((state) => state.order.localCart);
+  const dispatch = useDispatch();
+  const quantityOfCart = useSelector((state) => state.order.quantityOfCart);
+  const orderListItems = useSelector((state) => state.order.orderList);
+
   useEffect(() => {
-    loadCartItems();
-    setLoading(false);
+    if (orderListItems) {
+      setSelectedItems(
+        orderListItems.map(
+          (item) => item.productVariations.find((v) => v.isSelected).id
+        )
+      );
+    }
   }, []);
 
-  const loadCartItems = () => {
-    setCartItems(dummyCartItems);
-  };
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      if (!isLoggedIn()) {
+        setLoading(true);
+        setCartItems(cartItemsInRedux);
+        console.log("cart in redux:", cartItemsInRedux);
+        setLoading(false);
+      } else {
+        setLoading(true);
+        const response = await getCart();
+        if (response.status === 200) {
+          setCartItems(response.data.cartItems || []);
+          setLoading(false);
+        }
+      }
+    };
+    fetchCartItems();
+  }, []);
+
   const handleToggleSelect = (itemId) => {
-    setSelectedItems(prev =>
+    setSelectedItems((prev) =>
       prev.includes(itemId)
-        ? prev.filter(id => id !== itemId)
+        ? prev.filter((id) => id !== itemId)
         : [...prev, itemId]
     );
   };
@@ -84,52 +70,246 @@ const CartPage = () => {
     if (selectedItems.length === cartItems.length) {
       setSelectedItems([]);
     } else {
-      setSelectedItems(cartItems.map(item => item.id));
+      setSelectedItems(
+        cartItems.map(
+          (item) =>
+            item?.productVariations?.find((variant) => variant?.isSelected)?.id
+        )
+      );
     }
   };
-  const handleUpdateQuantity = (id, newQuantity) => {
+  const handleUpdateQuantity = async (id, newQuantity) => {
     if (newQuantity < 1) return;
-    setCartItems(items =>
-      items.map(item =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
-    );
+    if (isLoggedIn()) {
+      try {
+        const data = {
+          oldVariantId: id,
+          quantity: newQuantity,
+        };
+        const response = await updateCartItem(data);
+        if (response.status === 200) {
+          setCartItems(response.data.cartItems || []);
+          setCartItems((items) =>
+            items.map((item) => {
+              const updatedVariants = item.productVariations.map((variant) =>
+                variant.id === id
+                  ? { ...variant, cartQuantity: newQuantity } // ✅ gắn quantity vào variant
+                  : variant
+              );
+
+              return {
+                ...item,
+                productVariations: updatedVariants,
+              };
+            })
+          );
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      setCartItems((items) =>
+        items.map((item) => {
+          const updatedVariants = item.productVariations.map((variant) =>
+            variant.id === id
+              ? { ...variant, cartQuantity: newQuantity } // ✅ gắn quantity vào variant
+              : variant
+          );
+
+          return {
+            ...item,
+            productVariations: updatedVariants,
+          };
+        })
+      );
+      dispatch(updateLocalCart(cartItems));
+    }
   };
 
-  const handleRemoveItem = (id) => {
+  const handleChangeVariant = async (
+    itemId,
+    newVariantId,
+    oldVariantId,
+    quantity
+  ) => {
+    const newId = parseInt(newVariantId);
+    const oldId = parseInt(oldVariantId);
+    if (isLoggedIn()) {
+      const data = {
+        oldVariantId: oldId,
+        newVariantId: newId,
+        quantity: quantity || 1,
+      };
+      const response = await updateCartItem(data);
+      if (response.status === 200) {
+        setCartItems(response.data.cartItems || []);
+      }
+    } else {
+      const updatedVariants = cartItems.map((item) => {
+        // Chỉ xử lý item có id trùng với itemId
+        if (item.id !== itemId) return item;
+
+        // Kiểm tra nếu variant cũ tồn tại trong item
+        if (
+          item.productVariations.some(
+            (variant) => variant.isSelected && variant.id === oldId
+          )
+        ) {
+          const updatedVariant = item.productVariations.map((variant) => {
+            if (variant.id === oldId) {
+              return { ...variant, isSelected: false };
+            } else if (variant.id === newId) {
+              return { ...variant, isSelected: true, cartQuantity: quantity };
+            }
+            return variant;
+          });
+          return { ...item, productVariations: updatedVariant };
+        }
+        return item;
+      });
+
+      const uniqueVariants = [];
+      updatedVariants.forEach((item) => {
+        const selectedVariant = item.productVariations.find(
+          (variant) => variant.isSelected
+        );
+        if (!selectedVariant) return;
+
+        const existedIdx = uniqueVariants.findIndex((i) =>
+          i.productVariations.some(
+            (v) => v.isSelected && v.id === selectedVariant.id
+          )
+        );
+        if (existedIdx !== -1) {
+          // Cập nhật số lượng thành số lượng mới
+          uniqueVariants[existedIdx] = {
+            ...uniqueVariants[existedIdx],
+            productVariations: uniqueVariants[existedIdx].productVariations.map(
+              (v) =>
+                v.id === selectedVariant.id
+                  ? {
+                      ...v,
+                      cartQuantity:
+                        parseInt(v.cartQuantity) +
+                        parseInt(selectedVariant.cartQuantity),
+                    }
+                  : { ...v }
+            ),
+          };
+        } else {
+          uniqueVariants.push(item);
+        }
+      });
+
+      setCartItems(uniqueVariants);
+      setSelectedItems((prev) =>
+        prev.includes(oldId)
+          ? prev
+              .filter((id) => id !== oldId) // bỏ id cũ
+              .concat(newId) // thêm id mới
+          : prev
+      );
+      dispatch(updateLocalCart(uniqueVariants));
+    }
+  };
+
+  const handleRemoveItem = async (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
-      setCartItems(items => items.filter(item => item.id !== id));
-      setSelectedItems(selected => selected.filter(itemId => itemId !== id));
+      if (isLoggedIn()) {
+        const quantityDeleteing = cartItems
+          ?.find((item) =>
+            item?.productVariations?.some(
+              (variant) => variant?.isSelected && variant?.id === id
+            )
+          )
+          ?.productVariations?.find(
+            (variant) => variant?.isSelected && variant?.id === id
+          )?.cartQuantity;
+
+        const response = await removeProductFromCart(id);
+        if (response.status === 200) {
+          setCartItems(response.data.cartItems || []);
+          dispatch(setQuantityOfCart(quantityOfCart - quantityDeleteing));
+        }
+      } else {
+        const itemDeleteing = cartItems?.find((item) =>
+          item?.productVariations?.some(
+            (variant) => variant?.isSelected && variant?.id === id
+          )
+        );
+
+        const variantDeleteing = itemDeleteing?.productVariations?.filter(
+          (variant) => variant?.isSelected && variant?.id === id
+        );
+        dispatch(
+          setQuantityOfCart(
+            quantityOfCart - variantDeleteing?.cartQuantity || 1
+          )
+        );
+        const updateItems = cartItems.filter(
+          (item) =>
+            item?.productVariations?.find((variant) => variant?.isSelected)
+              ?.id !== id
+        );
+        setCartItems(updateItems);
+        dispatch(updateLocalCart(updateItems));
+        setSelectedItems((selected) =>
+          selected.filter((itemId) => itemId !== id)
+        );
+      }
     }
   };
 
-  const handleClearAll = () => {
+  const handleClearAll = async () => {
     if (window.confirm("Bạn có chắc chắn muốn xóa tất cả sản phẩm?")) {
-      setCartItems([]);
-      setSelectedItems([]);
+      if (isLoggedIn()) {
+        const response = await clearCart();
+        if (response.status === 204) {
+          setCartItems([]);
+          setSelectedItems([]);
+          dispatch(setQuantityOfCart(0));
+        }
+      } else {
+        setCartItems([]);
+        setSelectedItems([]);
+        dispatch(setQuantityOfCart(0));
+      }
     }
-  };
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const calculateTotal = () => {
+    // console.log(cartItems);
     return cartItems
-      .filter(item => selectedItems.includes(item.id))
-      .reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      .map((item) => {
+        const selectedVariant = item?.productVariations?.find(
+          (variant) => variant.isSelected && selectedItems.includes(variant.id)
+        );
+        if (!selectedVariant) return 0;
+
+        let price = selectedVariant.price ?? item.price ?? 0;
+        const discount = selectedVariant.discountPercent ?? 0;
+        price = price - (price * discount) / 100;
+        const quantity = selectedVariant.cartQuantity ?? 1; // ✅ Lấy từ variant
+
+        return price * quantity;
+      })
+      .reduce((sum, val) => sum + val, 0);
   };
 
-  useEffect(() => {
-    const totalPages = Math.ceil(cartItems.length / pageSize);
-    if (currentPage > totalPages && totalPages > 0) {
-      setCurrentPage(totalPages);
-    }
-  }, [cartItems, currentPage, pageSize]);
+  const handleClickCheckout = () => {
+    const itemSelecteds = cartItems.filter((item) =>
+      item?.productVariations?.some(
+        (variant) => variant.isSelected && selectedItems.includes(variant.id)
+      )
+    );
 
-  const indexOfLastItem = currentPage * pageSize;
-  const indexOfFirstItem = indexOfLastItem - pageSize;
-  const currentItems = cartItems.slice(indexOfFirstItem, indexOfLastItem);
+    dispatch(setOrderList(itemSelecteds));
+    if (isLoggedIn()) {
+      navigate("/paymentPage");
+    } else {
+      navigate("/auth");
+    }
+  };
 
   if (loading) {
     return (
@@ -151,7 +331,9 @@ const CartPage = () => {
           selectedCount={selectedItems.length}
           onClearAll={handleClearAll}
           onSelectAll={handleSelectAll}
-          allSelected={cartItems.length > 0 && selectedItems.length === cartItems.length}  // Thêm
+          allSelected={
+            cartItems.length > 0 && selectedItems.length === cartItems.length
+          } // Thêm
         />
 
         {cartItems.length === 0 ? (
@@ -159,30 +341,39 @@ const CartPage = () => {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
-              {currentItems.map((item) => (
+              {cartItems.map((item) => (
                 <CartItem
-                  key={item.id}
+                  key={
+                    item?.productVariations?.find(
+                      (variant) => variant.isSelected
+                    )?.id
+                  }
                   item={item}
-                  isSelected={selectedItems.includes(item.id)}
+                  isSelected={selectedItems.includes(
+                    item?.productVariations?.find(
+                      (variant) => variant.isSelected
+                    )?.id
+                  )}
                   onToggleSelect={handleToggleSelect}
                   onUpdateQuantity={handleUpdateQuantity}
+                  handleChangeVariant={handleChangeVariant}
                   onRemove={handleRemoveItem}
                 />
               ))}
-              <PaginationComponent
+              {/* <PaginationComponent
                 currentPage={currentPage}
                 totalItems={cartItems.length}
                 pageSize={pageSize}
                 onPageChange={handlePageChange}
-              />
+              /> */}
             </div>
 
             <div>
               <CartSummary
                 total={calculateTotal()}
                 selectedCount={selectedItems.length}
-                onContinue={() => navigate('/')}
-                onCheckout={() => navigate('/paymentPage')}
+                onContinue={() => navigate("/")}
+                onCheckout={handleClickCheckout}
               />
             </div>
           </div>

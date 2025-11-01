@@ -49,9 +49,9 @@ const LeftComponent = ({
     }
   }, [updateNavigation]);
 
-  useEffect(() => {
-    console.log(indexImage);
-  }, [indexImage]);
+  // useEffect(() => {
+  //   console.log(indexImage);
+  // }, [indexImage]);
 
   useEffect(() => {
     if (!swiperRef.current || !product?.productVariations) return;

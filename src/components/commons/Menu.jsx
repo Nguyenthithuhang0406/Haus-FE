@@ -5,20 +5,21 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { FaCaretDown, FaBars, FaShoppingCart, FaCaretUp } from "react-icons/fa";
 import { IoHeart } from "react-icons/io5";
 import { MdAccountCircle } from "react-icons/md";
-import { menuListProduct, menuProjects } from "@/utils/contants/Menu";
+import { menuProjects } from "@/utils/contants/Menu";
 import { removeAllCookies } from "@/utils/cookies";
 import { getAllCategory } from "@/api/category";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { isLoggedIn } from "@/utils/checkLogin";
+import { useSelector } from "react-redux";
 
 const Menu = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [productCategorys, setProductCategorys] = useState(menuListProduct);
   const [projectCategorys, setProjectCategorys] = useState(menuProjects);
   const [categories, setCategories] = useState([]);
 
-  const [isLogin, setIsLogin] = useState(false);
+  const [isLogin, setIsLogin] = useState(isLoggedIn());
   const [isShow, setIsShow] = useState(false);
   const [isShowMenuMb, setIsShowMenuMb] = useState(false);
 
@@ -74,6 +75,9 @@ const Menu = () => {
       pageSize: 200,
     });
   }, []);
+
+  const quantityOfProducts = useSelector((state) => state.order.quantityOfCart);
+
   return (
     <>
       {/* Menu desktop */}
@@ -268,8 +272,16 @@ const Menu = () => {
               </p>
             </div>
           )}
-          <li className="text-white text-center cursor-pointer">
+          <li
+            onClick={() => navigate("/cart")}
+            className="text-white text-center cursor-pointer relative"
+          >
             <FaShoppingCart className="w-5 h-5 mx-auto" />
+            {quantityOfProducts > 0 && (
+              <span className="text-red-500 bg-lime-50 w-[20px] h-[20px] rounded-full flex items-center justify-center absolute -top-2 right-0 text-[14px]">
+                {quantityOfProducts}
+              </span>
+            )}
             <p className="text-[15px]">Giỏ hàng</p>
           </li>
         </ul>

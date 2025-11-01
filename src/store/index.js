@@ -14,7 +14,7 @@ import {
 } from "redux-persist";
 
 const persistConfig = {
-  key: "search",
+  key: "haus",
   storage,
 };
 

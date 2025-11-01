@@ -1,15 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import Countdown from "./CountDown";
-import { listProduct } from "@/utils/contants/product";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import { GrFormPrevious, GrFormNext } from "react-icons/gr";
 import ProductItem from "../product/ProductItem";
+import { getAllProducts } from "@/api/product";
+import { getTargetDate } from "@/utils/function";
 
 const Discounted = () => {
-  const listDiscountedProduct = listProduct;
+  const [listDiscountedProduct, setListDiscountedProduct] = useState([]);
 
   const prevRef = useRef(null);
   const nextRef = useRef(null);
@@ -67,6 +68,21 @@ const Discounted = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = {
+        pageNum: 1,
+        pageSize: 10,
+        sortBy: "discount_desc",
+      };
+
+      const response = await getAllProducts(data);
+      if (response.status === 200) {
+        setListDiscountedProduct(response.data.items || []);
+      }
+    };
+    fetchData();
+  }, []);
   return (
     <div
       style={{
@@ -84,7 +100,11 @@ const Discounted = () => {
         />
         <div className="w-full flex flex-col sm:flex-row items-center justify-between bg-white py-4 px-8 rounded-xl xl:absolute xl:bottom-0 xl:left-[35px]">
           <div className="hidden xl:flex w-[270px]"></div>
-          <Countdown />
+          <Countdown
+            targetDate={getTargetDate(
+              listDiscountedProduct[0]?.daysRemaining || 0
+            )}
+          />
           <p className="text-[30px] md:text-[35px] xl:text-[42px] leading-[140%] text-[#ad7555] font-semibold">
             Ưu đãi đặc biệt
           </p>
@@ -119,16 +139,14 @@ const Discounted = () => {
               slidesOffsetAfter={0}
               className="w-full flex justify-center items-center"
             >
-              <div className="w-full flex justify-center items-center">
-                {listDiscountedProduct.map((product, index) => (
-                  <SwiperSlide
-                    key={index}
-                    className="!mr-0 last:!mr-0 w-full flex justify-center"
-                  >
-                    <ProductItem product={product} />
-                  </SwiperSlide>
-                ))}
-              </div>
+              {listDiscountedProduct.map((product, index) => (
+                <SwiperSlide
+                  key={index}
+                  className="!mr-0 last:!mr-0 w-full flex justify-center"
+                >
+                  <ProductItem product={product} />
+                </SwiperSlide>
+              ))}
             </Swiper>
           </div>
         </div>
