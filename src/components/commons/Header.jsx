@@ -8,11 +8,13 @@ import { MdFlipCameraIos, MdOutlineAccountCircle } from "react-icons/md";
 import { AiOutlineHeart } from "react-icons/ai";
 import { GrCart } from "react-icons/gr";
 import Logo from "@/assets/icons/Logo";
-import {removeAllCookies } from "@/utils/cookies";
+import { removeAllCookies } from "@/utils/cookies";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { setKeySearch } from "@/store/searchSlice";
 import { isLoggedIn } from "@/utils/checkLogin";
+import { getCart } from "@/api/cart";
+import { setQuantityOfCart } from "@/store/orderSlice";
 
 const Header = () => {
   const [inputText, setInputText] = useState("");
@@ -47,6 +49,32 @@ const Header = () => {
     toast.success("Đăng xuất thành công!");
     navigate("/");
   };
+
+  useEffect(() => {
+    const fetchCart = async () => {
+      if (isLoggedIn()) {
+        const res = await getCart();
+        const cartItems = res.data.cartItems;
+        let quantity = 0;
+        cartItems.forEach((cartItem) => {
+          cartItem.productVariations.forEach((variant) => {
+            variant.isSelected && (quantity += variant.cartQuantity);
+          });
+        });
+        dispatch(setQuantityOfCart(quantity));
+      } else {
+        const localCart = useSelector((state) => state.order.localCart);
+        let quantity = 0;
+        localCart.forEach((cartItem) => {
+          cartItem.productVariations.forEach((variant) => {
+            variant.isSelected && (quantity += variant.cartQuantity);
+          });
+        });
+        dispatch(setQuantityOfCart(quantity));
+      }
+    };
+    fetchCart();
+  }, []);
 
   const quantityOfProducts = useSelector((state) => state.order.quantityOfCart);
   return (

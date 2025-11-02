@@ -5,11 +5,14 @@ import ProductPayment from "./ProductPayment";
 import Header from "@/components/commons/Header";
 import Footer from "@/components/commons/Footer";
 import { useSelector } from "react-redux";
+import { setOrderList } from "@/store/orderSlice";
 
 const PaymentPage = () => {
   const [selectedDeliveryAddress, setSelectedDeliveryAddress] = useState(null);
   const orderListItem = useSelector((state) => state.order.orderList);
   const [itemsPayment, setItemsPayment] = useState(orderListItem || []);
+
+  console.log("orderList:", orderListItem);
 
   return (
     <>

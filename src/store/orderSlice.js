@@ -31,31 +31,46 @@ const orderSlice = createSlice({
     setLocalCart: (state, action) => {
       const newItem = action.payload;
 
-      // Tìm variant được chọn trong sản phẩm mới
+      // Lấy variant được chọn từ sản phẩm mới
       const selectedVariant = newItem.productVariations.find(
-        (variant) => variant.isSelected
+        (v) => v.isSelected
       );
       if (!selectedVariant) return;
 
+      const productId = newItem.id;
       const variantId = selectedVariant.id;
 
-      // Tìm xem variant đó đã có trong giỏ chưa
-      const existedItem = state.localCart.find((item) =>
-        item.productVariations.some(
-          (variant) => variant.isSelected && variant.id === variantId
-        )
+      // Tìm sản phẩm trong giỏ theo id
+      const existedProduct = state.localCart.find(
+        (item) => item.id === productId
       );
 
-      if (existedItem) {
-        // Tìm đúng variant trong sản phẩm cũ và cộng thêm số lượng
-        const existedVariant = existedItem.productVariations.find(
-          (variant) => variant.id === variantId
+      if (existedProduct) {
+        // Nếu sản phẩm đã tồn tại trong giỏ
+        const existedVariant = existedProduct.productVariations.find(
+          (v) => v.id === variantId && v.isSelected
         );
+
         if (existedVariant) {
+          // Nếu variant đã có => tăng số lượng
           existedVariant.cartQuantity += selectedVariant.cartQuantity;
+          existedVariant.isSelected = true;
+        } else {
+          // Nếu variant chưa có => thêm variant mới vào danh sách variations
+          existedProduct.productVariations =
+            existedProduct.productVariations.map((v) => {
+              if (v.id === variantId) {
+                return {
+                  ...v,
+                  isSelected: true,
+                  cartQuantity: selectedVariant.cartQuantity,
+                };
+              }
+              return v;
+            });
         }
       } else {
-        // Nếu chưa có, thêm sản phẩm mới vào giỏ
+        // Nếu chưa có sản phẩm này trong giỏ => thêm mới toàn bộ sản phẩm
         state.localCart.push(newItem);
       }
     },
