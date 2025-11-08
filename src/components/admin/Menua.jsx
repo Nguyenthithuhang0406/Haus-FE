@@ -3,13 +3,13 @@ import { MdDashboard, MdManageAccounts, MdInventory, MdShoppingCart, MdDiscount 
 
 const Menua = ({ isMenuOpen, activeItem, handleMenuItemClick, isMobile }) => {
   const location = useLocation();
-  
+
   const menuItems = [
     {
       id: "thong-ke",
       name: "Thống kê",
       icon: <MdDashboard className="w-5 h-5" />,
-      path: "/"
+      path: "/admin/dashboard"
     },
     {
       id: "quan-ly-danh-muc",
@@ -66,7 +66,7 @@ const Menua = ({ isMenuOpen, activeItem, handleMenuItemClick, isMobile }) => {
             {menuItems.map((item) => {
               // Check if this item is active based on current path
               const isActive = location.pathname === item.path;
-              
+
               return (
                 <li key={item.id}>
                   <Link

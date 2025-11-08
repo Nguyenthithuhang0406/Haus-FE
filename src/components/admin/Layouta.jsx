@@ -14,7 +14,7 @@ const Layouta = ({ children }) => {
 
   // Menu items mapping để lấy tên từ path
   const menuItemsMap = {
-    "/": "Thống kê",
+    "/admin/dashboard": "Thống kê",
     "/admin/managerCategory": "Quản lý danh mục",
     "/admin/managerProduct": "Quản lý sản phẩm",
     "/admin/managerOrder": "Quản lý đơn hàng",

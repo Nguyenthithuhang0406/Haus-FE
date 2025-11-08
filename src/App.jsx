@@ -17,21 +17,16 @@ const ChangePassword = lazy(() => import("@/pages/ChangePassword"));
 const ViewEditInfor = lazy(() => import("@/pages/ViewEditInfor"));
 const Promotion = lazy(() => import("@/pages/Promotion"));
 const LayoutAdmin = lazy(() => import("@/components/admin/Layouta"));
-const ManagerCategory = lazy(() =>
-  import("@/components/admin/Category/CategoriesPage")
-);
-const ManagerProduct = lazy(() =>
-  import("@/components/admin/Product/ProductsPage")
-);
-const ListProductByCategory = lazy(() =>
-  import("@/pages/ListProductByCategory")
-);
-const Order = lazy(()=>import("@/pages/OrderManagerment"));
+const ManagerCategory = lazy(() => import("@/components/admin/Category/CategoriesPage"));
+const ManagerProduct = lazy(() => import("@/components/admin/Product/ProductsPage"));
+const ListProductByCategory = lazy(() => import("@/pages/ListProductByCategory"));
+const DashboardPage = lazy(() => import("@/components/admin/Dashboard/DashBoardPage"));
+const Order = lazy(() => import("@/pages/OrderManagerment"));
 const DetailProduct = lazy(() => import("@/pages/DetailProduct"));
 const Search = lazy(() => import("@/pages/Search"));
-const CartPage = lazy(()=> import("@/pages/CartPage"))
+const CartPage = lazy(() => import("@/pages/CartPage"))
 const PaymentPage = lazy(() => import("@/components/payment/PaymentPage"))
-const WishList = lazy(()=> import("@/pages/WishList"))
+const WishList = lazy(() => import("@/pages/WishList"))
 const App = () => {
   useEffect(() => {
     AOS.init({
@@ -81,10 +76,11 @@ const App = () => {
         </ProtectedRoute>
       ),
       children: [
+        { path: "dashboard", element: <DashboardPage /> },
         { path: "managerCategory", element: <ManagerCategory /> },
         { path: "managerProduct", element: <ManagerProduct /> },
         { path: "managerPromotion", element: <Promotion /> },
-        {path:"managerOrder",element:<Order />},
+        { path: "managerOrder", element: <Order /> },
       ],
     },
     {
@@ -96,8 +92,8 @@ const App = () => {
         </div>
       ),
     },
-    {path:"/wishlist",element:<WishList />},
-    {path:"/cart",element:<CartPage />},
+    { path: "/wishlist", element: <WishList /> },
+    { path: "/cart", element: <CartPage /> },
   ]);
 
   return (
