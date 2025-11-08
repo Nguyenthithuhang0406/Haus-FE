@@ -112,7 +112,7 @@ const Header = () => {
         {/* Icons */}
         <div className="hidden lg:flex items-center gap-4 relative">
           <div
-            // onClick={() => navigate(`/followingProducts`)}
+            onClick={() => navigate(`/wishlist`)}
             className="flex flex-col items-center cursor-pointer text-[#efefef] hover:text-[#9a542c]"
           >
             <AiOutlineHeart className="w-[30px] h-[30px]" />

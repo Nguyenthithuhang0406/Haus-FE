@@ -254,7 +254,6 @@ const CartPage = () => {
   };
 
   const calculateTotal = () => {
-    // console.log(cartItems);
     return cartItems
       .map((item) => {
         const selectedVariant = item?.productVariations?.find(
@@ -273,11 +272,6 @@ const CartPage = () => {
   };
 
   const handleClickCheckout = () => {
-    // const itemSelecteds = cartItems.filter((item) =>
-    //   item?.productVariations?.some(
-    //     (variant) => variant.isSelected && selectedItems.includes(variant.id)
-    //   )
-    // );
     const itemSelecteds = cartItems
       .map((item) => {
         const selectedVariants = item.productVariations.filter((variant) =>

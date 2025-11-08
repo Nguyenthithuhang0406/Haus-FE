@@ -1,4 +1,4 @@
-import { request} from "@/utils/axios/axios-http";
+import { request } from "@/utils/axios/axios-http";
 import { axiosPrivate, axiosPublic } from "@/utils/axios/axiosInstance";
 import { getCookie, removeAllCookies, setCookie } from "@/utils/cookies";
 
@@ -51,7 +51,7 @@ export const login = async (data) => {
       method: "POST",
       url: "/auth/login",
       data: {
-        email,
+        username: email,
         password,
       },
     });
@@ -60,7 +60,7 @@ export const login = async (data) => {
     setCookie("accessToken", accessToken);
     setCookie("refreshToken", refreshToken);
     setCookie("role", role);
-    
+
     return response.data;
   } catch (error) {
     console.log(error);
