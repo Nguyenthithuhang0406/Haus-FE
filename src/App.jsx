@@ -66,7 +66,6 @@ const App = () => {
     { path: "/detailProduct/:id", element: <DetailProduct /> },
     { path: "/search", element: <Search /> },
     { path: "/paymentPage", element: <PaymentPage /> },
-    { path: "/promotion", element: <Promotion /> },
     {
       path: "/admin",
       // element: <LayoutAdmin />,

@@ -1,33 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Minus, Plus, X, Check } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { setQuantityOfCart } from "@/store/orderSlice";
 
 const CartItem = ({
   item,
+  variant,
   onUpdateQuantity,
   onRemove,
   isSelected,
   handleChangeVariant,
   onToggleSelect,
 }) => {
-  // const [isChangedVariant, setIsChangedVariant] = useState(false);
-  const [variantSelected, setVariantSelected] = useState(
-    item?.productVariations
-      ? item.productVariations.find((variant) => variant.isSelected)
-      : null
-  );
-
-  useEffect(() => {
-    // console.log("item:", item);
-    if (item?.productVariations) {
-      const selectedVariant = item.productVariations.find(
-        (variant) => variant.isSelected
-      );
-      // console.log("selected:", selectedVariant);
-      setVariantSelected(selectedVariant || null);
-    }
-  }, [item]);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat("vi-VN").format(price) + "đ";
@@ -44,7 +28,7 @@ const CartItem = ({
       {/* Mobile Layout */}
       <div className="flex gap-3 lg:hidden">
         <button
-          onClick={() => onToggleSelect(variantSelected?.id)}
+          onClick={() => onToggleSelect(variant?.id)}
           className={`mt-1 w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
             isSelected
               ? "bg-[#ad7555] border-[#ad7555]"
@@ -57,7 +41,7 @@ const CartItem = ({
         </button>
 
         <img
-          src={variantSelected?.media?.url || item?.medias?.[0]?.url}
+          src={variant?.media?.url || item?.medias?.[0]?.url}
           alt={item?.productName}
           className="w-20 h-20 object-cover rounded flex-shrink-0"
         />
@@ -68,7 +52,7 @@ const CartItem = ({
               {item?.productName}
             </h3>
             <button
-              onClick={() => onRemove(variantSelected?.id)}
+              onClick={() => onRemove(variant?.id)}
               className="text-gray-400 hover:text-red-600 transition-colors p-1 flex-shrink-0"
             >
               <X size={18} />
@@ -77,13 +61,13 @@ const CartItem = ({
 
           <select
             className="border mb-2 border-[#cecece] px-2 py-1 rounded-md outline-none focus:border-[#ad7555]"
-            value={variantSelected?.id}
+            value={variant?.id}
             onChange={(e) =>
               handleChangeVariant(
                 item?.id,
                 e.target.value,
-                variantSelected?.id,
-                variantSelected?.cartQuantity || 1
+                variant?.id,
+                variant?.cartQuantity || 1
               )
             }
           >
@@ -98,7 +82,7 @@ const CartItem = ({
             <p className="text-sm text-gray-600">
               Đơn giá:{" "}
               <span className="font-medium text-[#ad7555]">
-                {formatPrice(variantSelected?.price)}
+                {formatPrice(variant?.price)}
               </span>
             </p>
           </div> */}
@@ -108,24 +92,24 @@ const CartItem = ({
               <button
                 onClick={() => {
                   onUpdateQuantity(
-                    variantSelected?.id,
-                    variantSelected?.cartQuantity - 1
+                    variant?.id,
+                    variant?.cartQuantity - 1
                   );
                   dispatch(setQuantityOfCart(Math.max(0, quantityOfCart - 1)));
                 }}
                 className="text-gray-600 hover:text-gray-900 p-1 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={variantSelected?.cartQuantity <= 1}
+                disabled={variant?.cartQuantity <= 1}
               >
                 <Minus size={16} />
               </button>
               <span className="w-6 text-center font-medium text-sm">
-                {variantSelected?.cartQuantity || 1}
+                {variant?.cartQuantity || 1}
               </span>
               <button
                 onClick={() => {
                   onUpdateQuantity(
-                    variantSelected?.id,
-                    variantSelected?.cartQuantity + 1
+                    variant?.id,
+                    variant?.cartQuantity + 1
                   );
                   dispatch(setQuantityOfCart(quantityOfCart + 1));
                 }}
@@ -136,20 +120,20 @@ const CartItem = ({
             </div>
 
             <div className="text-right">
-              {variantSelected?.discountPercent > 0 && (
+              {variant?.discountPercent > 0 && (
                 <p className="text-xs text-gray-500 flex items-center justify-center gap-2">
                   <span className="line-through">
-                    {formatPrice(variantSelected?.price || 0)}
+                    {formatPrice(variant?.price || 0)}
                   </span>{" "}
                   <span className="text-[#ad7555]">
-                    - {variantSelected?.discountPercent}%
+                    - {variant?.discountPercent}%
                   </span>
                 </p>
               )}
               <p className="text-base font-bold text-[#ad7555]">
                 {formatPrice(
-                  (variantSelected?.price *
-                    (100 - (variantSelected?.discountPercent || 0))) /
+                  (variant?.price *
+                    (100 - (variant?.discountPercent || 0))) /
                     100
                 )}
               </p>
@@ -161,7 +145,7 @@ const CartItem = ({
       {/* Desktop Layout */}
       <div className="hidden lg:flex items-center gap-6">
         <button
-          onClick={() => onToggleSelect(variantSelected?.id)}
+          onClick={() => onToggleSelect(variant?.id)}
           className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
             isSelected
               ? "bg-[#ad7555] border-[#ad7555] scale-110"
@@ -174,7 +158,7 @@ const CartItem = ({
         </button>
 
         <img
-          src={variantSelected?.media?.url || item?.medias?.[0]?.url}
+          src={variant?.media?.url || item?.medias?.[0]?.url}
           alt={item?.productName}
           className="w-24 h-24 object-cover rounded"
         />
@@ -185,13 +169,13 @@ const CartItem = ({
           </h3>
           <select
             className="border border-[#cecece] px-2 py-1 rounded-md outline-none focus:border-[#ad7555]"
-            value={variantSelected?.id}
+            value={variant?.id}
             onChange={(e) =>
               handleChangeVariant(
                 item?.id,
                 e.target.value,
-                variantSelected?.id,
-                variantSelected?.cartQuantity || 1
+                variant?.id,
+                variant?.cartQuantity || 1
               )
             }
           >
@@ -206,7 +190,7 @@ const CartItem = ({
         {/* <div className="text-center min-w-[100px]">
           <p className="text-sm text-gray-500 mb-1">Đơn giá</p>
           <p className="text-base font-medium text-[#ad7555]">
-            {formatPrice(variantSelected?.price)}
+            {formatPrice(variant?.price)}
           </p>
         </div> */}
 
@@ -214,24 +198,24 @@ const CartItem = ({
           <button
             onClick={() => {
               onUpdateQuantity(
-                variantSelected?.id,
-                variantSelected?.cartQuantity - 1
+                variant?.id,
+                variant?.cartQuantity - 1
               );
               dispatch(setQuantityOfCart(Math.max(0, quantityOfCart - 1)));
             }}
             className="text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={variantSelected?.cartQuantity <= 1}
+            disabled={variant?.cartQuantity <= 1}
           >
             <Minus size={18} />
           </button>
           <span className="w-8 text-center font-medium">
-            {variantSelected?.cartQuantity || 1}
+            {variant?.cartQuantity || 1}
           </span>
           <button
             onClick={() => {
               onUpdateQuantity(
-                variantSelected?.id,
-                variantSelected?.cartQuantity + 1
+                variant?.id,
+                variant?.cartQuantity + 1
               );
               dispatch(setQuantityOfCart(quantityOfCart + 1));
             }}
@@ -242,27 +226,27 @@ const CartItem = ({
         </div>
 
         <div className="text-center min-w-[120px]">
-          {variantSelected?.discountPercent > 0 && (
+          {variant?.discountPercent > 0 && (
             <p className="text-sm text-gray-500 mb-1 flex items-center justify-center gap-2">
               <span className="line-through">
-                {formatPrice(variantSelected?.price || 0)}
+                {formatPrice(variant?.price || 0)}
               </span>{" "}
               <span className="text-[#ad7555]">
-                - {variantSelected?.discountPercent || 0}%
+                - {variant?.discountPercent || 0}%
               </span>
             </p>
           )}
           <p className="text-lg font-bold text-[#ad7555]">
             {formatPrice(
-              ((variantSelected?.price || 0) *
-                (100 - (variantSelected?.discountPercent || 0))) /
+              ((variant?.price || 0) *
+                (100 - (variant?.discountPercent || 0))) /
                 100
             )}
           </p>
         </div>
 
         <button
-          onClick={() => onRemove(variantSelected?.id)}
+          onClick={() => onRemove(variant?.id)}
           className="text-gray-400 hover:text-red-600 transition-colors p-2"
         >
           <X size={20} />

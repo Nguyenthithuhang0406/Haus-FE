@@ -145,63 +145,39 @@ const CartPage = () => {
         setCartItems(response.data.cartItems || []);
       }
     } else {
-      const updatedVariants = cartItems.map((item) => {
-        // Chỉ xử lý item có id trùng với itemId
+      // ---- TRƯỜNG HỢP CHƯA LOGIN ----
+      const updatedCart = cartItems.map((item) => {
         if (item.id !== itemId) return item;
 
-        // Kiểm tra nếu variant cũ tồn tại trong item
-        if (
-          item.productVariations.some(
-            (variant) => variant.isSelected && variant.id === oldId
-          )
-        ) {
-          const updatedVariant = item.productVariations.map((variant) => {
-            if (variant.id === oldId) {
-              return { ...variant, isSelected: false };
-            } else if (variant.id === newId) {
-              return { ...variant, isSelected: true, cartQuantity: quantity };
+        const variants = item.productVariations.map((variant) => {
+          // Nếu là variant cũ -> bỏ chọn
+          if (variant.id === oldId) {
+            return { ...variant, isSelected: false };
+          }
+
+          // Nếu là variant mới
+          if (variant.id === newId) {
+            if (variant.isSelected) {
+              // Nếu đã chọn từ trước -> tăng số lượng
+              return {
+                ...variant,
+                cartQuantity: variant.cartQuantity + (quantity || 1),
+              };
+            } else {
+              // Nếu chưa chọn -> chọn mới và gán quantity
+              return {
+                ...variant,
+                isSelected: true,
+                cartQuantity: quantity || 1,
+              };
             }
-            return variant;
-          });
-          return { ...item, productVariations: updatedVariant };
-        }
-        return item;
+          }
+          return variant;
+        });
+
+        return { ...item, productVariations: variants };
       });
-
-      const uniqueVariants = [];
-      updatedVariants.forEach((item) => {
-        const selectedVariant = item.productVariations.find(
-          (variant) => variant.isSelected
-        );
-        if (!selectedVariant) return;
-
-        const existedIdx = uniqueVariants.findIndex((i) =>
-          i.productVariations.some(
-            (v) => v.isSelected && v.id === selectedVariant.id
-          )
-        );
-        if (existedIdx !== -1) {
-          // Cập nhật số lượng thành số lượng mới
-          uniqueVariants[existedIdx] = {
-            ...uniqueVariants[existedIdx],
-            productVariations: uniqueVariants[existedIdx].productVariations.map(
-              (v) =>
-                v.id === selectedVariant.id
-                  ? {
-                      ...v,
-                      cartQuantity:
-                        parseInt(v.cartQuantity) +
-                        parseInt(selectedVariant.cartQuantity),
-                    }
-                  : { ...v }
-            ),
-          };
-        } else {
-          uniqueVariants.push(item);
-        }
-      });
-
-      setCartItems(uniqueVariants);
+      setCartItems(updatedCart);
       setSelectedItems((prev) =>
         prev.includes(oldId)
           ? prev
@@ -209,7 +185,7 @@ const CartPage = () => {
               .concat(newId) // thêm id mới
           : prev
       );
-      dispatch(updateLocalCart(uniqueVariants));
+      dispatch(updateLocalCart(updatedCart));
     }
   };
 
@@ -278,7 +254,6 @@ const CartPage = () => {
   };
 
   const calculateTotal = () => {
-    // console.log(cartItems);
     return cartItems
       .map((item) => {
         const selectedVariant = item?.productVariations?.find(
@@ -297,11 +272,20 @@ const CartPage = () => {
   };
 
   const handleClickCheckout = () => {
-    const itemSelecteds = cartItems.filter((item) =>
-      item?.productVariations?.some(
-        (variant) => variant.isSelected && selectedItems.includes(variant.id)
-      )
-    );
+    const itemSelecteds = cartItems
+      .map((item) => {
+        const selectedVariants = item.productVariations.filter((variant) =>
+          selectedItems.includes(variant.id)
+        );
+        if (selectedVariants.length > 0) {
+          return {
+            ...item,
+            productVariations: selectedVariants,
+          };
+        }
+        return null;
+      })
+      .filter((item) => item !== null);
 
     dispatch(setOrderList(itemSelecteds));
     if (isLoggedIn()) {
@@ -341,25 +325,25 @@ const CartPage = () => {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
-              {cartItems.map((item) => (
-                <CartItem
-                  key={
-                    item?.productVariations?.find(
-                      (variant) => variant.isSelected
-                    )?.id
-                  }
-                  item={item}
-                  isSelected={selectedItems.includes(
-                    item?.productVariations?.find(
-                      (variant) => variant.isSelected
-                    )?.id
-                  )}
-                  onToggleSelect={handleToggleSelect}
-                  onUpdateQuantity={handleUpdateQuantity}
-                  handleChangeVariant={handleChangeVariant}
-                  onRemove={handleRemoveItem}
-                />
-              ))}
+              {cartItems.map(
+                (item) =>
+                  item.productVariations.length > 0 &&
+                  item.productVariations.map(
+                    (variant) =>
+                      variant.isSelected && (
+                        <CartItem
+                          key={variant?.id}
+                          item={item}
+                          variant={variant}
+                          isSelected={selectedItems.includes(variant?.id)}
+                          onToggleSelect={handleToggleSelect}
+                          onUpdateQuantity={handleUpdateQuantity}
+                          handleChangeVariant={handleChangeVariant}
+                          onRemove={handleRemoveItem}
+                        />
+                      )
+                  )
+              )}
               {/* <PaginationComponent
                 currentPage={currentPage}
                 totalItems={cartItems.length}

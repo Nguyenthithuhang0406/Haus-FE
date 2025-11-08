@@ -223,7 +223,10 @@ const Menu = () => {
               </p>
             </div>
           )}
-          <li className="text-white text-center cursor-pointer">
+          <li
+            onClick={() => navigate("/wishlist")}
+            className="text-white text-center cursor-pointer"
+          >
             <IoHeart className="w-5 h-5 mx-auto" />
             <p className="text-[15px]">Yêu thích</p>
           </li>
