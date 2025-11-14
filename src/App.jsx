@@ -27,6 +27,7 @@ const Search = lazy(() => import("@/pages/Search"));
 const CartPage = lazy(() => import("@/pages/CartPage"))
 const PaymentPage = lazy(() => import("@/components/payment/PaymentPage"))
 const WishList = lazy(() => import("@/pages/WishList"))
+const OrderInfor = lazy(()=> import("@/pages/OrderInfor"))
 const App = () => {
   useEffect(() => {
     AOS.init({
@@ -66,6 +67,7 @@ const App = () => {
     { path: "/detailProduct/:id", element: <DetailProduct /> },
     { path: "/search", element: <Search /> },
     { path: "/paymentPage", element: <PaymentPage /> },
+    { path: "/order-infor", element: <OrderInfor/>},
     {
       path: "/admin",
       // element: <LayoutAdmin />,
