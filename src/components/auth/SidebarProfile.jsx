@@ -18,9 +18,9 @@ const SidebarProfile = () => {
             Thông tin tài khoản
           </Link>
           <Link
-            to="#"
+            to="/order-infor"
             className={`block w-full text-left py-3 px-4 rounded ${
-              location.pathname === "/"
+              location.pathname === "/order-infor"
                 ? "text-[#ad7555] bg-[#ad7555]/10 border-[#ad7555]"
                 : "text-gray-700 hover:bg-gray-100"
             } font-medium border-l-4`}
