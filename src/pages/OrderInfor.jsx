@@ -8,16 +8,38 @@ import OrderItem from "@/components/searchOrder/OrderItem";
 const { Option } = Select;
 
 const OrderInfor = () => {
-  const mockOrders = [
+ const mockOrders = [
     {
       id: 1,
-      name: "Gương phòng tắm có đèn",
-      type: "Bạc 60x20 cm",
-      quantity: 1,
-      price: 1000000,
-      total: 1000000,
+      // Đơn hàng có nhiều sản phẩm
+      products: [
+        {
+          id: 101,
+          name: "Gương phòng tắm có đèn",
+          type: "Bạc 60x20 cm",
+          quantity: 1,
+          price: 1000000,
+          image: null
+        },
+        {
+          id: 102,
+          name: "Kệ treo tường",
+          type: "Gỗ sồi",
+          quantity: 2,
+          price: 500000,
+          image: null
+        },
+        {
+          id: 103,
+          name: "Đèn ngủ LED",
+          type: "Màu trắng",
+          quantity: 1,
+          price: 250000,
+          image: null
+        }
+      ],
+      total: 2250000,
       status: "Đang chờ",
-      image: null,
       shippingAddress: "123 Nguyễn Văn A, Quận 1, TP.HCM",
       phone: "0123456789",
       shippingFee: 30000,
@@ -28,10 +50,11 @@ const OrderInfor = () => {
     },
     {
       id: 2,
+      // Đơn hàng chỉ có 1 sản phẩm (format cũ vẫn hoạt động)
       name: "Sofa cao cấp",
       type: "đỏ",
       quantity: 1,
-      price: 1000000,
+      price: 2000000,
       total: 2000000,
       status: "Đang giao",
       image: null,
@@ -45,13 +68,42 @@ const OrderInfor = () => {
     },
     {
       id: 3,
-      name: "Bàn làm việc gỗ",
-      type: "Gỗ sồi",
-      quantity: 2,
-      price: 1500000,
-      total: 3000000,
+      products: [
+        {
+          id: 301,
+          name: "Bàn làm việc gỗ",
+          type: "Gỗ sồi",
+          quantity: 1,
+          price: 1500000,
+          image: null
+        },
+        {
+          id: 302,
+          name: "Ghế xoay văn phòng",
+          type: "Da PU đen",
+          quantity: 1,
+          price: 800000,
+          image: null
+        },
+        {
+          id: 303,
+          name: "Đèn bàn LED",
+          type: "Ánh sáng vàng",
+          quantity: 1,
+          price: 350000,
+          image: null
+        },
+        {
+          id: 304,
+          name: "Kệ sách mini",
+          type: "3 tầng - Trắng",
+          quantity: 2,
+          price: 400000,
+          image: null
+        }
+      ],
+      total: 3450000,
       status: "Đã giao",
-      image: null,
       shippingAddress: "789 Trần Văn C, Quận 5, TP.HCM",
       phone: "0369852147",
       shippingFee: 40000,
