@@ -1,14 +1,92 @@
 import { getAllPromotions } from "@/api/promotion";
+import { createOrder } from "@/api/order";
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
-const WAREHOUSE_ADDRESS = "Số 39, ngõ 134, Cầu Diễn, Minh Khai, Bắc Từ Liêm, Hà Nội";
+const WAREHOUSE_ADDRESS =
+  "Số 39, ngõ 134, Cầu Diễn, Minh Khai, Bắc Từ Liêm, Hà Nội";
+
+let googleMapsLoaderPromise = null;
+
+const loadGoogleMapsScript = (apiKey) => {
+  if (typeof window === "undefined") {
+    return Promise.reject(new Error("Window is undefined"));
+  }
+
+  if (window.google?.maps) {
+    return Promise.resolve();
+  }
+
+  if (!apiKey) {
+    return Promise.reject(
+      new Error("Google Maps API key is missing while loading script.")
+    );
+  }
+
+  if (!googleMapsLoaderPromise) {
+    googleMapsLoaderPromise = new Promise((resolve, reject) => {
+      const existingScript = document.querySelector(
+        'script[src^="https://maps.googleapis.com/maps/api/js"]'
+      );
+      if (existingScript) {
+        existingScript.addEventListener("load", resolve);
+        existingScript.addEventListener("error", () =>
+          reject(new Error("Failed to load Google Maps"))
+        );
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+      script.async = true;
+      script.defer = true;
+      script.onload = resolve;
+      script.onerror = () =>
+        reject(new Error("Failed to load Google Maps script"));
+      document.head.appendChild(script);
+    });
+  }
+
+  return googleMapsLoaderPromise;
+};
+
+const getDistanceMatrix = ({ origins, destinations }) => {
+  return new Promise((resolve, reject) => {
+    if (!window.google?.maps) {
+      reject(new Error("Google Maps library not initialized"));
+      return;
+    }
+
+    const service = new window.google.maps.DistanceMatrixService();
+    service.getDistanceMatrix(
+      {
+        origins,
+        destinations,
+        travelMode: window.google.maps.TravelMode.DRIVING,
+        unitSystem: window.google.maps.UnitSystem.METRIC,
+      },
+      (response, status) => {
+        if (status === "OK") {
+          resolve(response);
+        } else {
+          const errorMessage =
+            response?.rows?.[0]?.elements?.[0]?.status ||
+            response?.error_message ||
+            status;
+          reject(
+            new Error(`Distance Matrix API error: ${errorMessage || status}`)
+          );
+        }
+      }
+    );
+  });
+};
 
 const ProductPayment = ({ listProducts, diliveryAddress }) => {
   const products = useMemo(() => listProducts || [], [listProducts]);
   const [shippingFee, setShippingFee] = useState(0);
   const [shippingNote, setShippingNote] = useState("");
-  const [promotion, setPromotion] = useState(null);
+  const [promotion, setPromotion] = useState(null); // Lưu cả promotion object để có id
 
   const subtotal = useMemo(
     () =>
@@ -65,7 +143,7 @@ const ProductPayment = ({ listProducts, diliveryAddress }) => {
             const bestPromotion = validPromotions.reduce((max, current) =>
               current.discountPercent > max.discountPercent ? current : max
             );
-            setPromotion(bestPromotion?.discountPercent);
+            setPromotion(bestPromotion); // Lưu cả object để có id
           } else {
             setPromotion(null);
           }
@@ -135,17 +213,13 @@ const ProductPayment = ({ listProducts, diliveryAddress }) => {
       }
 
       try {
-        const { Client } = await import("@googlemaps/google-maps-services-js");
-        const client = new Client({});
-        const response = await client.distancematrix({
-          params: {
-            origins: [WAREHOUSE_ADDRESS],
-            destinations: [destination],
-            key: googleApiKey,
-          },
+        await loadGoogleMapsScript(googleApiKey);
+        const data = await getDistanceMatrix({
+          origins: [WAREHOUSE_ADDRESS],
+          destinations: [destination],
         });
 
-        const element = response?.data?.rows?.[0]?.elements?.[0];
+        const element = data?.rows?.[0]?.elements?.[0];
 
         if (!element || element.status !== "OK") {
           console.warn("Unable to calculate shipping distance", element);
@@ -190,9 +264,18 @@ const ProductPayment = ({ listProducts, diliveryAddress }) => {
         console.error("Failed to calculate shipping fee:", error);
         if (!isCancelled) {
           setShippingFee(0);
-          setShippingNote(
-            "Có lỗi xảy ra khi tính phí vận chuyển. Vui lòng thử lại sau."
-          );
+          let errorNote =
+            "Có lỗi xảy ra khi tính phí vận chuyển. Vui lòng thử lại sau.";
+
+          if (
+            error?.message?.includes("REQUEST_DENIED") ||
+            error?.message?.includes("INVALID_REQUEST")
+          ) {
+            errorNote =
+              "Không thể truy cập Google Distance Matrix API. Vui lòng kiểm tra khóa API, quyền truy cập (HTTP referrer, địa chỉ IP) và đảm bảo đã bật các dịch vụ Distance Matrix + Maps JavaScript.";
+          }
+
+          setShippingNote(errorNote);
         }
       }
     };
@@ -204,7 +287,8 @@ const ProductPayment = ({ listProducts, diliveryAddress }) => {
     };
   }, [diliveryAddress, subtotal]);
 
-  const total = (subtotal * (100 - (promotion || 0))) / 100 + shippingFee;
+  const total =
+    (subtotal * (100 - (promotion?.discountPercent || 0))) / 100 + shippingFee;
 
   let countProduct = 0;
   products.forEach((item) => {
@@ -215,9 +299,56 @@ const ProductPayment = ({ listProducts, diliveryAddress }) => {
     });
   });
 
-  const handleOrder = () => {
-    console.log("list products:", listProducts);
-    console.log("diliveryAddress:", diliveryAddress);
+  const handleOrder = async () => {
+    if (!diliveryAddress) {
+      alert("Vui lòng chọn địa chỉ giao hàng");
+      return;
+    }
+
+    const orderItems = [];
+    listProducts.forEach((item) => {
+      item.productVariations
+        .filter((variant) => variant.isSelected)
+        .forEach((variant) => {
+          const priceAtSale = Math.round(
+            variant.price * ((100 - (variant.discountPercent || 0)) / 100)
+          );
+          orderItems.push({
+            productVariationId: variant.id,
+            quantity: variant.cartQuantity,
+            priceAtSale: priceAtSale,
+          });
+        });
+    });
+
+    const orderData = {
+      orderItems: orderItems,
+      order: {
+        shippingFee: shippingFee,
+        totalAmount: total,
+        addresses: [
+          {
+            id: diliveryAddress.id,
+            isSelected: true,
+          },
+        ],
+        ...(promotion?.id && { promotionId: promotion.id }),
+      },
+      payment: {
+        paymentGateway: "VNPAY",
+        paymentType: "ONLINE_PAYMENT",
+      },
+    };
+
+    try {
+      console.log("Order data:", orderData);
+      const response = await createOrder(orderData);
+      console.log("Order created:", response);
+      // TODO: Xử lý response (ví dụ: redirect đến trang thanh toán hoặc trang xác nhận)
+    } catch (error) {
+      console.error("Failed to create order:", error);
+      alert("Có lỗi xảy ra khi tạo đơn hàng. Vui lòng thử lại.");
+    }
   };
   return (
     <div className="w-[600px] md:w-[500px] rounded-lg border border-gray-200 shadow-lg flex flex-col">
@@ -285,10 +416,12 @@ const ProductPayment = ({ listProducts, diliveryAddress }) => {
           <span>Tạm tính:</span>
           <span>{subtotal.toLocaleString()} đ</span>
         </div>
-        {promotion && promotion > 0 && (
+        {promotion && promotion.discountPercent > 0 && (
           <div className="flex justify-between border-t border-[#ad7555] pt-3 my-3 font-medium">
             <span>Giảm giá:</span>
-            <span className="text-[#ad7555]">- {promotion} %</span>
+            <span className="text-[#ad7555]">
+              - {promotion.discountPercent} %
+            </span>
           </div>
         )}
         <div className="flex justify-between pt-1 pb-5 border-b border-[#ad7555] font-medium">
