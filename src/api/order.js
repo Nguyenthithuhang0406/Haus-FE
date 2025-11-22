@@ -1,6 +1,20 @@
 import { request } from "@/utils/axios/axios-http";
 import { axiosPrivate } from "@/utils/axios/axiosInstance";
 
+export const createOrder = async (data) => {
+  try {
+    const response = await request(axiosPrivate, {
+      method: "POST",
+      url: "/orders",
+      data: data,
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export const getAllOrder = async (data) => {
   try {
     const { status, pageNum = 1, pageSize = 10 } = data;
