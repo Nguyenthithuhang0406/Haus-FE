@@ -10,6 +10,7 @@ export const getAllProducts = async (data) => {
       keyword,
       priceRange,
       color,
+      material,
       categoryId,
     } = data;
     const response = await request(axiosPublic, {
@@ -24,6 +25,7 @@ export const getAllProducts = async (data) => {
           categoryId && `categoryId:${categoryId}`,
           priceRange && `priceRange:${priceRange}`,
           color && `color:${color}`,
+          material && `material:${material}`,
         ]
           .filter(Boolean)
           .join(","),
@@ -41,6 +43,7 @@ export const createProduct = async (data) => {
     const {
       productName,
       price,
+      material,
       description,
       detailDescription,
       categories,
@@ -49,6 +52,7 @@ export const createProduct = async (data) => {
     const requestData = {
       productName,
       price,
+      material,
       description,
       detailDescription,
       categories,
@@ -77,6 +81,7 @@ export const updateProduct = async (data) => {
       id,
       productName,
       price,
+      material,
       description,
       detailDescription,
       categories,
@@ -87,6 +92,7 @@ export const updateProduct = async (data) => {
     const requestData = {
       productName,
       price,
+      material,
       description,
       detailDescription,
       categories,

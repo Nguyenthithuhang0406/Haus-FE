@@ -6,10 +6,10 @@ export const ProductSchema = () =>
     categories: Yup.string().required("Danh mục bắt buộc"),
     description: Yup.string()
       .required("Mô tả ngắn bắt buộc")
-      .max(100, "Mô tả ngắn tối đa 1000 ký tự"),
+      .max(500, "Mô tả ngắn tối đa 500 ký tự"),
     detailDescription: Yup.string()
       .required("Mô tả chi tiết bắt buộc")
-      .max(1000, "Mô tả chi tiết tối đa 2000 ký tự"),
+      .max(2000, "Mô tả chi tiết tối đa 2000 ký tự"),
     price: Yup.number()
       .min(1000, "Giá tối thiểu 1000đ")
       .required("Giá bắt buộc"),

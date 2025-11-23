@@ -144,6 +144,9 @@ const RightComponent = ({
           <p className="font-semibold">
             Màu sắc: {product?.productVariations[selectedVariantIndex]?.color}
           </p>
+          <p className="font-semibold">
+            Chất liệu: {product?.material || "Chưa có thông tin"}
+          </p>
 
           <div className="w-full flex items-center gap-[10px]">
             {product?.productVariations?.map((type, index) => (
