@@ -6,9 +6,14 @@ import { GrFormPrevious, GrFormNext } from "react-icons/gr";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import ProductItem from "../product/ProductItem";
+import { getAllProducts } from "@/api/product";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const Materials = () => {
-  const [products, setProducts] = useState(listProduct);
+  const [products, setProducts] = useState([]);
+  const [selectedMaterial, setSelectedMaterial] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [slidesPerView, setSlidesPerView] = useState(2);
   const updateSlidesPerView = () => {
     const width = window.innerWidth;
@@ -27,11 +32,47 @@ const Materials = () => {
     return () => window.removeEventListener("resize", updateSlidesPerView); // Cleanup
   }, []);
 
+  // Hàm chung để fetch products
+  const fetchProducts = async (material = null) => {
+    setLoading(true);
+    try {
+      const params = {
+        pageNum: 1,
+        pageSize: 20,
+        sortBy: "asc",
+      };
+
+      // Chỉ thêm material vào params nếu có
+      if (material) {
+        params.material = material;
+      }
+
+      const response = await getAllProducts(params);
+      if (response.status === 200) {
+        setProducts(response.data.items || []);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        toast.error("Đã xảy ra lỗi khi tải sản phẩm");
+      }
+      console.log(error);
+      // Fallback về listProduct nếu API lỗi
+      setProducts(listProduct);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load tất cả sản phẩm mặc định khi component mount (không filter)
   useEffect(() => {
-    updateSlidesPerView();
-    window.addEventListener("resize", updateSlidesPerView);
-    return () => window.removeEventListener("resize", updateSlidesPerView); // Cleanup
+    fetchProducts();
   }, []);
+
+  // Lọc sản phẩm theo material khi click
+  const handleMaterialClick = (material) => {
+    setSelectedMaterial(material);
+    fetchProducts(material);
+  };
 
   const prevRef = useRef(null);
   const nextRef = useRef(null);
@@ -59,25 +100,25 @@ const Materials = () => {
     {
       image:
         "https://bizweb.dktcdn.net/100/570/902/themes/1027061/assets/bg_menu_1.png?1755707267701",
-      name: "Vải",
+      name: "vải",
       title: "Vải",
     },
     {
       image:
         "https://bizweb.dktcdn.net/100/570/902/themes/1027061/assets/bg_menu_2.png?1755707267701",
-      name: "Gỗ",
+      name: "gỗ",
       title: "Gỗ",
     },
     {
       image:
         "https://bizweb.dktcdn.net/100/570/902/themes/1027061/assets/bg_menu_3.png?1755707267701",
-      name: "Đá",
+      name: "đá",
       title: "Đá",
     },
     {
       image:
         "https://bizweb.dktcdn.net/100/570/902/themes/1027061/assets/bg_menu_4.png?1755707267701",
-      name: "Da",
+      name: "da",
       title: "Da",
     },
   ];
@@ -116,14 +157,17 @@ const Materials = () => {
           {listMaterials.map((item, index) => (
             <div
               key={index}
+              onClick={() => handleMaterialClick(item.name)}
               style={{
                 backgroundImage: `url(${item.image})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
               }}
-              className="w-[210px] h-[57px] rounded-xl cursor-pointer flex items-center justify-center bg-[length:0%_100%] hover:bg-[length:100%_100%] 
-             bg-no-repeat bg-center transition-[background-size] duration-500 ease-out"
+              className={`w-[210px] h-[57px] rounded-xl cursor-pointer flex items-center justify-center bg-[length:0%_100%] hover:bg-[length:100%_100%] 
+             bg-no-repeat bg-center transition-[background-size] duration-500 ease-out ${
+               selectedMaterial === item.name ? "ring-2 ring-[#ad7555]" : ""
+             }`}
             >
               <div
                 className="w-full h-full rounded-xl flex items-center justify-center 
@@ -164,17 +208,27 @@ const Materials = () => {
                 nextEl: nextRef.current,
               }}
               slidesPerView={slidesPerView}
-              loop={true}
+              loop={products.length > slidesPerView}
               className="w-full flex items-center justify-center"
             >
-              {products.map((product, index) => (
-                <SwiperSlide
-                  className="flex items-center justify-center"
-                  key={index}
-                >
-                  <ProductItem product={product} />
+              {loading ? (
+                <SwiperSlide className="flex items-center justify-center">
+                  <div className="text-center py-10">Đang tải...</div>
                 </SwiperSlide>
-              ))}
+              ) : products.length > 0 ? (
+                products.map((product, index) => (
+                  <SwiperSlide
+                    className="flex items-center justify-center"
+                    key={product.id || index}
+                  >
+                    <ProductItem product={product} />
+                  </SwiperSlide>
+                ))
+              ) : (
+                <SwiperSlide className="flex items-center justify-center">
+                  <div className="text-center py-10">Không có sản phẩm nào</div>
+                </SwiperSlide>
+              )}
             </Swiper>
             <button
               ref={nextRef}
