@@ -126,6 +126,9 @@ export default function ProductViewModal({
                 <p>
                   <b>Giá:</b> {item?.price?.toLocaleString()}đ
                 </p>
+                <p>
+                  <b>Chất liệu:</b> {item?.material || "Chưa có"}
+                </p>
                 <p className="col-span-1 sm:col-span-2 flex items-center gap-2">
                   <b>Trạng thái:</b>
                   <span

@@ -31,6 +31,7 @@ export default function ProductFormModal({
     description: "",
     detailDescription: "",
     price: "",
+    material: "",
   });
 
   useEffect(() => {
@@ -47,6 +48,7 @@ export default function ProductFormModal({
               description: response.data.description || "",
               detailDescription: response.data.detailDescription || "",
               price: response.data.price || "",
+              material: response.data.material || "",
             });
             setPrevImages(response.data.medias || []);
             setPreviews(imgs);
@@ -136,6 +138,7 @@ export default function ProductFormModal({
       const data = {
         productName: values.productName,
         price: values.price,
+        material: values.material,
         description: values.description,
         detailDescription: values.detailDescription,
         categories: [values.categories],
@@ -174,6 +177,7 @@ export default function ProductFormModal({
       id: editId,
       productName: values.productName,
       price: values.price,
+      material: values.material,
       description: values.description,
       detailDescription: values.detailDescription,
       categories: [values.categories],
@@ -288,7 +292,7 @@ export default function ProductFormModal({
                     rows={2}
                     name="description"
                     onChange={(e) => {
-                      const maxLength = 100;
+                      const maxLength = 500;
                       const value = e.target.value.slice(0, maxLength); // cắt nếu dài hơn
                       setFieldValue("description", value);
                     }}
@@ -302,14 +306,14 @@ export default function ProductFormModal({
                     />
                     <span
                       className={`text-sm ml-auto ${
-                        values.description.length > 900
+                        values.description.length > 480
                           ? "text-red-500"
-                          : values.description.length > 700
+                          : values.description.length > 450
                           ? "text-yellow-600"
                           : "text-gray-500"
                       }`}
                     >
-                      {values.description?.length || 0} / 100
+                      {values.description?.length || 0} / 500
                     </span>
                   </div>
                 </div>
@@ -340,9 +344,9 @@ export default function ProductFormModal({
                     }}
                     onChange={(event, editor) => {
                       let data = editor.getData();
-                      const maxLength = 1000;
+                      const maxLength = 2000;
 
-                      // Nếu vượt quá 1000 ký tự (tính cả HTML) thì cắt chuỗi
+                      // Nếu vượt quá 2000 ký tự (tính cả HTML) thì cắt chuỗi
                       if (data.length > maxLength) {
                         data = data.substring(0, maxLength);
                       }
@@ -358,19 +362,19 @@ export default function ProductFormModal({
                     />
                     <span
                       className={`text-sm ml-auto ${
-                        values.detailDescription.length > 1800
+                        values.detailDescription.length > 1900
                           ? "text-red-500"
-                          : values.detailDescription.length > 1500
+                          : values.detailDescription.length > 1800
                           ? "text-yellow-600"
                           : "text-gray-500"
                       }`}
                     >
-                      {values.detailDescription?.length || 0} / 1000
+                      {values.detailDescription?.length || 0} / 2000
                     </span>
                   </div>
                 </div>
 
-                {/* Giá + số lượng */}
+                {/* Giá + Chất liệu */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -383,6 +387,27 @@ export default function ProductFormModal({
                     />
                     <ErrorMessage
                       name="price"
+                      component="div"
+                      className="text-red-500 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Chất liệu
+                    </label>
+                    <Field
+                      as="select"
+                      name="material"
+                      className="border border-gray-200 focus:ring-1 focus:ring-gray-300 focus:border-gray-400 outline-none p-3 rounded-xl w-full bg-white"
+                    >
+                      <option value="">-- Chọn chất liệu --</option>
+                      <option value="vải">Vải</option>
+                      <option value="gỗ">Gỗ</option>
+                      <option value="đá">Đá</option>
+                      <option value="da">Da</option>
+                    </Field>
+                    <ErrorMessage
+                      name="material"
                       component="div"
                       className="text-red-500 text-sm"
                     />
