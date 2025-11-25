@@ -26,6 +26,8 @@ const DetailProduct = lazy(() => import("@/pages/DetailProduct"));
 const Search = lazy(() => import("@/pages/Search"));
 const CartPage = lazy(() => import("@/pages/CartPage"))
 const PaymentPage = lazy(() => import("@/components/payment/PaymentPage"))
+const PaymentResult = lazy(() => import("@/pages/PaymentResult"))
+const MomoCallback = lazy(() => import("@/pages/MomoCallback"))
 const WishList = lazy(() => import("@/pages/WishList"))
 const OrderInfor = lazy(()=> import("@/pages/OrderInfor"))
 const App = () => {
@@ -67,6 +69,8 @@ const App = () => {
     { path: "/detailProduct/:id", element: <DetailProduct /> },
     { path: "/search", element: <Search /> },
     { path: "/paymentPage", element: <PaymentPage /> },
+    { path: "/payment-result", element: <PaymentResult /> },
+    { path: "/payment/momo/callback", element: <MomoCallback /> },
     { path: "/order-infor", element: <OrderInfor/>},
     {
       path: "/admin",

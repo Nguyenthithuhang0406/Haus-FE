@@ -1,7 +1,9 @@
 import { getAllPromotions } from "@/api/promotion";
 import { createOrder } from "@/api/order";
+import { paymentCod, paymentMomo } from "@/api/payment";
 import React, { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const WAREHOUSE_ADDRESS =
   "Số 39, ngõ 134, Cầu Diễn, Minh Khai, Bắc Từ Liêm, Hà Nội";
@@ -113,6 +115,7 @@ const ProductPayment = ({
   orderNote,
   setOrderNote,
 }) => {
+  const navigate = useNavigate();
   const products = useMemo(() => listProducts || [], [listProducts]);
   const [shippingFee, setShippingFee] = useState(0);
   const [shippingNote, setShippingNote] = useState("");
@@ -331,7 +334,7 @@ const ProductPayment = ({
 
   const handleOrder = async () => {
     if (!diliveryAddress) {
-      alert("Vui lòng chọn địa chỉ giao hàng");
+      toast.error("Vui lòng chọn địa chỉ giao hàng");
       return;
     }
 
@@ -386,13 +389,104 @@ const ProductPayment = ({
     };
 
     try {
-      console.log("Order data:", orderData);
       const response = await createOrder(orderData);
-      console.log("Order created:", response);
-      // TODO: Xử lý response (ví dụ: redirect đến trang thanh toán hoặc trang xác nhận)
+
+      // Lấy orderId từ response
+      const orderId = response?.data?.orderId || response.data;
+
+      if (!orderId) {
+        console.error("Order response:", response);
+        toast.error("Không thể lấy thông tin đơn hàng. Vui lòng thử lại.");
+        return;
+      }
+
+      // Nếu thanh toán COD và tạo đơn hàng thành công
+      if (paymentMethod === "COD") {
+        try {
+          const phoneNumber = diliveryAddress?.phoneNumber;
+
+          if (!phoneNumber) {
+            toast.error(
+              "Không tìm thấy số điện thoại. Vui lòng kiểm tra lại địa chỉ giao hàng."
+            );
+            return;
+          }
+
+          // Gọi API paymentCod
+          const paymentResponse = await paymentCod({
+            orderId: orderId,
+            phoneNumber: phoneNumber,
+            note: orderNote?.trim() || "",
+          });
+
+          console.log("Payment COD response:", paymentResponse);
+
+          // Kiểm tra response thành công (có thể là paymentResponse.status === 200 hoặc paymentResponse.data)
+          const isSuccess =
+            paymentResponse?.status === 200 || paymentResponse?.data;
+          const message = isSuccess
+            ? "Đơn hàng của bạn đã được xác nhận thành công."
+            : "Đơn hàng đã được tạo nhưng có lỗi khi xử lý thanh toán COD. Vui lòng liên hệ hỗ trợ.";
+
+          // Navigate đến trang kết quả thanh toán
+          navigate(
+            `/payment-result?status=${
+              isSuccess ? "success" : "failed"
+            }&orderId=${orderId}&message=${encodeURIComponent(message)}`
+          );
+        } catch (paymentError) {
+          console.error("Failed to process COD payment:", paymentError);
+          const errorMessage =
+            paymentError?.response?.data?.message ||
+            "Đơn hàng đã được tạo nhưng có lỗi khi xử lý thanh toán COD. Vui lòng liên hệ hỗ trợ.";
+
+          // Navigate đến trang kết quả thanh toán với trạng thái thất bại
+          navigate(
+            `/payment-result?status=failed&orderId=${orderId}&message=${encodeURIComponent(
+              errorMessage
+            )}`
+          );
+        }
+      } else if (paymentMethod === "MOMO") {
+        // Xử lý thanh toán MOMO
+        try {
+          // Gọi API paymentMomo
+          const paymentResponse = await paymentMomo({
+            orderId: orderId,
+          });
+
+          console.log("Payment MOMO response:", paymentResponse);
+
+          // Kiểm tra response thành công và có payment URL
+          if (paymentResponse?.status === 200 || paymentResponse?.data) {
+            // Nếu có payment URL, redirect đến trang thanh toán
+            const paymentUrl = paymentResponse?.data?.payUrl;
+            if (paymentUrl) {
+              window.location.href = paymentUrl;
+            } else {
+              toast.success(
+                "Đơn hàng đã được tạo thành công! Vui lòng thanh toán qua MoMo."
+              );
+            }
+          } else {
+            toast.error(
+              "Đơn hàng đã được tạo nhưng có lỗi khi xử lý thanh toán MOMO. Vui lòng liên hệ hỗ trợ."
+            );
+          }
+        } catch (paymentError) {
+          console.error("Failed to process MOMO payment:", paymentError);
+          toast.error(
+            "Đơn hàng đã được tạo nhưng có lỗi khi xử lý thanh toán MOMO. Vui lòng liên hệ hỗ trợ."
+          );
+        }
+      } else {
+        // Xử lý các phương thức thanh toán khác (VNPAY)
+        // TODO: Redirect đến trang thanh toán hoặc trang xác nhận
+        toast.success("Đơn hàng đã được tạo thành công!");
+      }
     } catch (error) {
       console.error("Failed to create order:", error);
-      alert("Có lỗi xảy ra khi tạo đơn hàng. Vui lòng thử lại.");
+      toast.error("Có lỗi xảy ra khi tạo đơn hàng. Vui lòng thử lại.");
     }
   };
   return (

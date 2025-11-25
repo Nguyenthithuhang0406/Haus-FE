@@ -3,7 +3,11 @@ import pc0 from "./img/image.png";
 import pc1 from "./img/image2.png";
 import pc2 from "./img/image3.png";
 
-const PaymentMethod = ({ selectedAddress, paymentMethod, setPaymentMethod }) => {
+const PaymentMethod = ({
+  selectedAddress,
+  paymentMethod,
+  setPaymentMethod,
+}) => {
   const getSelectedValue = () => {
     if (paymentMethod === "COD") return "cod";
     if (paymentMethod === "VNPAY") return "vnpay";

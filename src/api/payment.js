@@ -33,3 +33,16 @@ export const paymentMomo = async (data) => {
     throw error;
   }
 };
+
+export const momoCallback = async (params) => {
+  try {
+    const response = await request(axiosPrivate, {
+      method: "POST",
+      url: `/payment/momo/callback?${params}`,
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
