@@ -31,14 +31,14 @@ const CartPage = () => {
   const orderListItems = useSelector((state) => state.order.orderList);
 
   useEffect(() => {
-    if (orderListItems) {
+    if (orderListItems && orderListItems.length > 0) {
       setSelectedItems(
-        orderListItems.map(
-          (item) => item.productVariations.find((v) => v.isSelected).id
-        )
+        orderListItems
+          .map((item) => item.productVariations.find((v) => v.isSelected)?.id)
+          .filter(Boolean)
       );
     }
-  }, []);
+  }, [orderListItems]);
 
   useEffect(() => {
     const fetchCartItems = async () => {
@@ -57,7 +57,57 @@ const CartPage = () => {
       }
     };
     fetchCartItems();
-  }, []);
+  }, [cartItemsInRedux]);
+
+  // Khởi tạo và cleanup selectedItems khi cartItems thay đổi
+  useEffect(() => {
+    // Lấy tất cả variant IDs có thể chọn (isSelected = true)
+    const allSelectableIds = cartItems.reduce((ids, item) => {
+      const selectedVariants = item.productVariations
+        .filter((v) => v.isSelected)
+        .map((v) => v.id);
+      return [...ids, ...selectedVariants];
+    }, []);
+
+    // Nếu chưa có selectedItems và có orderListItems, khởi tạo từ orderListItems
+    if (
+      selectedItems.length === 0 &&
+      orderListItems &&
+      orderListItems.length > 0
+    ) {
+      const initialFromOrder = orderListItems
+        .map((item) => item.productVariations.find((v) => v.isSelected)?.id)
+        .filter(Boolean);
+      if (initialFromOrder.length > 0) {
+        setSelectedItems(initialFromOrder);
+        return;
+      }
+    }
+
+    // Nếu chưa có selectedItems, khởi tạo từ cartItems
+    if (selectedItems.length === 0 && allSelectableIds.length > 0) {
+      setSelectedItems(allSelectableIds);
+      return;
+    }
+
+    // Cleanup: loại bỏ các IDs không còn tồn tại trong cartItems
+    if (selectedItems.length > 0) {
+      const validSelected = selectedItems.filter((id) =>
+        allSelectableIds.includes(id)
+      );
+      if (validSelected.length !== selectedItems.length) {
+        setSelectedItems(validSelected);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cartItems]);
+
+  // Tính tổng số variants có thể chọn (isSelected = true)
+  const getTotalSelectableItems = () => {
+    return cartItems.reduce((count, item) => {
+      return count + item.productVariations.filter((v) => v.isSelected).length;
+    }, 0);
+  };
 
   const handleToggleSelect = (itemId) => {
     setSelectedItems((prev) =>
@@ -66,16 +116,22 @@ const CartPage = () => {
         : [...prev, itemId]
     );
   };
+
   const handleSelectAll = () => {
-    if (selectedItems.length === cartItems.length) {
+    const totalSelectable = getTotalSelectableItems();
+
+    if (selectedItems.length === totalSelectable && totalSelectable > 0) {
+      // Bỏ chọn tất cả
       setSelectedItems([]);
     } else {
-      setSelectedItems(
-        cartItems.map(
-          (item) =>
-            item?.productVariations?.find((variant) => variant?.isSelected)?.id
-        )
-      );
+      // Chọn tất cả variants có isSelected = true
+      const allSelectableIds = cartItems.reduce((ids, item) => {
+        const selectedVariants = item.productVariations
+          .filter((v) => v.isSelected)
+          .map((v) => v.id);
+        return [...ids, ...selectedVariants];
+      }, []);
+      setSelectedItems(allSelectableIds);
     }
   };
   const handleUpdateQuantity = async (id, newQuantity) => {
@@ -311,13 +367,14 @@ const CartPage = () => {
     <Layout>
       <div className="max-w-[1400px] mx-auto mt-[120px] px-4 py-8">
         <CartHeader
-          totalItems={cartItems.length}
+          totalItems={getTotalSelectableItems()}
           selectedCount={selectedItems.length}
           onClearAll={handleClearAll}
           onSelectAll={handleSelectAll}
           allSelected={
-            cartItems.length > 0 && selectedItems.length === cartItems.length
-          } // Thêm
+            getTotalSelectableItems() > 0 &&
+            selectedItems.length === getTotalSelectableItems()
+          }
         />
 
         {cartItems.length === 0 ? (

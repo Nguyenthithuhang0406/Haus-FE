@@ -6,6 +6,30 @@ import { Link } from "react-router-dom";
 const WAREHOUSE_ADDRESS =
   "Số 39, ngõ 134, Cầu Diễn, Minh Khai, Bắc Từ Liêm, Hà Nội";
 
+// Hàm tạo orderNumber duy nhất với thông tin phương thức thanh toán
+const generateOrderNumber = (paymentMethod) => {
+  const timestamp = Date.now(); // Lấy timestamp hiện tại (milliseconds)
+  const random = Math.floor(Math.random() * 10000)
+    .toString()
+    .padStart(4, "0"); // Số ngẫu nhiên 4 chữ số
+  const date = new Date(timestamp);
+  const dateStr = date.toISOString().slice(0, 10).replace(/-/g, ""); // YYYYMMDD
+  const timeStr = date.toTimeString().slice(0, 8).replace(/:/g, ""); // HHMMSS
+
+  // Thêm mã phương thức thanh toán vào orderNumber
+  const paymentCode =
+    paymentMethod === "COD"
+      ? "COD"
+      : paymentMethod === "VNPAY"
+      ? "VNP"
+      : paymentMethod === "MOMO"
+      ? "MOM"
+      : "";
+
+  // Format: ORDER + PaymentCode + YYYYMMDD + HHMMSS + random 4 digits
+  return `ORDER${paymentCode}${dateStr}${timeStr}${random}`;
+};
+
 let googleMapsLoaderPromise = null;
 
 const loadGoogleMapsScript = (apiKey) => {
@@ -82,7 +106,13 @@ const getDistanceMatrix = ({ origins, destinations }) => {
   });
 };
 
-const ProductPayment = ({ listProducts, diliveryAddress }) => {
+const ProductPayment = ({
+  listProducts,
+  diliveryAddress,
+  paymentMethod,
+  orderNote,
+  setOrderNote,
+}) => {
   const products = useMemo(() => listProducts || [], [listProducts]);
   const [shippingFee, setShippingFee] = useState(0);
   const [shippingNote, setShippingNote] = useState("");
@@ -321,9 +351,23 @@ const ProductPayment = ({ listProducts, diliveryAddress }) => {
         });
     });
 
+    // Xác định paymentGateway và paymentType dựa trên paymentMethod
+    let paymentGateway = null;
+    let paymentType = "CASH_ON_DELIVERY";
+
+    if (paymentMethod === "VNPAY") {
+      paymentGateway = "VNPAY";
+      paymentType = "ONLINE_PAYMENT";
+    } else if (paymentMethod === "MOMO") {
+      paymentGateway = "MOMO";
+      paymentType = "ONLINE_PAYMENT";
+    }
+    // COD: paymentGateway = null, paymentType = "CASH_ON_DELIVERY" (mặc định)
+
     const orderData = {
       orderItems: orderItems,
       order: {
+        orderNumber: generateOrderNumber(paymentMethod),
         shippingFee: shippingFee,
         totalAmount: total,
         addresses: [
@@ -333,10 +377,11 @@ const ProductPayment = ({ listProducts, diliveryAddress }) => {
           },
         ],
         ...(promotion?.id && { promotionId: promotion.id }),
+        ...(orderNote && orderNote.trim() && { note: orderNote.trim() }),
       },
       payment: {
-        paymentGateway: "VNPAY",
-        paymentType: "ONLINE_PAYMENT",
+        paymentGateway: paymentGateway,
+        paymentType: paymentType,
       },
     };
 
@@ -434,6 +479,24 @@ const ProductPayment = ({ listProducts, diliveryAddress }) => {
         <div className="flex justify-between mt-8 pb-5 border-b border-[#ad7555] font-semibold">
           <span>Tổng cộng:</span>
           <span>{total.toLocaleString()} đ</span>
+        </div>
+
+        {/* Ghi chú đơn hàng */}
+        <div className="mt-5 mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Ghi chú đơn hàng (tùy chọn)
+          </label>
+          <textarea
+            value={orderNote || ""}
+            onChange={(e) => setOrderNote(e.target.value)}
+            placeholder="Nhập ghi chú cho đơn hàng của bạn (ví dụ: Giao hàng vào buổi sáng, gọi điện trước khi giao...)"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:border-[#ad7555] resize-none transition-colors"
+            rows={3}
+            maxLength={500}
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            {orderNote?.length || 0}/500 ký tự
+          </p>
         </div>
 
         {/* Nút luôn ở dưới */}
