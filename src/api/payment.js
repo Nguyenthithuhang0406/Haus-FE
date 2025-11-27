@@ -33,12 +33,12 @@ export const paymentMomo = async (data) => {
     throw error;
   }
 };
-
-export const momoCallback = async (params) => {
+export const getUrlVnpay = async (data) => {
   try {
+    const { orderId } = data;
     const response = await request(axiosPrivate, {
-      method: "POST",
-      url: `/payment/momo/callback?${params}`,
+      method: "GET",
+      url: `/payment/vnpay/payment_url?orderId=${orderId}`,
     });
     return response.data;
   } catch (error) {

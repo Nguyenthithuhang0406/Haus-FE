@@ -7,12 +7,19 @@ import { Link } from "react-router-dom";
 const PaymentResult = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  
+
   const status = searchParams.get("status"); // "success" hoặc "failed"
   const message = searchParams.get("message") || "";
   const orderId = searchParams.get("orderId") || "";
+  const paymentMethod = searchParams.get("paymentMethod") || ""; // COD, VNPAY, MOMO
 
-  const isSuccess = status === "success";
+  // Xác định trạng thái thành công
+  // Đối với COD: kiểm tra status === "success"
+  // Đối với VNPay/MOMO: kiểm tra message === "Thành công."
+  const isSuccess =
+    paymentMethod === "COD"
+      ? status === "success"
+      : message === "Thành công." || status === "success";
 
   return (
     <Layout>
@@ -26,10 +33,14 @@ const PaymentResult = () => {
                 </div>
               </div>
               <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                Thanh toán thành công!
+                {paymentMethod === "COD"
+                  ? "Đặt hàng thành công!"
+                  : "Thanh toán thành công!"}
               </h1>
               <p className="text-lg text-gray-600 mb-2">
-                Đơn hàng của bạn đã được xác nhận và đang được xử lý.
+                {paymentMethod === "COD"
+                  ? "Đơn hàng của bạn đã được xác nhận. Bạn sẽ thanh toán khi nhận hàng (COD)."
+                  : "Đơn hàng của bạn đã được xác nhận và đang được xử lý."}
               </p>
               {message && (
                 <p className="text-sm text-gray-500 mb-4">{message}</p>
@@ -48,10 +59,14 @@ const PaymentResult = () => {
                 </div>
               </div>
               <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                Thanh toán thất bại
+                {paymentMethod === "COD"
+                  ? "Đặt hàng thất bại"
+                  : "Thanh toán thất bại"}
               </h1>
               <p className="text-lg text-gray-600 mb-2">
-                Có lỗi xảy ra trong quá trình thanh toán.
+                {paymentMethod === "COD"
+                  ? "Có lỗi xảy ra trong quá trình đặt hàng. Vui lòng thử lại."
+                  : "Có lỗi xảy ra trong quá trình thanh toán."}
               </p>
               {message && (
                 <p className="text-sm text-red-500 mb-4">{message}</p>
@@ -93,4 +108,3 @@ const PaymentResult = () => {
 };
 
 export default PaymentResult;
-
