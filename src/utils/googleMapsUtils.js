@@ -83,4 +83,3 @@ export const getDistanceMatrix = ({ origins, destinations }) => {
     );
   });
 };
-

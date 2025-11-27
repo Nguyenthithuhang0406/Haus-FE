@@ -43,4 +43,3 @@ export const getPaymentConfig = (paymentMethod) => {
 
   return { paymentGateway, paymentType };
 };
-
