@@ -1,92 +1,19 @@
-import { getAllPromotions } from "@/api/promotion";
-import { createOrder } from "@/api/order";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
+import { useShippingFee } from "@/hooks/useShippingFee";
+import { usePromotion } from "@/hooks/usePromotion";
+import { processOrder } from "@/services/orderService";
+import { useNavigate } from "react-router-dom";
 
-const WAREHOUSE_ADDRESS =
-  "Số 39, ngõ 134, Cầu Diễn, Minh Khai, Bắc Từ Liêm, Hà Nội";
-
-let googleMapsLoaderPromise = null;
-
-const loadGoogleMapsScript = (apiKey) => {
-  if (typeof window === "undefined") {
-    return Promise.reject(new Error("Window is undefined"));
-  }
-
-  if (window.google?.maps) {
-    return Promise.resolve();
-  }
-
-  if (!apiKey) {
-    return Promise.reject(
-      new Error("Google Maps API key is missing while loading script.")
-    );
-  }
-
-  if (!googleMapsLoaderPromise) {
-    googleMapsLoaderPromise = new Promise((resolve, reject) => {
-      const existingScript = document.querySelector(
-        'script[src^="https://maps.googleapis.com/maps/api/js"]'
-      );
-      if (existingScript) {
-        existingScript.addEventListener("load", resolve);
-        existingScript.addEventListener("error", () =>
-          reject(new Error("Failed to load Google Maps"))
-        );
-        return;
-      }
-
-      const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
-      script.async = true;
-      script.defer = true;
-      script.onload = resolve;
-      script.onerror = () =>
-        reject(new Error("Failed to load Google Maps script"));
-      document.head.appendChild(script);
-    });
-  }
-
-  return googleMapsLoaderPromise;
-};
-
-const getDistanceMatrix = ({ origins, destinations }) => {
-  return new Promise((resolve, reject) => {
-    if (!window.google?.maps) {
-      reject(new Error("Google Maps library not initialized"));
-      return;
-    }
-
-    const service = new window.google.maps.DistanceMatrixService();
-    service.getDistanceMatrix(
-      {
-        origins,
-        destinations,
-        travelMode: window.google.maps.TravelMode.DRIVING,
-        unitSystem: window.google.maps.UnitSystem.METRIC,
-      },
-      (response, status) => {
-        if (status === "OK") {
-          resolve(response);
-        } else {
-          const errorMessage =
-            response?.rows?.[0]?.elements?.[0]?.status ||
-            response?.error_message ||
-            status;
-          reject(
-            new Error(`Distance Matrix API error: ${errorMessage || status}`)
-          );
-        }
-      }
-    );
-  });
-};
-
-const ProductPayment = ({ listProducts, diliveryAddress }) => {
+const ProductPayment = ({
+  listProducts,
+  diliveryAddress,
+  paymentMethod,
+  orderNote,
+  setOrderNote,
+}) => {
+  const navigate = useNavigate();
   const products = useMemo(() => listProducts || [], [listProducts]);
-  const [shippingFee, setShippingFee] = useState(0);
-  const [shippingNote, setShippingNote] = useState("");
-  const [promotion, setPromotion] = useState(null); // Lưu cả promotion object để có id
 
   const subtotal = useMemo(
     () =>
@@ -104,188 +31,12 @@ const ProductPayment = ({ listProducts, diliveryAddress }) => {
     [products]
   );
 
-  useEffect(() => {
-    const fetchPromotion = async () => {
-      try {
-        const data = {
-          pageNum: 1,
-          pageSize: 100,
-          sortByPrice: "desc",
-          type: "order",
-          status: "active",
-        };
-
-        const response = await getAllPromotions(data);
-        if (response.status === 200) {
-          const promotions = response.data.items || [];
-
-          const today = new Date();
-
-          // Lọc các promotion thỏa điều kiện subtotal
-          const validPromotions = promotions.filter((promo) => {
-            const { minPriceOrder, maxPriceOrder, startDate, endDate, status } =
-              promo;
-
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-
-            return (
-              status === "active" &&
-              subtotal >= (minPriceOrder || 0) &&
-              subtotal <= (maxPriceOrder || Infinity) &&
-              today >= start &&
-              today <= end
-            );
-          });
-
-          if (validPromotions.length > 0) {
-            // Lấy promotion có discountPercent lớn nhất
-            const bestPromotion = validPromotions.reduce((max, current) =>
-              current.discountPercent > max.discountPercent ? current : max
-            );
-            setPromotion(bestPromotion); // Lưu cả object để có id
-          } else {
-            setPromotion(null);
-          }
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchPromotion();
-  }, [subtotal]);
-
-  useEffect(() => {
-    let isCancelled = false;
-
-    const calculateShippingFee = async () => {
-      if (!diliveryAddress) {
-        if (!isCancelled) {
-          setShippingFee(0);
-          setShippingNote(
-            "Vui lòng chọn địa chỉ nhận hàng để tính phí vận chuyển."
-          );
-        }
-        return;
-      }
-
-      if (subtotal >= 10000000) {
-        if (!isCancelled) {
-          setShippingFee(0);
-          setShippingNote("Miễn phí giao hàng cho đơn hàng trên 10.000.000đ.");
-        }
-        return;
-      }
-
-      const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-
-      if (!googleApiKey) {
-        console.warn(
-          "Google Maps API key is missing. Set VITE_GOOGLE_MAPS_API_KEY in your environment."
-        );
-        if (!isCancelled) {
-          setShippingFee(0);
-          setShippingNote(
-            "Không thể tính phí vận chuyển vì thiếu Google Maps API key."
-          );
-        }
-        return;
-      }
-
-      const destination = [
-        diliveryAddress.detailAddress,
-        diliveryAddress.commune,
-        diliveryAddress.district,
-        diliveryAddress.city,
-        diliveryAddress.country,
-      ]
-        .filter(Boolean)
-        .join(", ");
-
-      if (!destination) {
-        if (!isCancelled) {
-          setShippingFee(0);
-          setShippingNote(
-            "Địa chỉ nhận hàng chưa đầy đủ để tính phí vận chuyển."
-          );
-        }
-        return;
-      }
-
-      try {
-        await loadGoogleMapsScript(googleApiKey);
-        const data = await getDistanceMatrix({
-          origins: [WAREHOUSE_ADDRESS],
-          destinations: [destination],
-        });
-
-        const element = data?.rows?.[0]?.elements?.[0];
-
-        if (!element || element.status !== "OK") {
-          console.warn("Unable to calculate shipping distance", element);
-          if (!isCancelled) {
-            setShippingFee(0);
-            setShippingNote(
-              "Không thể tính khoảng cách đến địa chỉ này. Vui lòng thử lại."
-            );
-          }
-          return;
-        }
-
-        const distanceKm = element.distance.value / 1000;
-
-        if (distanceKm <= 10) {
-          if (!isCancelled) {
-            setShippingFee(0);
-            setShippingNote("Miễn phí vận chuyển trong phạm vi 10km từ kho.");
-          }
-          return;
-        }
-
-        const extraDistanceKm = Math.max(distanceKm - 10, 0);
-        const ratePerKm = distanceKm <= 30 ? 15000 : 20000;
-
-        let calculatedFee = Math.ceil(extraDistanceKm) * ratePerKm;
-
-        if (distanceKm > 50) {
-          calculatedFee = Math.max(calculatedFee, 200000);
-          calculatedFee = Math.min(calculatedFee, 1000000);
-        }
-
-        if (!isCancelled) {
-          setShippingFee(calculatedFee);
-          setShippingNote(
-            `Khoảng cách ước tính ${distanceKm.toFixed(
-              1
-            )}km. Phí áp dụng ${ratePerKm.toLocaleString()}đ/km cho quãng đường vượt quá 10km.`
-          );
-        }
-      } catch (error) {
-        console.error("Failed to calculate shipping fee:", error);
-        if (!isCancelled) {
-          setShippingFee(0);
-          let errorNote =
-            "Có lỗi xảy ra khi tính phí vận chuyển. Vui lòng thử lại sau.";
-
-          if (
-            error?.message?.includes("REQUEST_DENIED") ||
-            error?.message?.includes("INVALID_REQUEST")
-          ) {
-            errorNote =
-              "Không thể truy cập Google Distance Matrix API. Vui lòng kiểm tra khóa API, quyền truy cập (HTTP referrer, địa chỉ IP) và đảm bảo đã bật các dịch vụ Distance Matrix + Maps JavaScript.";
-          }
-
-          setShippingNote(errorNote);
-        }
-      }
-    };
-
-    calculateShippingFee();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [diliveryAddress, subtotal]);
+  // Sử dụng custom hooks
+  const { shippingFee, shippingNote } = useShippingFee(
+    diliveryAddress,
+    subtotal
+  );
+  const promotion = usePromotion(subtotal);
 
   const total =
     (subtotal * (100 - (promotion?.discountPercent || 0))) / 100 + shippingFee;
@@ -300,55 +51,16 @@ const ProductPayment = ({ listProducts, diliveryAddress }) => {
   });
 
   const handleOrder = async () => {
-    if (!diliveryAddress) {
-      alert("Vui lòng chọn địa chỉ giao hàng");
-      return;
-    }
-
-    const orderItems = [];
-    listProducts.forEach((item) => {
-      item.productVariations
-        .filter((variant) => variant.isSelected)
-        .forEach((variant) => {
-          const priceAtSale = Math.round(
-            variant.price * ((100 - (variant.discountPercent || 0)) / 100)
-          );
-          orderItems.push({
-            productVariationId: variant.id,
-            quantity: variant.cartQuantity,
-            priceAtSale: priceAtSale,
-          });
-        });
+    await processOrder({
+      listProducts,
+      diliveryAddress,
+      paymentMethod,
+      orderNote,
+      shippingFee,
+      total,
+      promotion,
+      navigate,
     });
-
-    const orderData = {
-      orderItems: orderItems,
-      order: {
-        shippingFee: shippingFee,
-        totalAmount: total,
-        addresses: [
-          {
-            id: diliveryAddress.id,
-            isSelected: true,
-          },
-        ],
-        ...(promotion?.id && { promotionId: promotion.id }),
-      },
-      payment: {
-        paymentGateway: "VNPAY",
-        paymentType: "ONLINE_PAYMENT",
-      },
-    };
-
-    try {
-      console.log("Order data:", orderData);
-      const response = await createOrder(orderData);
-      console.log("Order created:", response);
-      // TODO: Xử lý response (ví dụ: redirect đến trang thanh toán hoặc trang xác nhận)
-    } catch (error) {
-      console.error("Failed to create order:", error);
-      alert("Có lỗi xảy ra khi tạo đơn hàng. Vui lòng thử lại.");
-    }
   };
   return (
     <div className="w-[600px] md:w-[500px] rounded-lg border border-gray-200 shadow-lg flex flex-col">
@@ -434,6 +146,24 @@ const ProductPayment = ({ listProducts, diliveryAddress }) => {
         <div className="flex justify-between mt-8 pb-5 border-b border-[#ad7555] font-semibold">
           <span>Tổng cộng:</span>
           <span>{total.toLocaleString()} đ</span>
+        </div>
+
+        {/* Ghi chú đơn hàng */}
+        <div className="mt-5 mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Ghi chú đơn hàng (tùy chọn)
+          </label>
+          <textarea
+            value={orderNote || ""}
+            onChange={(e) => setOrderNote(e.target.value)}
+            placeholder="Nhập ghi chú cho đơn hàng của bạn (ví dụ: Giao hàng vào buổi sáng, gọi điện trước khi giao...)"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:border-[#ad7555] resize-none transition-colors"
+            rows={3}
+            maxLength={500}
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            {orderNote?.length || 0}/500 ký tự
+          </p>
         </div>
 
         {/* Nút luôn ở dưới */}

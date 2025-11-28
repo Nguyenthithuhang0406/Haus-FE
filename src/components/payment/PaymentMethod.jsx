@@ -1,10 +1,27 @@
-import React, { useState } from "react";
+import React from "react";
 import pc0 from "./img/image.png";
 import pc1 from "./img/image2.png";
 import pc2 from "./img/image3.png";
 
-const PaymentMethod = ({ selectedAddress }) => {
-  const [selected, setSelected] = useState("cod");
+const PaymentMethod = ({
+  selectedAddress,
+  paymentMethod,
+  setPaymentMethod,
+}) => {
+  const getSelectedValue = () => {
+    if (paymentMethod === "COD") return "cod";
+    if (paymentMethod === "VNPAY") return "vnpay";
+    if (paymentMethod === "MOMO") return "momo";
+    return "cod";
+  };
+
+  const handlePaymentChange = (value) => {
+    if (value === "cod") setPaymentMethod("COD");
+    else if (value === "vnpay") setPaymentMethod("VNPAY");
+    else if (value === "momo") setPaymentMethod("MOMO");
+  };
+
+  const selected = getSelectedValue();
 
   return (
     <div className="w-full max-w-[600px] mt-5">
@@ -20,7 +37,7 @@ const PaymentMethod = ({ selectedAddress }) => {
             name="payment"
             className="mt-1 accent-[#ad7555]"
             checked={selected === "cod"}
-            onChange={() => setSelected("cod")}
+            onChange={() => handlePaymentChange("cod")}
           />
           <div className="flex flex-1 gap-3 sm:gap-4 items-start sm:items-center w-full">
             <img
@@ -54,7 +71,7 @@ const PaymentMethod = ({ selectedAddress }) => {
             name="payment"
             className="mt-1 accent-[#ad7555]"
             checked={selected === "vnpay"}
-            onChange={() => setSelected("vnpay")}
+            onChange={() => handlePaymentChange("vnpay")}
           />
           <div className="flex flex-1 gap-3 sm:gap-4 items-start sm:items-center w-full">
             <img
@@ -91,7 +108,7 @@ const PaymentMethod = ({ selectedAddress }) => {
             name="payment"
             className="mt-1 accent-[#ad7555]"
             checked={selected === "momo"}
-            onChange={() => setSelected("momo")}
+            onChange={() => handlePaymentChange("momo")}
           />
           <div className="flex flex-1 gap-3 sm:gap-4 items-start sm:items-center w-full">
             <img

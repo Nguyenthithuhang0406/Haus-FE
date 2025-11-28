@@ -17,17 +17,26 @@ const ChangePassword = lazy(() => import("@/pages/ChangePassword"));
 const ViewEditInfor = lazy(() => import("@/pages/ViewEditInfor"));
 const Promotion = lazy(() => import("@/pages/Promotion"));
 const LayoutAdmin = lazy(() => import("@/components/admin/Layouta"));
-const ManagerCategory = lazy(() => import("@/components/admin/Category/CategoriesPage"));
-const ManagerProduct = lazy(() => import("@/components/admin/Product/ProductsPage"));
-const ListProductByCategory = lazy(() => import("@/pages/ListProductByCategory"));
-const DashboardPage = lazy(() => import("@/components/admin/Dashboard/DashBoardPage"));
+const ManagerCategory = lazy(() =>
+  import("@/components/admin/Category/CategoriesPage")
+);
+const ManagerProduct = lazy(() =>
+  import("@/components/admin/Product/ProductsPage")
+);
+const ListProductByCategory = lazy(() =>
+  import("@/pages/ListProductByCategory")
+);
+const DashboardPage = lazy(() =>
+  import("@/components/admin/Dashboard/DashBoardPage")
+);
 const Order = lazy(() => import("@/pages/OrderManagerment"));
 const DetailProduct = lazy(() => import("@/pages/DetailProduct"));
 const Search = lazy(() => import("@/pages/Search"));
-const CartPage = lazy(() => import("@/pages/CartPage"))
-const PaymentPage = lazy(() => import("@/components/payment/PaymentPage"))
-const WishList = lazy(() => import("@/pages/WishList"))
-const OrderInfor = lazy(()=> import("@/pages/OrderInfor"))
+const CartPage = lazy(() => import("@/pages/CartPage"));
+const PaymentPage = lazy(() => import("@/components/payment/PaymentPage"));
+const PaymentResult = lazy(() => import("@/pages/PaymentResult"));
+const WishList = lazy(() => import("@/pages/WishList"));
+const OrderInfor = lazy(() => import("@/pages/OrderInfor"));
 const App = () => {
   useEffect(() => {
     AOS.init({
@@ -63,11 +72,15 @@ const App = () => {
     { path: "/update-password", element: <UpdatePassword /> },
     { path: "/change-password", element: <ChangePassword /> },
     { path: "/view-infor", element: <ViewEditInfor /> },
-    { path: "/listProductByCategory/:categoryId", element: <ListProductByCategory /> },
+    {
+      path: "/listProductByCategory/:categoryId",
+      element: <ListProductByCategory />,
+    },
     { path: "/detailProduct/:id", element: <DetailProduct /> },
     { path: "/search", element: <Search /> },
     { path: "/paymentPage", element: <PaymentPage /> },
-    { path: "/order-infor", element: <OrderInfor/>},
+    { path: "/payment-result", element: <PaymentResult /> },
+    { path: "/order-infor", element: <OrderInfor /> },
     {
       path: "/admin",
       // element: <LayoutAdmin />,

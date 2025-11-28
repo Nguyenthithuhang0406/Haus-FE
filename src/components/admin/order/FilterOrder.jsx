@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { Search, ChevronDown, X } from "lucide-react";
+import useDebouncedInput from "@/hooks/useDebouncedInput";
 
 const FilterOrder = ({
   filteredCount,
@@ -9,16 +10,57 @@ const FilterOrder = ({
 }) => {
   const [mobileFilterExpanded, setMobileFilterExpanded] = useState(false);
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    setCurrentPage(1);
-  };
+  // Use custom hook for debounced inputs
+  const [orderCodeInput, setOrderCodeInput] = useDebouncedInput(
+    filters.orderCode,
+    "orderCode",
+    filters,
+    setFilters,
+    setCurrentPage
+  );
 
-  const handleClearFilters = () => {
+  const [customerNameInput, setCustomerNameInput] = useDebouncedInput(
+    filters.customerName,
+    "customerName",
+    filters,
+    setFilters,
+    setCurrentPage
+  );
+
+  // Memoize debounced fields
+  const debouncedFields = useMemo(
+    () => new Set(["orderCode", "customerName"]),
+    []
+  );
+
+  const handleFilterChange = useCallback(
+    (e) => {
+      const { name, value } = e.target;
+
+      if (debouncedFields.has(name)) {
+        if (name === "orderCode") {
+          setOrderCodeInput(value);
+        } else if (name === "customerName") {
+          setCustomerNameInput(value);
+        }
+      } else {
+        setFilters((prev) => ({
+          ...prev,
+          [name]: value,
+        }));
+        setCurrentPage(1);
+      }
+    },
+    [
+      debouncedFields,
+      setOrderCodeInput,
+      setCustomerNameInput,
+      setFilters,
+      setCurrentPage,
+    ]
+  );
+
+  const handleClearFilters = useCallback(() => {
     setFilters({
       orderCode: "",
       customerName: "",
@@ -29,7 +71,11 @@ const FilterOrder = ({
       pageSize: 5,
     });
     setCurrentPage(1);
-  };
+  }, [setFilters, setCurrentPage]);
+
+  const toggleMobileFilter = useCallback(() => {
+    setMobileFilterExpanded((prev) => !prev);
+  }, []);
 
   return (
     <div className="flex-col p-8">
@@ -62,10 +108,10 @@ const FilterOrder = ({
               <input
                 type="text"
                 name="orderCode"
-                value={filters.orderCode}
+                value={orderCodeInput}
                 onChange={handleFilterChange}
                 placeholder="Nhập mã đơn hàng"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#ad7555]"
               />
             </div>
 
@@ -76,10 +122,10 @@ const FilterOrder = ({
               <input
                 type="text"
                 name="customerName"
-                value={filters.customerName}
+                value={customerNameInput}
                 onChange={handleFilterChange}
                 placeholder="Nhập tên khách hàng"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#ad7555]"
               />
             </div>
 
@@ -91,13 +137,17 @@ const FilterOrder = ({
                 name="status"
                 value={filters.status}
                 onChange={handleFilterChange}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#ad7555] bg-white"
               >
                 <option value="">Tất cả trạng thái</option>
                 <option value="pending">Đang chờ</option>
-                <option value="shipping">Đang giao</option>
+                <option value="confirmed">Đã xác nhận</option>
+                <option value="processing">Đang xử lý</option>
                 <option value="delivered">Đã giao</option>
-                <option value="returned">Bị hoàn</option>
+                <option value="completed">Hoàn thành</option>
+                <option value="returned">Đã trả hàng</option>
+                <option value="cancelled">Đã hủy</option>
+                <option value="refunded">Đã hoàn tiền</option>
               </select>
             </div>
 
@@ -110,7 +160,7 @@ const FilterOrder = ({
                 name="startDate"
                 value={filters.startDate}
                 onChange={handleFilterChange}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#ad7555]"
               />
             </div>
           </div>
@@ -144,7 +194,7 @@ const FilterOrder = ({
               <span className="font-medium text-gray-900">Lọc đơn hàng</span>
             </div>
             <button
-              onClick={() => setMobileFilterExpanded(!mobileFilterExpanded)}
+              onClick={toggleMobileFilter}
               className="p-1 text-gray-500 hover:text-gray-700"
             >
               <ChevronDown
@@ -164,10 +214,10 @@ const FilterOrder = ({
                 <input
                   type="text"
                   name="orderCode"
-                  value={filters.orderCode}
+                  value={orderCodeInput}
                   onChange={handleFilterChange}
                   placeholder="Nhập mã đơn hàng"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#ad7555]"
                 />
               </div>
 
@@ -178,10 +228,10 @@ const FilterOrder = ({
                 <input
                   type="text"
                   name="customerName"
-                  value={filters.customerName}
+                  value={customerNameInput}
                   onChange={handleFilterChange}
                   placeholder="Nhập tên khách hàng"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#ad7555]"
                 />
               </div>
 
@@ -193,13 +243,17 @@ const FilterOrder = ({
                   name="status"
                   value={filters.status}
                   onChange={handleFilterChange}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none bg-white"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#ad7555] bg-white"
                 >
                   <option value="">Tất cả trạng thái</option>
                   <option value="pending">Đang chờ</option>
-                  <option value="shipping">Đang giao</option>
+                  <option value="confirmed">Đã xác nhận</option>
+                  <option value="processing">Đang xử lý</option>
                   <option value="delivered">Đã giao</option>
-                  <option value="returned">Bị hoàn</option>
+                  <option value="completed">Hoàn thành</option>
+                  <option value="returned">Đã trả hàng</option>
+                  <option value="cancelled">Đã hủy</option>
+                  <option value="refunded">Đã hoàn tiền</option>
                 </select>
               </div>
 
@@ -211,7 +265,8 @@ const FilterOrder = ({
                   Xóa bộ lọc
                 </button>
                 <div className="text-sm text-gray-600">
-                  <span className="font-semibold">{filteredCount}</span> đơn hàng
+                  <span className="font-semibold">{filteredCount}</span> đơn
+                  hàng
                 </div>
               </div>
             </div>
