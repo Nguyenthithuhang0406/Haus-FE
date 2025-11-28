@@ -20,11 +20,17 @@ const ListOrder = ({
         border: "border-yellow-200",
         label: "Đang chờ",
       },
-      shipping: {
+      confirmed: {
         bg: "bg-blue-100",
         text: "text-blue-800",
         border: "border-blue-200",
-        label: "Đang giao",
+        label: "Đã xác nhận",
+      },
+      processing: {
+        bg: "bg-indigo-100",
+        text: "text-indigo-800",
+        border: "border-indigo-200",
+        label: "Đang xử lý",
       },
       delivered: {
         bg: "bg-green-100",
@@ -32,11 +38,29 @@ const ListOrder = ({
         border: "border-green-200",
         label: "Đã giao",
       },
+      completed: {
+        bg: "bg-emerald-100",
+        text: "text-emerald-800",
+        border: "border-emerald-200",
+        label: "Hoàn thành",
+      },
       returned: {
+        bg: "bg-orange-100",
+        text: "text-orange-800",
+        border: "border-orange-200",
+        label: "Đã trả hàng",
+      },
+      cancelled: {
         bg: "bg-red-100",
         text: "text-red-800",
         border: "border-red-200",
-        label: "Bị hoàn",
+        label: "Đã hủy",
+      },
+      refunded: {
+        bg: "bg-purple-100",
+        text: "text-purple-800",
+        border: "border-purple-200",
+        label: "Đã hoàn tiền",
       },
     };
 

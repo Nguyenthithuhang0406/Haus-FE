@@ -65,7 +65,7 @@ const FilterOrder = ({
                 value={filters.orderCode}
                 onChange={handleFilterChange}
                 placeholder="Nhập mã đơn hàng"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#ad7555]"
               />
             </div>
 
@@ -79,7 +79,7 @@ const FilterOrder = ({
                 value={filters.customerName}
                 onChange={handleFilterChange}
                 placeholder="Nhập tên khách hàng"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#ad7555]"
               />
             </div>
 
@@ -91,13 +91,17 @@ const FilterOrder = ({
                 name="status"
                 value={filters.status}
                 onChange={handleFilterChange}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#ad7555] bg-white"
               >
                 <option value="">Tất cả trạng thái</option>
                 <option value="pending">Đang chờ</option>
-                <option value="shipping">Đang giao</option>
+                <option value="confirmed">Đã xác nhận</option>
+                <option value="processing">Đang xử lý</option>
                 <option value="delivered">Đã giao</option>
-                <option value="returned">Bị hoàn</option>
+                <option value="completed">Hoàn thành</option>
+                <option value="returned">Đã trả hàng</option>
+                <option value="cancelled">Đã hủy</option>
+                <option value="refunded">Đã hoàn tiền</option>
               </select>
             </div>
 
@@ -110,7 +114,7 @@ const FilterOrder = ({
                 name="startDate"
                 value={filters.startDate}
                 onChange={handleFilterChange}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#ad7555]"
               />
             </div>
           </div>
@@ -167,7 +171,7 @@ const FilterOrder = ({
                   value={filters.orderCode}
                   onChange={handleFilterChange}
                   placeholder="Nhập mã đơn hàng"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#ad7555]"
                 />
               </div>
 
@@ -181,7 +185,7 @@ const FilterOrder = ({
                   value={filters.customerName}
                   onChange={handleFilterChange}
                   placeholder="Nhập tên khách hàng"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#ad7555]"
                 />
               </div>
 
@@ -193,13 +197,17 @@ const FilterOrder = ({
                   name="status"
                   value={filters.status}
                   onChange={handleFilterChange}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none bg-white"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#ad7555] bg-white"
                 >
                   <option value="">Tất cả trạng thái</option>
                   <option value="pending">Đang chờ</option>
-                  <option value="shipping">Đang giao</option>
+                  <option value="confirmed">Đã xác nhận</option>
+                  <option value="processing">Đang xử lý</option>
                   <option value="delivered">Đã giao</option>
-                  <option value="returned">Bị hoàn</option>
+                  <option value="completed">Hoàn thành</option>
+                  <option value="returned">Đã trả hàng</option>
+                  <option value="cancelled">Đã hủy</option>
+                  <option value="refunded">Đã hoàn tiền</option>
                 </select>
               </div>
 
@@ -211,7 +219,8 @@ const FilterOrder = ({
                   Xóa bộ lọc
                 </button>
                 <div className="text-sm text-gray-600">
-                  <span className="font-semibold">{filteredCount}</span> đơn hàng
+                  <span className="font-semibold">{filteredCount}</span> đơn
+                  hàng
                 </div>
               </div>
             </div>
