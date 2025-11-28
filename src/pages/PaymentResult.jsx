@@ -10,6 +10,7 @@ const PaymentResult = () => {
 
   const status = searchParams.get("status"); // "success" hoặc "failed"
   const message = searchParams.get("message") || "";
+  const vnp_ResponseCode = searchParams.get("vnp_ResponseCode") || "";
   const orderId = searchParams.get("orderId") || "";
   const paymentMethod = searchParams.get("paymentMethod") || ""; // COD, VNPAY, MOMO
 
@@ -19,7 +20,9 @@ const PaymentResult = () => {
   const isSuccess =
     paymentMethod === "COD"
       ? status === "success"
-      : message === "Thành công." || status === "success";
+      : message === "Thành công." ||
+        status === "success" ||
+        vnp_ResponseCode === "00";
 
   return (
     <Layout>
