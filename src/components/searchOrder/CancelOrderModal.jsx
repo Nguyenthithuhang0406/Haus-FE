@@ -50,22 +50,22 @@ const CancelOrderModal = ({ visible, order, onCancel, onConfirm }) => {
       try {
         const cancelData = {
           orderId: order?.id,
-          reason: values.selectedReason === "Lý do khác" 
-            ? values.customReason 
+          reason: values.selectedReason === "Lý do khác"
+            ? values.customReason
             : values.selectedReason,
-          note: values.selectedReason !== "Lý do khác" && values.customReason 
-            ? values.customReason 
+          note: values.selectedReason !== "Lý do khác" && values.customReason
+            ? values.customReason
             : null,
           timestamp: new Date().toISOString()
         };
 
         await new Promise(resolve => setTimeout(resolve, 500));
-        
+
         onConfirm(order?.id, cancelData);
-        
+
         // Hiển thị thông báo thành công
         message.success("Hủy đơn hàng thành công!");
-        
+
         // Reset form và đóng modal
         handleClose();
       } catch (error) {
@@ -84,7 +84,7 @@ const CancelOrderModal = ({ visible, order, onCancel, onConfirm }) => {
   // Tính phí hủy (nếu có)
   const getCancellationFee = () => {
     if (!order) return 0;
-    
+
     if (order.status === "Đang chờ") {
       return 0;
     } else if (order.status === "Đang giao") {
@@ -117,7 +117,9 @@ const CancelOrderModal = ({ visible, order, onCancel, onConfirm }) => {
             <div className="space-y-1 text-sm">
               <p><span className="text-gray-600">Mã đơn:</span> <span className="font-medium">#{order?.id}</span></p>
               <p><span className="text-gray-600">Sản phẩm:</span> <span className="font-medium">{order?.name}</span></p>
-              <p><span className="text-gray-600">Tổng tiền:</span> <span className="font-medium text-red-600">{order?.total.toLocaleString()}đ</span></p>
+              <p><span className="text-gray-600">Tổng tiền:</span> <span className="font-medium text-red-600">
+                {(order?.total || order?.totalAmount || 0).toLocaleString()}đ
+              </span></p>
               <p><span className="text-gray-600">Trạng thái:</span> <span className="font-medium">{order?.status}</span></p>
             </div>
           </div>

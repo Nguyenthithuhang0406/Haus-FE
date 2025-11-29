@@ -6,9 +6,9 @@ const ProductRow = ({ product, isFirst }) => {
       {/* Image */}
       <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0 mx-auto sm:mx-0">
         {product.image ? (
-          <img 
-            src={product.image} 
-            alt={product.name} 
+          <img
+            src={product.image}
+            alt={product.name}
             className="w-full h-full object-cover rounded-lg"
           />
         ) : (
@@ -32,10 +32,10 @@ const ProductRow = ({ product, isFirst }) => {
       {/* Price */}
       <div className="text-center sm:text-right sm:min-w-[120px] flex flex-col justify-center">
         <p className="text-sm sm:text-base font-semibold">
-          {product.price.toLocaleString()}đ
+          {(product.price || product.priceAtSale || 0).toLocaleString()}đ
         </p>
         <p className="text-xs text-gray-500">
-          Tổng: {(product.price * product.quantity).toLocaleString()}đ
+          Tổng: {((product.price || product.priceAtSale || 0) * (product.quantity || 0)).toLocaleString()}đ
         </p>
       </div>
     </div>

@@ -5,227 +5,81 @@ import WishListHeader from "@/components/wishlist/WishListHeader";
 import EmptyWishList from "@/components/wishlist/EmptyWishList";
 import PaginationComponent from "@/components/wishlist/Panigation";
 import { useNavigate } from "react-router-dom";
-
-const dummyLikeProducts = [
-    {
-        id: 1,
-        code: "SP001",
-        name: "Ghế có tay vịn BONHOLMEN",
-        category: "Nội thất ngoài trời",
-        image: [
-            "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp20-4.jpg?v=1746439987253",
-            "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp18.jpg?v=1746437935323",
-        ],
-        shortDesc: "Ghế ngoài trời chắc chắn",
-        price: 3500000,
-        discount: 40,
-        stock: 11,
-        sell: 8,
-        total: 20,
-    },
-    {
-        id: 2,
-        code: "SP002",
-        name: "Ghế có tay vịn TARNO",
-        category: "Nội thất ngoài trời",
-        image: [
-            "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp18.jpg?v=1746437935323",
-        ],
-        shortDesc: "Ghế gỗ gấp tiện lợi",
-        price: 1000000,
-        discount: 43,
-        stock: 12,
-        sell: 5,
-        total: 15,
-    },
-    {
-        id: 3,
-        code: "SP003",
-        name: "Ghế thư giãn có tay vịn",
-        category: "Nội thất ngoài trời",
-        image: [
-            "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp20-4.jpg?v=1746439987253",
-        ],
-        shortDesc: "Ghế thư giãn cao cấp",
-        price: 2500000,
-        discount: 40,
-        stock: 8,
-        sell: 12,
-        total: 20,
-    },
-    {
-        id: 4,
-        code: "SP004",
-        name: "Ghế NORRMANSO",
-        category: "Nội thất ngoài trời",
-        image: [
-            "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp18.jpg?v=1746437935323",
-        ],
-        shortDesc: "Ghế hiện đại tiện lợi",
-        price: 2800000,
-        discount: 43,
-        stock: 10,
-        sell: 6,
-        total: 10,
-    },
-    {
-        id: 5,
-        code: "SP004",
-        name: "Ghế NORRMANSO",
-        category: "Nội thất ngoài trời",
-        image: [
-            "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp18.jpg?v=1746437935323",
-        ],
-        shortDesc: "Ghế hiện đại tiện lợi",
-        price: 2800000,
-        discount: 43,
-        stock: 10,
-        sell: 6,
-        total: 10,
-    },
-    {
-        id: 6,
-        code: "SP004",
-        name: "Ghế NORRMANSO",
-        category: "Nội thất ngoài trời",
-        image: [
-            "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp18.jpg?v=1746437935323",
-        ],
-        shortDesc: "Ghế hiện đại tiện lợi",
-        price: 2800000,
-        discount: 43,
-        stock: 10,
-        sell: 6,
-        total: 10,
-    },
-    {
-        id: 7,
-        code: "SP004",
-        name: "Ghế NORRMANSO",
-        category: "Nội thất ngoài trời",
-        image: [
-            "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp18.jpg?v=1746437935323",
-        ],
-        shortDesc: "Ghế hiện đại tiện lợi",
-        price: 2800000,
-        discount: 43,
-        stock: 10,
-        sell: 6,
-        total: 10,
-    },
-    {
-        id: 8,
-        code: "SP004",
-        name: "Ghế NORRMANSO",
-        category: "Nội thất ngoài trời",
-        image: [
-            "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp18.jpg?v=1746437935323",
-        ],
-        shortDesc: "Ghế hiện đại tiện lợi",
-        price: 2800000,
-        discount: 43,
-        stock: 10,
-        sell: 6,
-        total: 10,
-    },
-    {
-        id: 9,
-        code: "SP004",
-        name: "Ghế NORRMANSO",
-        category: "Nội thất ngoài trời",
-        image: [
-            "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp18.jpg?v=1746437935323",
-        ],
-        shortDesc: "Ghế hiện đại tiện lợi",
-        price: 2800000,
-        discount: 43,
-        stock: 10,
-        sell: 6,
-        total: 10,
-    },
-    {
-        id: 10,
-        code: "SP004",
-        name: "Ghế NORRMANSO",
-        category: "Nội thất ngoài trời",
-        image: [
-            "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp18.jpg?v=1746437935323",
-        ],
-        shortDesc: "Ghế hiện đại tiện lợi",
-        price: 2800000,
-        discount: 43,
-        stock: 10,
-        sell: 6,
-        total: 10,
-    },
-    {
-        id: 11,
-        code: "SP004",
-        name: "Ghế NORRMANSO",
-        category: "Nội thất ngoài trời",
-        image: [
-            "https://bizweb.dktcdn.net/thumb/large/100/570/902/products/sp18.jpg?v=1746437935323",
-        ],
-        shortDesc: "Ghế hiện đại tiện lợi",
-        price: 2800000,
-        discount: 43,
-        stock: 10,
-        sell: 6,
-        total: 10,
-    },
-];
+import { isLoggedIn } from "@/utils/checkLogin";
+import { getFavoriteProducts, syncFavoritesAfterLogin, deleteFavoriteProduct } from "@/api/favorite";
 
 const WishList = () => {
     const navigate = useNavigate();
     const [likeProducts, setLikeProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1); 
-    const [pageSize] = useState(8); 
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize] = useState(8);
+    const [totalItems, setTotalItems] = useState(0);
+
+    // Load wishlist
+    const loadLikeProducts = async (page = 1) => {
+        setLoading(true);
+
+        if (!isLoggedIn()) {
+            const localFav = JSON.parse(localStorage.getItem("likeProducts")) || [];
+            setLikeProducts(localFav);
+            setTotalItems(localFav.length);
+            setLoading(false);
+        } else {
+            // Sync localStorage lên server
+            await syncFavoritesAfterLogin();
+
+            try {
+                const res = await getFavoriteProducts(page, pageSize);
+                const products = Array.isArray(res.data) ? res.data : Array.isArray(res.data?.data) ? res.data.data : [];
+                setLikeProducts(products);
+                setTotalItems(res.data?.total || products.length);
+            } catch (err) {
+                console.error("Load favorite products failed:", err);
+                setLikeProducts([]);
+                setTotalItems(0);
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
 
     useEffect(() => {
-        loadLikeProducts();
-        setLoading(false);
-    }, []);
+        loadLikeProducts(currentPage);
+    }, [currentPage]);
 
-    const loadLikeProducts = () => {
-        // Luôn sử dụng dummyData để test (không dùng localStorage)
-        setLikeProducts(dummyLikeProducts);
+    const handleRemoveFavorite = (productId) => {
+        if (!isLoggedIn()) {
+            const localFav = JSON.parse(localStorage.getItem("likeProducts")) || [];
+            const updated = localFav.filter((p) => p.id !== productId);
+            localStorage.setItem("likeProducts", JSON.stringify(updated));
+            setLikeProducts(updated);
+            setTotalItems(updated.length);
+        } else {
+            deleteFavoriteProduct(productId)
+                .then(() => {
+                    setLikeProducts((prev) => prev.filter((p) => p.id !== productId));
+                    setTotalItems((prev) => prev - 1);
+                })
+                .catch((err) => console.error("Remove favorite failed:", err));
+        }
     };
 
     const handleClearAll = () => {
         if (window.confirm("Bạn có chắc chắn muốn xóa tất cả sản phẩm yêu thích?")) {
+            if (!isLoggedIn()) localStorage.removeItem("likeProducts");
+            else {
+                // TODO: call API xóa tất cả
+            }
             setLikeProducts([]);
+            setTotalItems(0);
         }
     };
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: "smooth" });
     };
-
-    useEffect(() => {
-        const handleStorageChange = () => {
-            loadLikeProducts();
-        };
-
-        window.addEventListener("likeProductsChanged", handleStorageChange);
-
-        return () => {
-            window.removeEventListener("likeProductsChanged", handleStorageChange);
-        };
-    }, []);
-
-    useEffect(() => {
-        const totalPages = Math.ceil(likeProducts.length / pageSize);
-        if (currentPage > totalPages && totalPages > 0) {
-            setCurrentPage(totalPages);
-        }
-    }, [likeProducts, currentPage, pageSize]);
-
-    // Tính toán sản phẩm hiển thị theo trang
-    const indexOfLastProduct = currentPage * pageSize;
-    const indexOfFirstProduct = indexOfLastProduct - pageSize;
-    const currentProducts = likeProducts.slice(indexOfFirstProduct, indexOfLastProduct);
 
     if (loading) {
         return (
@@ -242,23 +96,23 @@ const WishList = () => {
     return (
         <Layout>
             <div className="max-w-[1400px] mx-auto px-4 py-[150px] min-h-screen">
-                <WishListHeader 
-                    totalItems={likeProducts.length} 
-                    onClearAll={handleClearAll}
-                />
-                
+                <WishListHeader totalItems={totalItems} onClearAll={handleClearAll} />
                 {likeProducts.length === 0 ? (
                     <EmptyWishList onNavigate={(path) => navigate(path)} />
                 ) : (
                     <>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
-                            {currentProducts.map((product) => (
-                                <ProductItem key={product.id} product={product} />
+                            {likeProducts.map((product) => (
+                                <ProductItem
+                                    key={product.id}
+                                    product={product}
+                                    onRemoveFavorite={() => handleRemoveFavorite(product.id)}
+                                />
                             ))}
                         </div>
                         <PaginationComponent
                             currentPage={currentPage}
-                            totalItems={likeProducts.length}
+                            totalItems={totalItems}
                             pageSize={pageSize}
                             onPageChange={handlePageChange}
                         />

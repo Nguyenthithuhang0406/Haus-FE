@@ -63,3 +63,32 @@ export const getOrderById = async (id) => {
     throw error;
   }
 };
+
+export const getInvoiceByOrderId = async (orderId) => {
+  try {
+    const response = await request(axiosPrivate, {
+      method: "GET",
+      url: `/orders/${orderId}/invoice`,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi lấy hóa đơn:", error);
+    throw error;
+  }
+};
+
+export const getInvoicePdf = async (orderId) => {
+  try {
+    const response = await request(axiosPrivate, {
+      method: "GET",
+      url: `/orders/${orderId}/invoice/pdf`,
+      responseType: "blob",
+    });
+
+    return response;
+  } catch (error) {
+    console.error("Lỗi lấy hóa đơn PDF:", error);
+    throw error;
+  }
+};
