@@ -39,7 +39,7 @@ export const getAllOrder = async (data) => {
 export const updateOrderStatus = async (orderId, status) => {
   try {
     const response = await request(axiosPrivate, {
-      method: "POST",
+      method: "PATCH",
       url: `/order/${orderId}/status=${status}`,
     });
 

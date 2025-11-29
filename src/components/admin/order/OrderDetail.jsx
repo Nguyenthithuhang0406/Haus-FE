@@ -4,40 +4,90 @@ import { getOrderById } from "@/api/order";
 import { toast } from "react-toastify";
 
 const mapOrderData = (apiOrder) => {
-  const user = apiOrder.user || {};
-  const customerName =
-    `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
-    user.username ||
-    "";
+  const recipientInfo = apiOrder.recipientInfo || {};
+  const customerName = recipientInfo.recipientName || "";
+
+  // Build full address from recipientInfo
+  const addressParts = [
+    recipientInfo.detailAddress,
+    recipientInfo.commune,
+    recipientInfo.district,
+    recipientInfo.city,
+    recipientInfo.country,
+  ].filter(Boolean);
+  const fullAddress = addressParts.join(", ") || "";
 
   // Calculate subtotal and discount
   const totalAmount = apiOrder.totalAmount || 0;
   const shippingFee = apiOrder.shippingFee || 0;
   const discountPercent = apiOrder.promotion?.discountPercent || 0;
+  
+  // Calculate subtotal: totalAmount already includes discount, so we need to reverse calculate
+  // If discountPercent is applied, subtotal = totalAmount / (1 - discountPercent/100) - shippingFee
+  // But since totalAmount is final, we calculate discount from products total
+  const productsTotal = apiOrder.products?.reduce(
+    (sum, product) => sum + (product.total || 0),
+    0
+  ) || 0;
   const discountAmount =
-    discountPercent > 0 ? Math.round((totalAmount * discountPercent) / 100) : 0;
-  const subtotal = totalAmount - shippingFee + discountAmount;
+    discountPercent > 0
+      ? Math.round((productsTotal * discountPercent) / 100)
+      : 0;
+  const subtotal = productsTotal - discountAmount;
+
+  // Map products to items format
+  const items = (apiOrder.products || []).map((product) => ({
+    productId: product.productId,
+    productCode: product.productCode,
+    name: product.productName,
+    productName: product.productName,
+    variationId: product.variationId,
+    color: product.color,
+    size: product.size,
+    quantity: product.quantity,
+    price: product.priceAtSale,
+    priceAtSale: product.priceAtSale,
+    total: product.total,
+    image: product.image,
+  }));
+
+  // Format dates
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleString("vi-VN", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return dateString;
+    }
+  };
 
   return {
     id: apiOrder.id,
     orderNumber: apiOrder.orderNumber || "",
     orderCode: apiOrder.orderNumber || "",
     customerName: customerName,
-    phone: user.phone || "",
-    email: user.email || "",
-    orderDate: apiOrder.orderDate || "",
-    deliveryDate: apiOrder.deliveryDate || null,
+    phone: recipientInfo.phoneNumber || "",
+    email: "", // Not in new API structure
+    orderDate: formatDate(apiOrder.orderDate || apiOrder.createdAt),
+    deliveryDate: formatDate(apiOrder.deliveryDate),
     status: apiOrder.status || "pending",
     totalAmount: totalAmount,
     shippingFee: shippingFee,
     subtotal: subtotal,
     discount: discountAmount,
-    paymentMethod: apiOrder.payment?.type || apiOrder.paymentMethod || "COD",
+    paymentMethod: apiOrder.payment?.type || "CASH_ON_DELIVERY",
     payment: apiOrder.payment || null,
     promotion: apiOrder.promotion || null,
-    shippingAddress: apiOrder.shippingAddress || "",
-    items: apiOrder.items || [],
-    user: apiOrder.user || null,
+    shippingAddress: fullAddress,
+    items: items,
+    recipientInfo: recipientInfo,
   };
 };
 
@@ -89,6 +139,7 @@ const OrderDetail = ({ orderId, setShowDetailModal }) => {
     const typeMap = {
       ONLINE_PAYMENT: "Thanh toán online",
       COD: "Thanh toán khi nhận hàng",
+      CASH_ON_DELIVERY: "Thanh toán khi nhận hàng",
       BANK_TRANSFER: "Chuyển khoản",
     };
     return typeMap[type] || type;
@@ -188,33 +239,27 @@ const OrderDetail = ({ orderId, setShowDetailModal }) => {
             <div className="bg-gray-50 p-4 rounded-lg">
               <div className="flex items-center gap-2 mb-3">
                 <User className="h-5 w-5 text-gray-600" />
-                <h3 className="font-semibold">Thông tin khách hàng</h3>
+                <h3 className="font-semibold">Thông tin người nhận</h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <span className="text-sm text-gray-600">Tên:</span>
                   <p className="font-medium">
-                    {currentOrder.user
-                      ? `${currentOrder.user.firstName || ""} ${
-                          currentOrder.user.lastName || ""
-                        }`.trim() || currentOrder.user.username
-                      : currentOrder.customerName}
+                    {currentOrder.customerName || "Chưa cập nhật"}
                   </p>
                 </div>
                 <div>
                   <span className="text-sm text-gray-600">Số điện thoại:</span>
                   <p className="font-medium">
-                    {currentOrder.user?.phone ||
-                      currentOrder.phone ||
-                      "Chưa cập nhật"}
+                    {currentOrder.phone || "Chưa cập nhật"}
                   </p>
                 </div>
-                <div className="md:col-span-2">
-                  <span className="text-sm text-gray-600">Email:</span>
-                  <p className="font-medium">
-                    {currentOrder.user?.email || currentOrder.email}
-                  </p>
-                </div>
+                {currentOrder.email && (
+                  <div className="md:col-span-2">
+                    <span className="text-sm text-gray-600">Email:</span>
+                    <p className="font-medium">{currentOrder.email}</p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -225,7 +270,26 @@ const OrderDetail = ({ orderId, setShowDetailModal }) => {
                   <MapPin className="h-5 w-5 text-gray-600" />
                   <h3 className="font-semibold">Địa chỉ giao hàng</h3>
                 </div>
-                <p className="text-gray-700">{currentOrder.shippingAddress}</p>
+                <div className="space-y-1">
+                  {currentOrder.recipientInfo?.detailAddress && (
+                    <p className="text-gray-700 font-medium">
+                      {currentOrder.recipientInfo.detailAddress}
+                    </p>
+                  )}
+                  <p className="text-gray-700">
+                    {[
+                      currentOrder.recipientInfo?.commune,
+                      currentOrder.recipientInfo?.district,
+                      currentOrder.recipientInfo?.city,
+                      currentOrder.recipientInfo?.country,
+                    ]
+                      .filter(Boolean)
+                      .join(", ")}
+                  </p>
+                  {!currentOrder.recipientInfo && (
+                    <p className="text-gray-700">{currentOrder.shippingAddress}</p>
+                  )}
+                </div>
               </div>
             )}
 
@@ -315,14 +379,20 @@ const OrderDetail = ({ orderId, setShowDetailModal }) => {
                           {item.name || item.productName || "Sản phẩm"}
                         </h4>
                         <p className="text-xs text-gray-500">
-                          SL: {item.quantity}
+                          Mã SP: {item.productCode || "N/A"}
+                        </p>
+                        {(item.color || item.size) && (
+                          <p className="text-xs text-gray-500">
+                            {[item.color, item.size].filter(Boolean).join(" - ")}
+                          </p>
+                        )}
+                        <p className="text-xs text-gray-500">
+                          SL: {item.quantity} x {formatPrice(item.price || item.priceAtSale || 0)}
                         </p>
                       </div>
                       <div className="text-right">
                         <p className="font-medium text-[#ad7555]">
-                          {formatPrice(
-                            (item.price || 0) * (item.quantity || 1)
-                          )}
+                          {formatPrice(item.total || (item.price || item.priceAtSale || 0) * (item.quantity || 1))}
                         </p>
                       </div>
                     </div>
