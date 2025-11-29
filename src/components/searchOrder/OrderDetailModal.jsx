@@ -1,8 +1,8 @@
 import React from "react";
 import { Modal, Timeline, Tag, Divider } from "antd";
-import { 
-  CheckCircleOutlined, 
-  ClockCircleOutlined, 
+import {
+  CheckCircleOutlined,
+  ClockCircleOutlined,
   CloseCircleOutlined,
   EnvironmentOutlined,
   PhoneOutlined,
@@ -38,14 +38,14 @@ const OrderDetailModal = ({ visible, order, onClose }) => {
 
   const getOrderTimeline = () => {
     const timeline = [];
-    
+
     if (order.history && order.history.length > 0) {
       return order.history;
     }
 
     const baseTimeline = [
-      { 
-        status: "Đơn hàng đã đặt", 
+      {
+        status: "Đơn hàng đã đặt",
         time: order.createdAt || "2024-01-15 10:30",
         description: "Đơn hàng của bạn đã được tiếp nhận"
       }
@@ -120,8 +120,8 @@ const OrderDetailModal = ({ visible, order, onClose }) => {
               <p className="text-sm text-gray-600">Trạng thái đơn hàng</p>
               <Tag color={
                 order.status === "Đã giao" ? "success" :
-                order.status === "Đang giao" ? "processing" :
-                order.status === "Đang chờ" ? "warning" : "error"
+                  order.status === "Đang giao" ? "processing" :
+                    order.status === "Đang chờ" ? "warning" : "error"
               }>
                 {order.status}
               </Tag>
@@ -192,8 +192,8 @@ const OrderDetailModal = ({ visible, order, onClose }) => {
                   <p className="text-xs text-gray-600">x{order.quantity}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold text-sm">{order.price.toLocaleString()}đ</p>
-                  <p className="text-xs text-gray-600">Tổng: {order.total.toLocaleString()}đ</p>
+                  <p className="font-semibold text-sm">{(order.price || 0).toLocaleString()}đ</p>
+                  <p className="text-xs text-gray-600">Tổng: {(order.total || 0).toLocaleString()}đ</p>
                 </div>
               </div>
             )}
@@ -255,7 +255,7 @@ const OrderDetailModal = ({ visible, order, onClose }) => {
         <div className="bg-gray-50 p-4 rounded-lg space-y-2">
           <div className="flex justify-between">
             <span className="text-gray-600">Tạm tính</span>
-            <span className="font-medium">{order.total.toLocaleString()}đ</span>
+            <span className="font-medium">{(order.total || 0).toLocaleString()}đ</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">Phí vận chuyển</span>
@@ -271,7 +271,7 @@ const OrderDetailModal = ({ visible, order, onClose }) => {
           <div className="flex justify-between text-lg">
             <span className="font-semibold">Tổng cộng</span>
             <span className="font-bold text-red-600">
-              {((order.total + (order.shippingFee || 30000)) - (order.discount || 0)).toLocaleString()}đ
+              {((Number(order.total) || 0) + (Number(order.shippingFee) || 30000) - (Number(order.discount) || 0)).toLocaleString()}đ
             </span>
           </div>
         </div>

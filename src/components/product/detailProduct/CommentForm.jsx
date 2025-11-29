@@ -3,13 +3,23 @@ import React, { useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { IoSend } from "react-icons/io5";
 import { FaStar } from "react-icons/fa6";
-
+import { addProductReview } from "@/api/review";
+import { isLoggedIn } from "@/utils/checkLogin";
+import { useNavigate } from "react-router-dom";
 const CommentForm = ({ setIsShowAddComment, product }) => {
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
+  const navigator = useNavigate();
 
   const handleAddComment = async () => {
+
+    if (!isLoggedIn()) {
+      alert("Bạn cần đăng nhập để đánh giá sản phẩm!");
+      navigator("/auth")
+      return;
+    }
+
     if (rating === 0) {
       alert("Vui lòng chọn số sao đánh giá!");
       return;
@@ -18,7 +28,22 @@ const CommentForm = ({ setIsShowAddComment, product }) => {
       alert("Vui lòng nhập nội dung đánh giá!");
       return;
     }
-    setIsShowAddComment(false);
+    try {
+      await addProductReview(product.id, {
+        rating: rating,
+        content: comment,
+      });
+
+      alert("Đánh giá thành công!");
+      setIsShowAddComment(false);
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
+      } else {
+        alert("Lỗi khi gửi đánh giá!");
+      }
+      console.error("Lỗi thêm đánh giá:", error);
+    }
   };
 
   return (
@@ -55,11 +80,10 @@ const CommentForm = ({ setIsShowAddComment, product }) => {
               onClick={() => setRating(star)}
               onMouseEnter={() => setHoverRating(star)}
               onMouseLeave={() => setHoverRating(0)}
-              className={`w-6 h-6 cursor-pointer transition-colors ${
-                (hoverRating || rating) >= star
-                  ? "text-yellow-400"
-                  : "text-gray-300"
-              }`}
+              className={`w-6 h-6 cursor-pointer transition-colors ${(hoverRating || rating) >= star
+                ? "text-yellow-400"
+                : "text-gray-300"
+                }`}
             />
           ))}
         </div>

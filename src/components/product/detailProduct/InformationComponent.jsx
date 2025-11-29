@@ -1,51 +1,83 @@
 import { detailProduct, policy } from "@/utils/contants/product";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaStar, FaRegStar, FaRegStarHalfStroke } from "react-icons/fa6";
 import CommentModal from "./CommentModal";
+import { getProductReviews, getProductReviewsByRating } from "@/api/review";
 
 const InformationComponent = ({ product }) => {
   const [activeTab, setActiveTab] = useState("info");
   const [isShowAddComment, setIsShowAddComment] = useState(false);
+
   const poly = policy;
   const fakeProduct = detailProduct;
+
+  const [reviews, setReviews] = useState([]);
+  const [filterStar, setFilterStar] = useState("all");
+
+  useEffect(() => {
+    if (product?.id) {
+      loadReviews("all");
+    }
+  }, [product?.id]);
+
+  // Hàm load review: nếu có rating thì gọi API lọc theo rating
+  const loadReviews = async (rating = "all") => {
+    try {
+      let res;
+
+      if (rating === "all") {
+        res = await getProductReviews(product.id, 1, 10);
+      } else {
+        res = await getProductReviewsByRating(product.id, rating, 1, 10);
+      }
+
+      setReviews(res.data.items || []);
+    } catch (e) {
+      console.log("Lỗi:", e);
+    }
+  };
+
+  // Reviews backend trả sẵn theo filter → không lọc lại
+  const filteredReviews = reviews;
+
+  const renderStars = (rating) => (
+    <span className="flex items-center gap-1 text-[#ffbe00]">
+      {Array.from({ length: Math.floor(rating) }, (_, i) => (
+        <FaStar key={i} />
+      ))}
+      {rating % 1 !== 0 && <FaRegStarHalfStroke />}
+      {Array.from({ length: 5 - Math.ceil(rating) }, (_, i) => (
+        <FaRegStar key={i} />
+      ))}
+    </span>
+  );
+
   return (
-    <div
-      data-aos="fade-up"
-      className="w-full flex flex-col gap-[30px] pb-[30px]"
-    >
+    <div data-aos="fade-up" className="w-full flex flex-col gap-[30px] pb-[30px]">
+
+      {/* Tabs */}
       <div className="w-full flex items-center justify-center gap-[30px]">
-        <p
-          onClick={() => setActiveTab("info")}
-          className={`text-[18px] py-[4px] md:text-[24px] ${
-            activeTab === "info"
-              ? "text-[#ad7555] border-[#ad7555]"
-              : "text-[#a0a0a0] border-transparent"
-          } font-semibold border-b-[2px] hover:text-[#ad7555] hover:border-[#ad7555] cursor-pointer`}
-        >
-          Thông tin sản phẩm
-        </p>
-        <p
-          onClick={() => setActiveTab("policy")}
-          className={`text-[18px] py-[4px] md:text-[24px] ${
-            activeTab === "policy"
-              ? "text-[#ad7555] border-[#ad7555]"
-              : "text-[#a0a0a0] border-transparent"
-          } font-semibold border-b-[2px] hover:text-[#ad7555] hover:border-[#ad7555] cursor-pointer`}
-        >
-          Chính sách đổi trả
-        </p>
-        <p
-          onClick={() => setActiveTab("review")}
-          className={`text-[18px] py-[4px] md:text-[24px] ${
-            activeTab === "review"
-              ? "text-[#ad7555] border-[#ad7555]"
-              : "text-[#a0a0a0] border-transparent"
-          } font-semibold border-b-[2px] hover:text-[#ad7555] hover:border-[#ad7555] cursor-pointer`}
-        >
-          Đánh giá sản phẩm
-        </p>
+        {[
+          { key: "info", label: "Thông tin sản phẩm" },
+          { key: "policy", label: "Chính sách đổi trả" },
+          { key: "review", label: "Đánh giá sản phẩm" },
+        ].map((tab) => (
+          <p
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`text-[18px] md:text-[24px] py-[4px] font-semibold cursor-pointer border-b-[2px]
+              ${activeTab === tab.key
+                ? "text-[#ad7555] border-[#ad7555]"
+                : "text-[#a0a0a0] border-transparent"
+              }
+              hover:text-[#ad7555] hover:border-[#ad7555]`}
+          >
+            {tab.label}
+          </p>
+        ))}
       </div>
 
+      {/* Thông tin sản phẩm */}
       {activeTab === "info" && (
         <div
           data-aos="fade-up"
@@ -54,6 +86,7 @@ const InformationComponent = ({ product }) => {
         />
       )}
 
+      {/* Chính sách */}
       {activeTab === "policy" && (
         <div
           data-aos="fade-up"
@@ -62,36 +95,25 @@ const InformationComponent = ({ product }) => {
         />
       )}
 
+      {/* Review */}
       {activeTab === "review" && (
         <div data-aos="fade-up" className="flex flex-col gap-[20px]">
-          <div className="w-full p-[20px] bg-[rgba(128,187,53,0.1)] border-[1px] border-[#e4e4e4]">
-            <div className="w-1/3 lg:w-1/4 xl:w-1/5 flex flex-col gap-[20px] items-center justify-center">
-              <p className="text-[30px] text-[#80BB35] font-semibold">
+
+          {/* Khung tổng quan rating */}
+          <div className="w-full p-[20px] bg-[rgba(128,187,53,0.1)] border border-[#e4e4e4] rounded-lg shadow-sm">
+            <div className="flex flex-col items-center gap-[15px]">
+              <p className="text-[40px] text-[#80BB35] font-bold">
                 {product.rating}
               </p>
 
-              <p className="flex items-center gap-1">
-                <span className="flex items-center gap-1 text-[#ffbe00]">
-                  {Array.from(
-                    { length: Math.floor(product.rating) },
-                    (_, i) => (
-                      <FaStar key={i} />
-                    )
-                  )}
-                  {product.rating % 1 !== 0 && <FaRegStarHalfStroke />}
-                  {Array.from(
-                    { length: 5 - Math.ceil(product.rating) },
-                    (_, i) => (
-                      <FaRegStar key={i} />
-                    )
-                  )}
-                </span>
+              <div>{renderStars(product.rating)}</div>
+
+              <p className="text-[14px] text-gray-600">
+                ({fakeProduct.comments.length} đánh giá)
               </p>
 
-              <p>({fakeProduct.comments.length} đánh giá)</p>
-
               <button
-                className="bg-[#80BB35] text-white px-[17px] py-[7px] flex items-center justify-center border-[1px] border-[#80BB35] hover:text-[#80BB35] hover:bg-transparent rounded-md"
+                className="bg-[#80BB35] text-white px-[17px] py-[8px] border border-[#80BB35] rounded-md hover:bg-transparent hover:text-[#80BB35] transition"
                 onClick={() => setIsShowAddComment(true)}
               >
                 Gửi đánh giá của bạn
@@ -99,48 +121,65 @@ const InformationComponent = ({ product }) => {
             </div>
           </div>
 
-          <div className="w-full flex flex-col gap-[20px]">
-            {fakeProduct.comments.map((review, index) => (
-              <div
-                key={index}
-                className="w-full flex flex-col items-start gap-[10px]"
+          {/* Bộ lọc số sao */}
+          <div className="flex gap-2 flex-wrap items-center">
+            {[
+              { key: "all", label: "Tất cả" },
+              { key: 5, label: "5 sao" },
+              { key: 4, label: "4 sao" },
+              { key: 3, label: "3 sao" },
+              { key: 2, label: "2 sao" },
+              { key: 1, label: "1 sao" },
+            ].map((s) => (
+              <button
+                key={s.key}
+                onClick={() => {
+                  setFilterStar(s.key);
+                  loadReviews(s.key); // Gọi API ngay khi click ⭐
+                }}
+                className={`px-4 py-2 rounded-md border text-sm ${filterStar === s.key
+                    ? "bg-[#80BB35] text-white border-[#80BB35]"
+                    : "bg-white border-gray-300 text-gray-700"
+                  }`}
               >
-                <div className="flex items-center gap-[5px]">
-                  <img
-                    className="w-[40px] h-[40px] rounded-full object-cover"
-                    src={review.avatar}
-                    alt={review.name}
-                  />
-                  <p className="font-semibold">{review.name}</p>
-                </div>
-
-                <div className="w-full pl-[40px] flex flex-col gap-[10px]">
-                  <p className="flex items-center gap-1">
-                    <span className="flex items-center gap-1 text-[#ffbe00]">
-                      {Array.from(
-                        { length: Math.floor(review.rating) },
-                        (_, i) => (
-                          <FaStar key={i} />
-                        )
-                      )}
-                      {review.rating % 1 !== 0 && <FaRegStarHalfStroke />}
-                      {Array.from(
-                        { length: 5 - Math.ceil(review.rating) },
-                        (_, i) => (
-                          <FaRegStar key={i} />
-                        )
-                      )}
-                    </span>
-                  </p>
-
-                  <p className="w-full break-words">{review.comment}</p>
-                </div>
-              </div>
+                {s.label}
+              </button>
             ))}
+          </div>
+
+          {/* Danh sách review */}
+          <div className="w-full flex flex-col gap-[20px]">
+            {filteredReviews.length === 0 ? (
+              <p className="text-gray-500 italic">Chưa có đánh giá nào.</p>
+            ) : (
+              filteredReviews.map((review, index) => (
+                <div
+                  key={index}
+                  className="w-full bg-white p-[15px] border border-[#e5e5e5] rounded-lg shadow-sm flex flex-col gap-[10px]"
+                >
+                  <div className="flex items-center gap-[10px]">
+                    <img
+                      className="w-[45px] h-[45px] rounded-full object-cover"
+                      src={review.avatar}
+                      alt={review.name}
+                    />
+                    <div>
+                      <p className="font-semibold">{review.name}</p>
+                      <div>{renderStars(review.rating)}</div>
+                    </div>
+                  </div>
+
+                  <p className="text-gray-700 break-words pl-[5px]">
+                    {review.comment}
+                  </p>
+                </div>
+              ))
+            )}
           </div>
         </div>
       )}
 
+      {/* Modal đánh giá */}
       {isShowAddComment && (
         <CommentModal
           isOpen={isShowAddComment}

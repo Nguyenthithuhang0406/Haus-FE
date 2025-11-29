@@ -19,7 +19,6 @@ const InvoiceModal = ({ onClose }) => {
                     Hóa đơn mua hàng
                 </h2>
 
-                // phan de hien thi file pdf
                 <div className="flex-1 border border-gray-300 rounded-lg overflow-hidden shadow-inner">
                     <iframe
                         src="/sample-invoice.pdf"
