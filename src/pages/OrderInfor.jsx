@@ -18,7 +18,6 @@ const OrderInfor = () => {
 
   const pageSize = 2;
 
-
   const mapOrderStatusToUI = (status) => {
     switch (status) {
       case "PENDING":
@@ -53,11 +52,11 @@ const OrderInfor = () => {
     }
   };
 
-
   const fetchOrders = async () => {
     try {
       const response = await getAllOrder({ pageNum: 1, pageSize: 100 });
 
+      console.log("response order:", response);
       // API trả về danh sách => response.data.list
       const list = response.data?.list || [];
 
@@ -101,22 +100,20 @@ const OrderInfor = () => {
     fetchOrders();
   }, []);
 
-
   const handleCancelOrder = (orderId, cancelData) => {
     setOrders((prev) =>
       prev.map((o) =>
         o.id === orderId
           ? {
-            ...o,
-            status: "Bị hoàn",
-            cancelReason: cancelData.reason,
-            canceledAt: cancelData.timestamp,
-          }
+              ...o,
+              status: "Bị hoàn",
+              cancelReason: cancelData.reason,
+              canceledAt: cancelData.timestamp,
+            }
           : o
       )
     );
   };
-
 
   useEffect(() => {
     const fetchById = async (id) => {
@@ -193,7 +190,6 @@ const OrderInfor = () => {
     setFilteredOrders(result);
     setCurrentPage(1);
   }, [searchText, statusFilter, orders]);
-
 
   const getCurrentPageOrders = () => {
     const start = (currentPage - 1) * pageSize;

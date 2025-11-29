@@ -1,4 +1,4 @@
-import { axiosPrivate } from "@/utils/axios/axiosInstance";
+import { axiosPrivate, axiosPublic } from "@/utils/axios/axiosInstance";
 
 // them danh gia san pham
 export const addProductReview = async (productId, data) => {
@@ -72,7 +72,7 @@ export const getProductReviewsByRating = async (
 // lấy danh sách đánh giá top (không phân biệt sản phẩm) — sort theo sao giảm dần
 export const getTopReviews = async (pageNum = 1, pageSize = 10) => {
   try {
-    const response = await axiosPrivate.get(`/review/top`, {
+    const response = await axiosPublic.get(`/review/top`, {
       params: {
         pageNum,
         pageSize,
