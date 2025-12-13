@@ -92,3 +92,35 @@ export const getInvoicePdf = async (orderId) => {
     throw error;
   }
 };
+
+export const getOrderStatistics = async () => {
+  try {
+    const response = await request(axiosPrivate, {
+      method: "GET",
+      url: "/statistics/order-by-month",
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi lấy thống kê đơn hàng:", error);
+    throw error;
+  }
+};
+
+export const getBestSellerProducts = async (pageNum = 1, pageSize = 10) => {
+  try {
+    const response = await request(axiosPrivate, {
+      method: "GET",
+      url: "/statistics/get-best-seller",
+      params: {
+        pageNum,
+        pageSize,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi lấy sản phẩm bán chạy:", error);
+    throw error;
+  }
+};
