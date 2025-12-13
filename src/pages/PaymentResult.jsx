@@ -1,7 +1,6 @@
 import React from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CheckCircle, XCircle } from "lucide-react";
-import Layout from "@/components/commons/Layout";
 import { Link } from "react-router-dom";
 
 const PaymentResult = () => {
@@ -25,8 +24,7 @@ const PaymentResult = () => {
         vnp_ResponseCode === "00";
 
   return (
-    <Layout>
-      <div className="max-w-2xl mx-auto mt-[120px] px-4 py-8">
+    <div className="max-w-2xl mx-auto mt-[120px] px-4 py-8">
         <div className="bg-white rounded-lg shadow-lg p-8 text-center">
           {isSuccess ? (
             <>
@@ -106,7 +104,6 @@ const PaymentResult = () => {
           </div>
         </div>
       </div>
-    </Layout>
   );
 };
 

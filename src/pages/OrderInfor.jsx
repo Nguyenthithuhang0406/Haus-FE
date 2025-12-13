@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Input, Pagination, Select, message } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
-import Layout from "@/components/commons/Layout";
 import SidebarProfile from "@/components/auth/SidebarProfile";
 import OrderItem from "@/components/searchOrder/OrderItem";
 import InvoiceButton from "@/components/payment/bill/InvoiceButton";
@@ -197,8 +196,7 @@ const OrderInfor = () => {
   };
 
   return (
-    <Layout>
-      <div className="min-h-screen bg-gray-50 pt-[80px] sm:pt-[100px]">
+    <div className="min-h-screen bg-gray-50 pt-[80px] sm:pt-[100px]">
         <div className="container mx-auto px-4 sm:px-8 md:px-12 lg:px-20 py-4 sm:py-8">
           <div className="flex flex-col lg:flex-row gap-4 sm:gap-8">
             <SidebarProfile />
@@ -280,7 +278,6 @@ const OrderInfor = () => {
       {getCurrentPageOrders()[0] && (
         <InvoiceButton orderId={getCurrentPageOrders()[0].id} />
       )}
-    </Layout>
   );
 };
 

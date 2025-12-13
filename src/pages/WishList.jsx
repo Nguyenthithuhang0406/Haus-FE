@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Layout from "@/components/commons/Layout";
 import ProductItem from "@/components/product/ProductItem";
 import WishListHeader from "@/components/wishlist/WishListHeader";
 import EmptyWishList from "@/components/wishlist/EmptyWishList";
@@ -93,62 +92,58 @@ const WishList = () => {
 
   if (loading) {
     return (
-      <Layout>
-        <div className="max-w-[1400px] mx-auto px-4 py-8">
-          <div className="flex items-center justify-center min-h-[60vh]">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#ad7555]"></div>
-          </div>
+      <div className="max-w-[1400px] mx-auto px-4 py-8">
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#ad7555]"></div>
         </div>
-      </Layout>
+      </div>
     );
   }
 
   return (
-    <Layout>
-      <div className="max-w-[1400px] mx-auto px-4 py-[150px] min-h-screen">
-        <WishListHeader totalItems={totalItems} onClearAll={handleClearAll} />
-        {itemsToShow.length === 0 && !loading ? (
-          <EmptyWishList onNavigate={(path) => navigate(path)} />
-        ) : (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
-              {itemsToShow.map((item) => {
-                const itemId = item.product?.id || item.id;
-                const isRemoving = removingItems.has(itemId);
+    <div className="max-w-[1400px] mx-auto px-4 py-[150px] min-h-screen">
+      <WishListHeader totalItems={totalItems} onClearAll={handleClearAll} />
+      {itemsToShow.length === 0 && !loading ? (
+        <EmptyWishList onNavigate={(path) => navigate(path)} />
+      ) : (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
+            {itemsToShow.map((item) => {
+              const itemId = item.product?.id || item.id;
+              const isRemoving = removingItems.has(itemId);
 
-                return (
-                  <div
-                    key={itemId}
-                    className={`${isRemoving ? "pointer-events-none" : ""}`}
-                    style={{
-                      transition:
-                        "opacity 0.3s ease-in-out, transform 0.3s ease-in-out",
-                      opacity: isRemoving ? 0 : 1,
-                      transform: isRemoving
-                        ? "scale(0.95) translateX(-16px)"
-                        : "scale(1) translateX(0)",
-                    }}
-                  >
-                    <ProductItem
-                      product={item.product || item}
-                      onRemoveFavorite={() => handleRemoveFavorite(itemId)}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-            {totalPages > 1 && (
-              <PaginationComponent
-                currentPage={currentPage}
-                totalItems={totalItems}
-                pageSize={pageSize}
-                onPageChange={setCurrentPage}
-              />
-            )}
-          </>
-        )}
-      </div>
-    </Layout>
+              return (
+                <div
+                  key={itemId}
+                  className={`${isRemoving ? "pointer-events-none" : ""}`}
+                  style={{
+                    transition:
+                      "opacity 0.3s ease-in-out, transform 0.3s ease-in-out",
+                    opacity: isRemoving ? 0 : 1,
+                    transform: isRemoving
+                      ? "scale(0.95) translateX(-16px)"
+                      : "scale(1) translateX(0)",
+                  }}
+                >
+                  <ProductItem
+                    product={item.product || item}
+                    onRemoveFavorite={() => handleRemoveFavorite(itemId)}
+                  />
+                </div>
+              );
+            })}
+          </div>
+          {totalPages > 1 && (
+            <PaginationComponent
+              currentPage={currentPage}
+              totalItems={totalItems}
+              pageSize={pageSize}
+              onPageChange={setCurrentPage}
+            />
+          )}
+        </>
+      )}
+    </div>
   );
 };
 

@@ -1,6 +1,5 @@
 /* eslint-disable */
 import { getAllProducts } from "@/api/product";
-import Layout from "@/components/commons/Layout";
 import ProductItem from "@/components/product/ProductItem";
 import { Pagination } from "antd";
 import React, { useEffect, useState } from "react";
@@ -42,8 +41,7 @@ const Search = () => {
   const navigate = useNavigate();
 
   return (
-    <Layout>
-      <div className="w-full mt-[150px] px-[20px]  md:px-[50px] lg:px-[130px]">
+    <div className="w-full mt-[150px] px-[20px]  md:px-[50px] lg:px-[130px]">
         <p
           data-aos="fade-down"
           className="flex items-center mb-[20px] gap-[10px]"
@@ -83,7 +81,6 @@ const Search = () => {
           // }}
         />
       </div>
-    </Layout>
   );
 };
 

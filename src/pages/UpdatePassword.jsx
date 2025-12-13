@@ -1,6 +1,5 @@
 // ResetNewPassword.jsx
 import { updatePassword } from "@/api/user";
-import Layout from "@/components/commons/Layout";
 import { updatePasswordSchema } from "@/utils/validation/authValidation";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import React, { useState } from "react";
@@ -40,8 +39,7 @@ export default function UpdatePassword() {
   };
 
   return (
-    <Layout>
-      <div className="min-h-screen bg-gray-50 pt-[200px] p-[2%] flex justify-center">
+    <div className="min-h-screen bg-gray-50 pt-[200px] p-[2%] flex justify-center">
         <div className="w-[400px] rounded-md shadow-lg bg-gray-50 flex items-center justify-center py-6 px-4">
           <Formik
             initialValues={initialValues}
@@ -139,6 +137,5 @@ export default function UpdatePassword() {
           </Formik>
         </div>
       </div>
-    </Layout>
   );
 }

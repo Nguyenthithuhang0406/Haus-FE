@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Layout from "@/components/commons/Layout";
 import CartHeader from "@/components/cart/CartHeader";
 import CartItem from "@/components/cart/CartItem";
 import EmptyCart from "@/components/cart/EmptyCart";
@@ -688,74 +687,70 @@ const CartPage = () => {
 
   if (loading) {
     return (
-      <Layout>
-        <div className="max-w-[1400px] mx-auto px-4 py-8">
-          <div className="flex items-center justify-center min-h-[60vh]">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#ad7555]"></div>
-          </div>
+      <div className="max-w-[1400px] mx-auto px-4 py-8">
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#ad7555]"></div>
         </div>
-      </Layout>
+      </div>
     );
   }
 
   return (
-    <Layout>
-      <div className="max-w-[1400px] mx-auto mt-[120px] px-4 py-8">
-        <CartHeader
-          totalItems={getTotalSelectableItems()}
-          selectedCount={selectedItems.length}
-          onClearAll={handleClearAll}
-          onSelectAll={handleSelectAll}
-          allSelected={
-            getTotalSelectableItems() > 0 &&
-            selectedItems.length === getTotalSelectableItems()
-          }
-        />
+    <div className="max-w-[1400px] mx-auto mt-[120px] px-4 py-8">
+      <CartHeader
+        totalItems={getTotalSelectableItems()}
+        selectedCount={selectedItems.length}
+        onClearAll={handleClearAll}
+        onSelectAll={handleSelectAll}
+        allSelected={
+          getTotalSelectableItems() > 0 &&
+          selectedItems.length === getTotalSelectableItems()
+        }
+      />
 
-        {cartItems.length === 0 ? (
-          <EmptyCart onNavigate={(path) => navigate(path)} />
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2">
-              {cartItems.map(
-                (item) =>
-                  item.productVariations.length > 0 &&
-                  item.productVariations.map(
-                    (variant) =>
-                      variant.isSelected && (
-                        <CartItem
-                          key={`${item.id}-${variant.id}`}
-                          item={item}
-                          variant={variant}
-                          isSelected={selectedItems.includes(variant?.id)}
-                          onToggleSelect={handleToggleSelect}
-                          onUpdateQuantity={handleUpdateQuantity}
-                          handleChangeVariant={handleChangeVariant}
-                          onRemove={handleRemoveItem}
-                        />
-                      )
-                  )
-              )}
-              {/* <PaginationComponent
+      {cartItems.length === 0 ? (
+        <EmptyCart onNavigate={(path) => navigate(path)} />
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            {cartItems.map(
+              (item) =>
+                item.productVariations.length > 0 &&
+                item.productVariations.map(
+                  (variant) =>
+                    variant.isSelected && (
+                      <CartItem
+                        key={`${item.id}-${variant.id}`}
+                        item={item}
+                        variant={variant}
+                        isSelected={selectedItems.includes(variant?.id)}
+                        onToggleSelect={handleToggleSelect}
+                        onUpdateQuantity={handleUpdateQuantity}
+                        handleChangeVariant={handleChangeVariant}
+                        onRemove={handleRemoveItem}
+                      />
+                    )
+                )
+            )}
+            {/* <PaginationComponent
                 currentPage={currentPage}
                 totalItems={cartItems.length}
                 pageSize={pageSize}
                 onPageChange={handlePageChange}
               /> */}
-            </div>
-
-            <div>
-              <CartSummary
-                total={calculateTotal()}
-                selectedCount={selectedItems.length}
-                onContinue={() => navigate("/")}
-                onCheckout={handleClickCheckout}
-              />
-            </div>
           </div>
-        )}
-      </div>
-    </Layout>
+
+          <div>
+            <CartSummary
+              total={calculateTotal()}
+              selectedCount={selectedItems.length}
+              onContinue={() => navigate("/")}
+              onCheckout={handleClickCheckout}
+            />
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

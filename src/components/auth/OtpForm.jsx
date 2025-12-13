@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { FaUserLock } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import Layout from "../commons/Layout";
 import { formatTime } from "@/utils/function";
 
 const AuthenOTP = () => {
@@ -95,8 +94,7 @@ const AuthenOTP = () => {
   };
 
   return (
-    <Layout>
-      <div className="flex mt-[50px] flex-col items-center justify-center min-h-screen bg-gray-50">
+    <div className="flex mt-[50px] flex-col items-center justify-center min-h-screen bg-gray-50">
         <div className="bg-white p-8 rounded-2xl shadow-lg w-[400px] text-center">
           {/* Icon */}
           <div className="flex justify-center mb-4">

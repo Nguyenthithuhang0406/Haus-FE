@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Layout from "@/components/commons/Layout";
 import { toast } from "react-toastify";
 import axios from "axios";
 import SidebarProfile from "@/components/auth/SidebarProfile";
@@ -131,8 +130,7 @@ const ChangePassword = () => {
   };
 
   return (
-    <Layout>
-      <div className="min-h-screen bg-gray-50 pt-[100px]">
+    <div className="min-h-screen bg-gray-50 pt-[100px]">
         <div className="container mx-auto px-20 py-8">
           <div className="flex flex-col lg:flex-row gap-8">
             <SidebarProfile />
@@ -335,7 +333,6 @@ const ChangePassword = () => {
           </div>
         </div>
       </div>
-    </Layout>
   );
 };
 
