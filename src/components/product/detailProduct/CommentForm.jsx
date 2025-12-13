@@ -13,10 +13,9 @@ const CommentForm = ({ setIsShowAddComment, product }) => {
   const navigator = useNavigate();
 
   const handleAddComment = async () => {
-
     if (!isLoggedIn()) {
       alert("Bạn cần đăng nhập để đánh giá sản phẩm!");
-      navigator("/auth")
+      navigator("/auth");
       return;
     }
 
@@ -29,6 +28,8 @@ const CommentForm = ({ setIsShowAddComment, product }) => {
       return;
     }
     try {
+      console.log("product", product);
+      console.log("product.id", product.id);
       await addProductReview(product.id, {
         rating: rating,
         content: comment,
@@ -80,10 +81,11 @@ const CommentForm = ({ setIsShowAddComment, product }) => {
               onClick={() => setRating(star)}
               onMouseEnter={() => setHoverRating(star)}
               onMouseLeave={() => setHoverRating(0)}
-              className={`w-6 h-6 cursor-pointer transition-colors ${(hoverRating || rating) >= star
-                ? "text-yellow-400"
-                : "text-gray-300"
-                }`}
+              className={`w-6 h-6 cursor-pointer transition-colors ${
+                (hoverRating || rating) >= star
+                  ? "text-yellow-400"
+                  : "text-gray-300"
+              }`}
             />
           ))}
         </div>

@@ -53,8 +53,10 @@ const InformationComponent = ({ product }) => {
   );
 
   return (
-    <div data-aos="fade-up" className="w-full flex flex-col gap-[30px] pb-[30px]">
-
+    <div
+      data-aos="fade-up"
+      className="w-full flex flex-col gap-[30px] pb-[30px]"
+    >
       {/* Tabs */}
       <div className="w-full flex items-center justify-center gap-[30px]">
         {[
@@ -66,9 +68,10 @@ const InformationComponent = ({ product }) => {
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`text-[18px] md:text-[24px] py-[4px] font-semibold cursor-pointer border-b-[2px]
-              ${activeTab === tab.key
-                ? "text-[#ad7555] border-[#ad7555]"
-                : "text-[#a0a0a0] border-transparent"
+              ${
+                activeTab === tab.key
+                  ? "text-[#ad7555] border-[#ad7555]"
+                  : "text-[#a0a0a0] border-transparent"
               }
               hover:text-[#ad7555] hover:border-[#ad7555]`}
           >
@@ -98,7 +101,6 @@ const InformationComponent = ({ product }) => {
       {/* Review */}
       {activeTab === "review" && (
         <div data-aos="fade-up" className="flex flex-col gap-[20px]">
-
           {/* Khung tổng quan rating */}
           <div className="w-full p-[20px] bg-[rgba(128,187,53,0.1)] border border-[#e4e4e4] rounded-lg shadow-sm">
             <div className="flex flex-col items-center gap-[15px]">
@@ -137,10 +139,11 @@ const InformationComponent = ({ product }) => {
                   setFilterStar(s.key);
                   loadReviews(s.key); // Gọi API ngay khi click ⭐
                 }}
-                className={`px-4 py-2 rounded-md border text-sm ${filterStar === s.key
+                className={`px-4 py-2 rounded-md border text-sm ${
+                  filterStar === s.key
                     ? "bg-[#80BB35] text-white border-[#80BB35]"
                     : "bg-white border-gray-300 text-gray-700"
-                  }`}
+                }`}
               >
                 {s.label}
               </button>
@@ -184,7 +187,7 @@ const InformationComponent = ({ product }) => {
         <CommentModal
           isOpen={isShowAddComment}
           onClose={() => setIsShowAddComment(false)}
-          product={fakeProduct}
+          product={product}
         />
       )}
     </div>
