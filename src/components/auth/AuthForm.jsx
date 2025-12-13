@@ -10,6 +10,7 @@ import Layout from "../commons/Layout";
 import { setCookie } from "@/utils/cookies";
 import { useDispatch } from "react-redux";
 import { syncFavoritesToServer, loadFavorites } from "@/store/favoriteSlice";
+import { syncLocalCartToServer, loadCartQuantity } from "@/store/orderSlice";
 
 export default function AuthForm() {
   const [isLogin, setIsLogin] = useState(true);
@@ -35,6 +36,16 @@ export default function AuthForm() {
 
           // Load favorites từ server
           await dispatch(loadFavorites());
+
+          // Sync giỏ hàng từ localStorage lên server sau khi đăng nhập
+          try {
+            await dispatch(syncLocalCartToServer()).unwrap();
+          } catch (syncError) {
+            console.error("Sync cart error:", syncError);
+          }
+
+          // Load số lượng giỏ hàng từ server
+          await dispatch(loadCartQuantity());
 
           toast.success("Đăng nhập thành công!");
           navigate("/");

@@ -9,7 +9,7 @@ import { FiPackage } from "react-icons/fi";
 import { FaTruck } from "react-icons/fa";
 import { isLoggedIn } from "@/utils/checkLogin";
 import { useDispatch, useSelector } from "react-redux";
-import { setLocalCart, setQuantityOfCart } from "@/store/orderSlice";
+import { setLocalCart, loadCartQuantity } from "@/store/orderSlice";
 import { toast } from "react-toastify";
 import { addToCart } from "@/api/cart";
 import { useNavigate } from "react-router-dom";
@@ -85,7 +85,8 @@ const RightComponent = ({
       const response = await addToCart(data);
       if (response.status === 200) {
         flyToCart(imageUrl, addCartBtnRef.current);
-        dispatch(setQuantityOfCart(quantityOfCart + count));
+        // Cập nhật số lượng giỏ hàng (chỉ đếm số variant, không đếm số lượng)
+        dispatch(loadCartQuantity());
         setCountInCart(countInCart + count);
         setTimeout(() => {
           toast.success("Đã thêm vào giỏ hàng");
@@ -106,7 +107,8 @@ const RightComponent = ({
       );
       setCountInCart(countInCart + 1);
       flyToCart(imageUrl, addCartBtnRef.current);
-      dispatch(setQuantityOfCart(quantityOfCart + count));
+      // Cập nhật số lượng giỏ hàng (chỉ đếm số variant, không đếm số lượng)
+      dispatch(loadCartQuantity());
       setTimeout(() => {
         toast.success("Đã thêm vào giỏ hàng");
       }, 1300);

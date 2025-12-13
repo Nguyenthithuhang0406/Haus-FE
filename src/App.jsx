@@ -9,6 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { getCookie } from "./utils/cookies";
 import { useDispatch } from "react-redux";
 import { loadFavorites } from "./store/favoriteSlice";
+import { loadCartQuantity } from "./store/orderSlice";
 
 const Home = lazy(() => import("@/pages/Home"));
 const AuthForm = lazy(() => import("@/components/auth/AuthForm"));
@@ -50,6 +51,9 @@ const App = () => {
 
     // Load favorites khi vào trang web
     dispatch(loadFavorites());
+
+    // Load số lượng giỏ hàng khi vào trang web
+    dispatch(loadCartQuantity());
   }, [dispatch]);
 
   const ProtectedRoute = ({ children, allowedRoles }) => {
