@@ -9,7 +9,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { setLocalCart, setQuantityOfCart } from "@/store/orderSlice";
 import { toast } from "react-toastify";
 import { addToCart } from "@/api/cart";
-import { addFavorite, removeFavorite, selectIsFavorite } from "@/store/favoriteSlice";
+import {
+  addFavorite,
+  removeFavorite,
+  selectIsFavorite,
+} from "@/store/favoriteSlice";
 
 const ProductItem = ({ product, onRemoveFavorite }) => {
   const [indexImage, setIndexImage] = useState(0);
@@ -18,7 +22,9 @@ const ProductItem = ({ product, onRemoveFavorite }) => {
   const imageRef = useRef(null);
 
   // Check favorite từ Redux
-  const isFavorite = useSelector((state) => selectIsFavorite(state, product?.id));
+  const isFavorite = useSelector((state) =>
+    selectIsFavorite(state, product?.id)
+  );
 
   const handleLike = async (e) => {
     e.stopPropagation();
@@ -29,14 +35,15 @@ const ProductItem = ({ product, onRemoveFavorite }) => {
         await dispatch(removeFavorite(product.id)).unwrap();
         onRemoveFavorite?.();
       } else {
-        await dispatch(addFavorite({ productId: product.id, product })).unwrap();
+        await dispatch(
+          addFavorite({ productId: product.id, product })
+        ).unwrap();
       }
     } catch (err) {
       console.error("Favorite Error:", err);
       toast.error("Có lỗi xảy ra khi cập nhật yêu thích");
     }
   };
-
 
   const quantityOfCart = useSelector((state) => state.order.quantityOfCart);
   const handleClickAddToCart = async (e) => {
@@ -119,17 +126,18 @@ const ProductItem = ({ product, onRemoveFavorite }) => {
           }}
           className={` w-[70%] z-10 bg-white text-[15px] font-medium px-3 py-2 rounded-xl
           opacity-0 translate-y-6 invisible group-hover:opacity-100 group-hover:translate-y-0 group-hover:visible transition-all duration-300
-          hover:bg-[#ad7555] hover:text-white ${product?.soldQuantity === product?.inventoryQuantity
+          hover:bg-[#ad7555] hover:text-white ${
+            product?.soldQuantity === product?.inventoryQuantity
               ? "cursor-not-allowed"
               : "cursor-pointer"
-            }`}
+          }`}
         >
           {product?.soldQuantity === product?.inventoryQuantity
             ? "Hết hàng"
             : product?.productVariations &&
               product?.productVariations.length > 1
-              ? "Tùy chọn"
-              : "Thêm vào giỏ hàng"}
+            ? "Tùy chọn"
+            : "Thêm vào giỏ hàng"}
         </button>
       </div>
 
@@ -141,10 +149,11 @@ const ProductItem = ({ product, onRemoveFavorite }) => {
               onMouseEnter={() => setIndexImage(index)}
               key={index}
               className={`w-[30px] h-[30px] rounded-lg overflow-hidden p-[2px] border 
-              ${index === indexImage
+              ${
+                index === indexImage
                   ? "border-[#ad7555] shadow-md z-10"
                   : "border-gray-300"
-                }`}
+              }`}
             >
               <img
                 ref={imageRef}

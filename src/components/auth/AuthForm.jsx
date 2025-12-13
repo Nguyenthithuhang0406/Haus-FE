@@ -25,17 +25,17 @@ export default function AuthForm() {
         const response = await login(values);
         if (response.status === 200) {
           setCookie("email", values.email);
-          
+
           // Sync favorites từ localStorage lên server và load lại
           try {
             await dispatch(syncFavoritesToServer()).unwrap();
           } catch (syncError) {
             console.error("Sync favorites error:", syncError);
           }
-          
+
           // Load favorites từ server
           await dispatch(loadFavorites());
-          
+
           toast.success("Đăng nhập thành công!");
           navigate("/");
         }
