@@ -64,7 +64,7 @@ axiosPrivate.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 403 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise(function (resolve, reject) {
           failedQueue.push({ resolve, reject });
@@ -100,11 +100,11 @@ axiosPrivate.interceptors.response.use(
       }
     }
 
-    if (error.response.status === 401) {
-      removeAllCookies();
-      window.location.href = "/auth";
-      return Promise.reject(error);
-    }
+    // if (error.response.status === 401) {
+    //   removeAllCookies();
+    //   window.location.href = "/auth";
+    //   return Promise.reject(error);
+    // }
     
     const errorResponse = {
       status: get(error, "response.status", null),
