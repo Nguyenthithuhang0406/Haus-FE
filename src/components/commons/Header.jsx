@@ -35,6 +35,27 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [childRef]);
 
+  // Cập nhật isLogin khi location thay đổi hoặc khi token được refresh
+  useEffect(() => {
+    setIsLogin(isLoggedIn());
+  }, [location.pathname]);
+
+  // Check lại isLogin định kỳ để detect khi token được refresh
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const currentLoginStatus = isLoggedIn();
+      setIsLogin((prev) => {
+        // Chỉ update nếu thay đổi để tránh re-render không cần thiết
+        if (prev !== currentLoginStatus) {
+          return currentLoginStatus;
+        }
+        return prev;
+      });
+    }, 2000); // Check mỗi 2 giây
+
+    return () => clearInterval(interval);
+  }, []);
+
   const handleKeyPress = async (e) => {
     if (e.key === "Enter") {
       dispatch(setKeySearch(inputText));
