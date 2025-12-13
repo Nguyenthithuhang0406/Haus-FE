@@ -5,122 +5,151 @@ import WishListHeader from "@/components/wishlist/WishListHeader";
 import EmptyWishList from "@/components/wishlist/EmptyWishList";
 import PaginationComponent from "@/components/wishlist/Panigation";
 import { useNavigate } from "react-router-dom";
-import { isLoggedIn } from "@/utils/checkLogin";
-import { getFavoriteProducts, syncFavoritesAfterLogin, deleteFavoriteProduct } from "@/api/favorite";
+import { useDispatch, useSelector } from "react-redux";
+import { refreshFavorites, removeFavorite } from "@/store/favoriteSlice";
 
 const WishList = () => {
-    const navigate = useNavigate();
-    const [likeProducts, setLikeProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize] = useState(8);
-    const [totalItems, setTotalItems] = useState(0);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { items, pageCustom, loading } = useSelector((state) => state.favorite);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(8);
+  const [removingItems, setRemovingItems] = useState(new Set());
+  const [itemsToShow, setItemsToShow] = useState([]);
 
-    // Load wishlist
-    const loadLikeProducts = async (page = 1) => {
-        setLoading(true);
+  // Load favorites khi vào trang hoặc khi đổi trang
+  useEffect(() => {
+    dispatch(refreshFavorites({ page: currentPage, pageSize }));
+  }, [dispatch, currentPage, pageSize]);
 
-        if (!isLoggedIn()) {
-            const localFav = JSON.parse(localStorage.getItem("likeProducts")) || [];
-            setLikeProducts(localFav);
-            setTotalItems(localFav.length);
-            setLoading(false);
-        } else {
-            // Sync localStorage lên server
-            await syncFavoritesAfterLogin();
+  // Cập nhật itemsToShow khi items thay đổi, nhưng giữ lại items đang removing
+  useEffect(() => {
+    setItemsToShow((prevItems) => {
+      // Lấy danh sách item IDs đang removing
+      const removingIds = Array.from(removingItems);
 
-            try {
-                const res = await getFavoriteProducts(page, pageSize);
-                const products = Array.isArray(res.data) ? res.data : Array.isArray(res.data?.data) ? res.data.data : [];
-                setLikeProducts(products);
-                setTotalItems(res.data?.total || products.length);
-            } catch (err) {
-                console.error("Load favorite products failed:", err);
-                setLikeProducts([]);
-                setTotalItems(0);
-            } finally {
-                setLoading(false);
-            }
+      // Filter items mới, loại bỏ những item đã bị xóa khỏi Redux và không còn trong removing
+      const newItems = items.filter(
+        (item) => !removingIds.includes(item.product?.id || item.id)
+      );
+
+      // Giữ lại items đang removing từ prevItems
+      const keepingRemoving = prevItems.filter((item) => {
+        const itemId = item.product?.id || item.id;
+        return removingIds.includes(itemId);
+      });
+
+      return [...newItems, ...keepingRemoving];
+    });
+  }, [items, removingItems]);
+
+  // Sử dụng items trực tiếp từ API (đã được phân trang)
+  const totalItems = pageCustom?.totalElement || items.length;
+  const totalPages = pageCustom?.totalPages || Math.ceil(totalItems / pageSize);
+
+  const handleRemoveFavorite = async (productId) => {
+    // Thêm vào danh sách đang xóa để trigger animation
+    setRemovingItems((prev) => new Set(prev).add(productId));
+
+    // Đợi fade out xong (300ms) rồi mới xóa thực sự
+    setTimeout(async () => {
+      try {
+        await dispatch(removeFavorite(productId)).unwrap();
+        // Xóa khỏi danh sách removing sau khi xóa thành công
+        setRemovingItems((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(productId);
+          return newSet;
+        });
+        // Không cần refresh vì đã xóa khỏi state trong reducer rồi
+        // Chỉ refresh nếu trang hiện tại trống và có trang trước đó
+        if (items.length === 1 && currentPage > 1) {
+          setCurrentPage(currentPage - 1);
         }
-    };
+      } catch (err) {
+        console.error("Remove favorite failed:", err);
+        // Nếu lỗi thì xóa khỏi removing để hiển thị lại
+        setRemovingItems((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(productId);
+          return newSet;
+        });
+      }
+    }, 300);
+  };
 
-    useEffect(() => {
-        loadLikeProducts(currentPage);
-    }, [currentPage]);
-
-    const handleRemoveFavorite = (productId) => {
-        if (!isLoggedIn()) {
-            const localFav = JSON.parse(localStorage.getItem("likeProducts")) || [];
-            const updated = localFav.filter((p) => p.id !== productId);
-            localStorage.setItem("likeProducts", JSON.stringify(updated));
-            setLikeProducts(updated);
-            setTotalItems(updated.length);
-        } else {
-            deleteFavoriteProduct(productId)
-                .then(() => {
-                    setLikeProducts((prev) => prev.filter((p) => p.id !== productId));
-                    setTotalItems((prev) => prev - 1);
-                })
-                .catch((err) => console.error("Remove favorite failed:", err));
+  const handleClearAll = () => {
+    if (
+      window.confirm("Bạn có chắc chắn muốn xóa tất cả sản phẩm yêu thích?")
+    ) {
+      // Xóa từng item
+      items.forEach((item) => {
+        if (item.product?.id) {
+          dispatch(removeFavorite(item.product.id));
         }
-    };
-
-    const handleClearAll = () => {
-        if (window.confirm("Bạn có chắc chắn muốn xóa tất cả sản phẩm yêu thích?")) {
-            if (!isLoggedIn()) localStorage.removeItem("likeProducts");
-            else {
-                // TODO: call API xóa tất cả
-            }
-            setLikeProducts([]);
-            setTotalItems(0);
-        }
-    };
-
-    const handlePageChange = (page) => {
-        setCurrentPage(page);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    };
-
-    if (loading) {
-        return (
-            <Layout>
-                <div className="max-w-[1400px] mx-auto px-4 py-8">
-                    <div className="flex items-center justify-center min-h-[60vh]">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#ad7555]"></div>
-                    </div>
-                </div>
-            </Layout>
-        );
+      });
     }
+  };
 
+  if (loading) {
     return (
-        <Layout>
-            <div className="max-w-[1400px] mx-auto px-4 py-[150px] min-h-screen">
-                <WishListHeader totalItems={totalItems} onClearAll={handleClearAll} />
-                {likeProducts.length === 0 ? (
-                    <EmptyWishList onNavigate={(path) => navigate(path)} />
-                ) : (
-                    <>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
-                            {likeProducts.map((product) => (
-                                <ProductItem
-                                    key={product.id}
-                                    product={product}
-                                    onRemoveFavorite={() => handleRemoveFavorite(product.id)}
-                                />
-                            ))}
-                        </div>
-                        <PaginationComponent
-                            currentPage={currentPage}
-                            totalItems={totalItems}
-                            pageSize={pageSize}
-                            onPageChange={handlePageChange}
-                        />
-                    </>
-                )}
-            </div>
-        </Layout>
+      <Layout>
+        <div className="max-w-[1400px] mx-auto px-4 py-8">
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#ad7555]"></div>
+          </div>
+        </div>
+      </Layout>
     );
+  }
+
+  return (
+    <Layout>
+      <div className="max-w-[1400px] mx-auto px-4 py-[150px] min-h-screen">
+        <WishListHeader totalItems={totalItems} onClearAll={handleClearAll} />
+        {itemsToShow.length === 0 && !loading ? (
+          <EmptyWishList onNavigate={(path) => navigate(path)} />
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
+              {itemsToShow.map((item) => {
+                const itemId = item.product?.id || item.id;
+                const isRemoving = removingItems.has(itemId);
+
+                return (
+                  <div
+                    key={itemId}
+                    className={`${isRemoving ? "pointer-events-none" : ""}`}
+                    style={{
+                      transition:
+                        "opacity 0.3s ease-in-out, transform 0.3s ease-in-out",
+                      opacity: isRemoving ? 0 : 1,
+                      transform: isRemoving
+                        ? "scale(0.95) translateX(-16px)"
+                        : "scale(1) translateX(0)",
+                    }}
+                  >
+                    <ProductItem
+                      product={item.product || item}
+                      onRemoveFavorite={() => handleRemoveFavorite(itemId)}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+            {totalPages > 1 && (
+              <PaginationComponent
+                currentPage={currentPage}
+                totalItems={totalItems}
+                pageSize={pageSize}
+                onPageChange={setCurrentPage}
+              />
+            )}
+          </>
+        )}
+      </div>
+    </Layout>
+  );
 };
 
 export default WishList;

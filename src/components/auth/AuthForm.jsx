@@ -8,6 +8,8 @@ import axios from "axios";
 import { LoginSchema, RegisterSchema } from "@/utils/validation/authValidation";
 import Layout from "../commons/Layout";
 import { setCookie } from "@/utils/cookies";
+import { useDispatch } from "react-redux";
+import { syncFavoritesToServer, loadFavorites } from "@/store/favoriteSlice";
 
 export default function AuthForm() {
   const [isLogin, setIsLogin] = useState(true);
@@ -15,6 +17,7 @@ export default function AuthForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleSubmit = async (values) => {
     if (isLogin) {
@@ -22,6 +25,17 @@ export default function AuthForm() {
         const response = await login(values);
         if (response.status === 200) {
           setCookie("email", values.email);
+          
+          // Sync favorites từ localStorage lên server và load lại
+          try {
+            await dispatch(syncFavoritesToServer()).unwrap();
+          } catch (syncError) {
+            console.error("Sync favorites error:", syncError);
+          }
+          
+          // Load favorites từ server
+          await dispatch(loadFavorites());
+          
           toast.success("Đăng nhập thành công!");
           navigate("/");
         }

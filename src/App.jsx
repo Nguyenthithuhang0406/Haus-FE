@@ -7,6 +7,8 @@ import "aos/dist/aos.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getCookie } from "./utils/cookies";
+import { useDispatch } from "react-redux";
+import { loadFavorites } from "./store/favoriteSlice";
 
 const Home = lazy(() => import("@/pages/Home"));
 const AuthForm = lazy(() => import("@/components/auth/AuthForm"));
@@ -38,12 +40,17 @@ const PaymentResult = lazy(() => import("@/pages/PaymentResult"));
 const WishList = lazy(() => import("@/pages/WishList"));
 const OrderInfor = lazy(() => import("@/pages/OrderInfor"));
 const App = () => {
+  const dispatch = useDispatch();
+
   useEffect(() => {
     AOS.init({
       duration: 1000, // Thời gian hiệu ứng (ms)
       once: true, // Chỉ chạy một lần khi cuộn
     });
-  }, []);
+
+    // Load favorites khi vào trang web
+    dispatch(loadFavorites());
+  }, [dispatch]);
 
   const ProtectedRoute = ({ children, allowedRoles }) => {
     const role = getCookie("role");

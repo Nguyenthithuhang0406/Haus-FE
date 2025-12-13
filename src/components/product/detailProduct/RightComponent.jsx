@@ -13,6 +13,7 @@ import { setLocalCart, setQuantityOfCart } from "@/store/orderSlice";
 import { toast } from "react-toastify";
 import { addToCart } from "@/api/cart";
 import { useNavigate } from "react-router-dom";
+import { addFavorite, removeFavorite, selectIsFavorite } from "@/store/favoriteSlice";
 
 const RightComponent = ({
   product,
@@ -44,6 +45,26 @@ const RightComponent = ({
   ];
 
   const quantityOfCart = useSelector((state) => state.order.quantityOfCart);
+  
+  // Check favorite từ Redux
+  const isFavorite = useSelector((state) => selectIsFavorite(state, product?.id));
+
+  const handleToggleFavorite = async () => {
+    if (!product?.id) return;
+
+    try {
+      if (isFavorite) {
+        await dispatch(removeFavorite(product.id)).unwrap();
+        toast.success("Đã xóa khỏi yêu thích");
+      } else {
+        await dispatch(addFavorite({ productId: product.id, product })).unwrap();
+        toast.success("Đã thêm vào yêu thích");
+      }
+    } catch (err) {
+      console.error("Favorite Error:", err);
+      toast.error("Có lỗi xảy ra khi cập nhật yêu thích");
+    }
+  };
   
   const handleAddToCart = async () => {
     const imageUrl = product.productVariations[selectedVariantIndex].media?.url;
@@ -199,7 +220,14 @@ const RightComponent = ({
             >
               THÊM VÀO GIỎ
             </button>
-            <button className="w-[53px] h-[53px] border-[1px] border-[#ad7555] rounded-lg text-[#ad7555] bg-transparent text-[24px] flex items-center justify-center hover:text-white hover:bg-[#ad7555]">
+            <button 
+              onClick={handleToggleFavorite}
+              className={`w-[53px] h-[53px] border-[1px] border-[#ad7555] rounded-lg text-[24px] flex items-center justify-center transition-colors ${
+                isFavorite 
+                  ? "bg-[#ad7555] text-white" 
+                  : "text-[#ad7555] bg-transparent hover:text-white hover:bg-[#ad7555]"
+              }`}
+            >
               <CiHeart className="text-[30px]" />
             </button>
           </div>
