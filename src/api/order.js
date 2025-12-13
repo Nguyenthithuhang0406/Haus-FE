@@ -92,3 +92,17 @@ export const getInvoicePdf = async (orderId) => {
     throw error;
   }
 };
+
+export const getOrderStatistics = async () => {
+  try {
+    const response = await request(axiosPrivate, {
+      method: "GET",
+      url: "/statistics/order-by-month",
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi lấy thống kê đơn hàng:", error);
+    throw error;
+  }
+};
