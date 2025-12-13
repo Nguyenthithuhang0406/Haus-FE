@@ -9,10 +9,15 @@ import { FiPackage } from "react-icons/fi";
 import { FaTruck } from "react-icons/fa";
 import { isLoggedIn } from "@/utils/checkLogin";
 import { useDispatch, useSelector } from "react-redux";
-import { setLocalCart, setQuantityOfCart } from "@/store/orderSlice";
+import { setLocalCart, loadCartQuantity } from "@/store/orderSlice";
 import { toast } from "react-toastify";
 import { addToCart } from "@/api/cart";
 import { useNavigate } from "react-router-dom";
+import {
+  addFavorite,
+  removeFavorite,
+  selectIsFavorite,
+} from "@/store/favoriteSlice";
 
 const RightComponent = ({
   product,
@@ -44,7 +49,31 @@ const RightComponent = ({
   ];
 
   const quantityOfCart = useSelector((state) => state.order.quantityOfCart);
-  
+
+  // Check favorite từ Redux
+  const isFavorite = useSelector((state) =>
+    selectIsFavorite(state, product?.id)
+  );
+
+  const handleToggleFavorite = async () => {
+    if (!product?.id) return;
+
+    try {
+      if (isFavorite) {
+        await dispatch(removeFavorite(product.id)).unwrap();
+        toast.success("Đã xóa khỏi yêu thích");
+      } else {
+        await dispatch(
+          addFavorite({ productId: product.id, product })
+        ).unwrap();
+        toast.success("Đã thêm vào yêu thích");
+      }
+    } catch (err) {
+      console.error("Favorite Error:", err);
+      toast.error("Có lỗi xảy ra khi cập nhật yêu thích");
+    }
+  };
+
   const handleAddToCart = async () => {
     const imageUrl = product.productVariations[selectedVariantIndex].media?.url;
 
@@ -56,7 +85,8 @@ const RightComponent = ({
       const response = await addToCart(data);
       if (response.status === 200) {
         flyToCart(imageUrl, addCartBtnRef.current);
-        dispatch(setQuantityOfCart(quantityOfCart + count));
+        // Cập nhật số lượng giỏ hàng (chỉ đếm số variant, không đếm số lượng)
+        dispatch(loadCartQuantity());
         setCountInCart(countInCart + count);
         setTimeout(() => {
           toast.success("Đã thêm vào giỏ hàng");
@@ -77,7 +107,8 @@ const RightComponent = ({
       );
       setCountInCart(countInCart + 1);
       flyToCart(imageUrl, addCartBtnRef.current);
-      dispatch(setQuantityOfCart(quantityOfCart + count));
+      // Cập nhật số lượng giỏ hàng (chỉ đếm số variant, không đếm số lượng)
+      dispatch(loadCartQuantity());
       setTimeout(() => {
         toast.success("Đã thêm vào giỏ hàng");
       }, 1300);
@@ -199,7 +230,14 @@ const RightComponent = ({
             >
               THÊM VÀO GIỎ
             </button>
-            <button className="w-[53px] h-[53px] border-[1px] border-[#ad7555] rounded-lg text-[#ad7555] bg-transparent text-[24px] flex items-center justify-center hover:text-white hover:bg-[#ad7555]">
+            <button
+              onClick={handleToggleFavorite}
+              className={`w-[53px] h-[53px] border-[1px] border-[#ad7555] rounded-lg text-[24px] flex items-center justify-center transition-colors ${
+                isFavorite
+                  ? "bg-[#ad7555] text-white"
+                  : "text-[#ad7555] bg-transparent hover:text-white hover:bg-[#ad7555]"
+              }`}
+            >
               <CiHeart className="text-[30px]" />
             </button>
           </div>

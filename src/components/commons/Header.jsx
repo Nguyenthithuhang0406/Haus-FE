@@ -13,8 +13,7 @@ import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { setKeySearch } from "@/store/searchSlice";
 import { isLoggedIn } from "@/utils/checkLogin";
-import { getCart } from "@/api/cart";
-import { setQuantityOfCart } from "@/store/orderSlice";
+import { loadCartQuantity, clearLocalCart } from "@/store/orderSlice";
 
 const Header = () => {
   const [inputText, setInputText] = useState("");
@@ -36,6 +35,27 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [childRef]);
 
+  // Cập nhật isLogin khi location thay đổi hoặc khi token được refresh
+  useEffect(() => {
+    setIsLogin(isLoggedIn());
+  }, [location.pathname]);
+
+  // Check lại isLogin định kỳ để detect khi token được refresh
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const currentLoginStatus = isLoggedIn();
+      setIsLogin((prev) => {
+        // Chỉ update nếu thay đổi để tránh re-render không cần thiết
+        if (prev !== currentLoginStatus) {
+          return currentLoginStatus;
+        }
+        return prev;
+      });
+    }, 2000); // Check mỗi 2 giây
+
+    return () => clearInterval(interval);
+  }, []);
+
   const handleKeyPress = async (e) => {
     if (e.key === "Enter") {
       dispatch(setKeySearch(inputText));
@@ -46,35 +66,16 @@ const Header = () => {
   const handleLogout = () => {
     removeAllCookies();
     setIsLogin(false);
+    // Load số lượng giỏ hàng từ local cart sau khi đăng xuất
+    dispatch(loadCartQuantity());
     toast.success("Đăng xuất thành công!");
     navigate("/");
   };
 
   useEffect(() => {
-    const fetchCart = async () => {
-      if (isLoggedIn()) {
-        const res = await getCart();
-        const cartItems = res.data.cartItems;
-        let quantity = 0;
-        cartItems.forEach((cartItem) => {
-          cartItem.productVariations.forEach((variant) => {
-            variant.isSelected && (quantity += variant.cartQuantity);
-          });
-        });
-        dispatch(setQuantityOfCart(quantity));
-      } else {
-        const localCart = useSelector((state) => state.order.localCart);
-        let quantity = 0;
-        localCart.forEach((cartItem) => {
-          cartItem.productVariations.forEach((variant) => {
-            variant.isSelected && (quantity += variant.cartQuantity);
-          });
-        });
-        dispatch(setQuantityOfCart(quantity));
-      }
-    };
-    fetchCart();
-  }, []);
+    // Load số lượng giỏ hàng khi component mount
+    dispatch(loadCartQuantity());
+  }, [dispatch]);
 
   const quantityOfProducts = useSelector((state) => state.order.quantityOfCart);
   return (

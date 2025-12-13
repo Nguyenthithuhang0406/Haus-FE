@@ -11,7 +11,8 @@ import { getAllCategory } from "@/api/category";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { isLoggedIn } from "@/utils/checkLogin";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { loadCartQuantity } from "@/store/orderSlice";
 
 const Menu = () => {
   const navigate = useNavigate();
@@ -45,6 +46,8 @@ const Menu = () => {
   const handleLogout = () => {
     removeAllCookies();
     setIsLogin(false);
+    // Load số lượng giỏ hàng từ local cart sau khi đăng xuất
+    dispatch(loadCartQuantity());
     toast.success("Đăng xuất thành công!");
     navigate("/");
   };

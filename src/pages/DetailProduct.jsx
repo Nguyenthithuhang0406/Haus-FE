@@ -1,6 +1,5 @@
 import { getProductById } from "@/api/product";
 import Loading from "@/components/admin/Loading";
-import Layout from "@/components/commons/Layout";
 import InformationComponent from "@/components/product/detailProduct/InformationComponent";
 import LeftComponent from "@/components/product/detailProduct/LeftComponent";
 import RightComponent from "@/components/product/detailProduct/RightComponent";
@@ -34,8 +33,7 @@ const DetailProduct = () => {
     <>
       {loading && <Loading />}
       {!loading && (
-        <Layout>
-          <div className="w-full mt-[150px] px-[20px]  md:px-[50px] lg:px-[130px] pb-[50px]">
+        <div className="w-full mt-[150px] px-[20px]  md:px-[50px] lg:px-[130px] pb-[50px]">
             <p className="w-full flex items-center py-[20px] gap-[10px] font-medium text-[18px] md:text-[20px]">
               <span
                 className="cursor-pointer  hover:underline"
@@ -67,7 +65,6 @@ const DetailProduct = () => {
               <SuggestProducts product={productDetail} />
             </div>
           </div>
-        </Layout>
       )}
     </>
   );

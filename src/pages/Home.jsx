@@ -1,4 +1,3 @@
-import Layout from "@/components/commons/Layout";
 import Banner from "@/components/home/Banner";
 import React from "react";
 import About from "../components/home/About";
@@ -16,7 +15,7 @@ import News from "@/components/home/News";
 
 const Home = () => {
   return (
-    <Layout>
+    <>
       <Banner />
       <About />
       <Category />
@@ -30,7 +29,7 @@ const Home = () => {
       <FAQ />
       <ReComment />
       <News />
-    </Layout>
+    </>
   );
 };
 

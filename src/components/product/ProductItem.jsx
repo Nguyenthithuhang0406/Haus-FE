@@ -10,10 +10,10 @@ import { setLocalCart, setQuantityOfCart } from "@/store/orderSlice";
 import { toast } from "react-toastify";
 import { addToCart } from "@/api/cart";
 import {
-  addFavoriteProduct,
-  deleteFavoriteProduct,
-  checkFavoriteProduct,
-} from "@/api/favorite";
+  addFavorite,
+  removeFavorite,
+  selectIsFavorite,
+} from "@/store/favoriteSlice";
 
 const ProductItem = ({ product, onRemoveFavorite }) => {
   const [indexImage, setIndexImage] = useState(0);
@@ -21,55 +21,29 @@ const ProductItem = ({ product, onRemoveFavorite }) => {
   const dispatch = useDispatch();
   const imageRef = useRef(null);
 
-  const [isFavorite, setIsFavorite] = useState(false);
+  // Check favorite từ Redux
+  const isFavorite = useSelector((state) =>
+    selectIsFavorite(state, product?.id)
+  );
 
-  useEffect(() => {
+  const handleLike = async (e) => {
+    e.stopPropagation();
     if (!product?.id) return;
-
-    if (isLoggedIn()) {
-      checkFavoriteProduct(product.id)
-        .then((res) => {
-          setIsFavorite(res.data === true);
-        })
-        .catch(() => { });
-    } else {
-
-      const localFav = JSON.parse(localStorage.getItem("likeProducts")) || [];
-      setIsFavorite(localFav.some((p) => p.id === product.id));
-    }
-  }, [product]);
-
-
-  const handleLike = async (product) => {
-    if (!isLoggedIn()) {
-      const localFav = JSON.parse(localStorage.getItem("likeProducts")) || [];
-      let updated;
-      if (isFavorite) {
-        updated = localFav.filter((p) => p.id !== product.id);
-        localStorage.setItem("likeProducts", JSON.stringify(updated));
-        setIsFavorite(false);
-        onRemoveFavorite?.();
-      } else {
-        updated = [...localFav, product];
-        localStorage.setItem("likeProducts", JSON.stringify(updated));
-        setIsFavorite(true);
-      }
-      return;
-    }
 
     try {
       if (isFavorite) {
-        await deleteFavoriteProduct(product.id);
+        await dispatch(removeFavorite(product.id)).unwrap();
+        onRemoveFavorite?.();
       } else {
-        await addFavoriteProduct(product.id);
+        await dispatch(
+          addFavorite({ productId: product.id, product })
+        ).unwrap();
       }
-
-      setIsFavorite(!isFavorite);
     } catch (err) {
-      console.error("Favorite API Error:", err);
+      console.error("Favorite Error:", err);
+      toast.error("Có lỗi xảy ra khi cập nhật yêu thích");
     }
   };
-
 
   const quantityOfCart = useSelector((state) => state.order.quantityOfCart);
   const handleClickAddToCart = async (e) => {
@@ -124,12 +98,12 @@ const ProductItem = ({ product, onRemoveFavorite }) => {
 
       {/* Nút yêu thích */}
       <div
-        onClick={(e) => e.stopPropagation()}
+        onClick={handleLike}
         className={`absolute shadow-lg top-2 right-2 z-10 w-[30px] h-[30px] flex items-center justify-center rounded-lg bg-[#faf5f5] cursor-pointer
           opacity-0 translate-x-6 invisible group-hover:opacity-100 group-hover:translate-x-0 group-hover:visible transition-all duration-300
           ${isFavorite ? "bg-[#ff6347] text-white" : ""}`}
       >
-        <FaRegHeart onClick={() => handleLike(product)} />
+        <FaRegHeart />
       </div>
 
       {/* Ảnh sản phẩm */}
@@ -152,17 +126,18 @@ const ProductItem = ({ product, onRemoveFavorite }) => {
           }}
           className={` w-[70%] z-10 bg-white text-[15px] font-medium px-3 py-2 rounded-xl
           opacity-0 translate-y-6 invisible group-hover:opacity-100 group-hover:translate-y-0 group-hover:visible transition-all duration-300
-          hover:bg-[#ad7555] hover:text-white ${product?.soldQuantity === product?.inventoryQuantity
+          hover:bg-[#ad7555] hover:text-white ${
+            product?.soldQuantity === product?.inventoryQuantity
               ? "cursor-not-allowed"
               : "cursor-pointer"
-            }`}
+          }`}
         >
           {product?.soldQuantity === product?.inventoryQuantity
             ? "Hết hàng"
             : product?.productVariations &&
               product?.productVariations.length > 1
-              ? "Tùy chọn"
-              : "Thêm vào giỏ hàng"}
+            ? "Tùy chọn"
+            : "Thêm vào giỏ hàng"}
         </button>
       </div>
 
@@ -174,10 +149,11 @@ const ProductItem = ({ product, onRemoveFavorite }) => {
               onMouseEnter={() => setIndexImage(index)}
               key={index}
               className={`w-[30px] h-[30px] rounded-lg overflow-hidden p-[2px] border 
-              ${index === indexImage
+              ${
+                index === indexImage
                   ? "border-[#ad7555] shadow-md z-10"
                   : "border-gray-300"
-                }`}
+              }`}
             >
               <img
                 ref={imageRef}

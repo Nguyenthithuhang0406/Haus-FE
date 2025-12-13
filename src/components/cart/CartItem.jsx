@@ -1,7 +1,5 @@
 import React from "react";
 import { Minus, Plus, X, Check } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
-import { setQuantityOfCart } from "@/store/orderSlice";
 
 const CartItem = ({
   item,
@@ -16,9 +14,6 @@ const CartItem = ({
   const formatPrice = (price) => {
     return new Intl.NumberFormat("vi-VN").format(price) + "đ";
   };
-
-  const quantityOfCart = useSelector((state) => state.order.quantityOfCart);
-  const dispatch = useDispatch();
   return (
     <div
       className={`bg-white rounded-lg p-4 sm:p-6 shadow-sm mb-4 transition-all duration-200 ${
@@ -95,7 +90,6 @@ const CartItem = ({
                     variant?.id,
                     variant?.cartQuantity - 1
                   );
-                  dispatch(setQuantityOfCart(Math.max(0, quantityOfCart - 1)));
                 }}
                 className="text-gray-600 hover:text-gray-900 p-1 disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={variant?.cartQuantity <= 1}
@@ -111,7 +105,6 @@ const CartItem = ({
                     variant?.id,
                     variant?.cartQuantity + 1
                   );
-                  dispatch(setQuantityOfCart(quantityOfCart + 1));
                 }}
                 className="text-gray-600 hover:text-gray-900 p-1"
               >
@@ -201,7 +194,6 @@ const CartItem = ({
                 variant?.id,
                 variant?.cartQuantity - 1
               );
-              dispatch(setQuantityOfCart(Math.max(0, quantityOfCart - 1)));
             }}
             className="text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={variant?.cartQuantity <= 1}
@@ -217,7 +209,6 @@ const CartItem = ({
                 variant?.id,
                 variant?.cartQuantity + 1
               );
-              dispatch(setQuantityOfCart(quantityOfCart + 1));
             }}
             className="text-gray-600 hover:text-gray-900"
           >

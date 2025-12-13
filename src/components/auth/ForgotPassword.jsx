@@ -1,6 +1,5 @@
 /* eslint-disable */
 import React, { useState, useEffect } from "react";
-import Layout from "../commons/Layout";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
@@ -148,8 +147,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <Layout>
-      <div className="min-h-screen bg-gray-50 pt-[200px] p-[2%]">
+    <div className="min-h-screen bg-gray-50 pt-[200px] p-[2%]">
         <div className="bg-gray-50 flex items-center justify-center py-8 px-4">
           <div className="max-w-sm w-full bg-white rounded-lg shadow-md p-6">
             <div className="text-center mb-6">
@@ -285,7 +283,6 @@ const ForgotPassword = () => {
           </div>
         </div>
       </div>
-    </Layout>
   );
 };
 

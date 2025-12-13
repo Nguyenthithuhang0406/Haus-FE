@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Layout from "@/components/commons/Layout";
 import { getUserProfile, updateUserProfile, uploadAvatar } from "@/api/user";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -220,8 +219,7 @@ const ViewEditInfor = () => {
   };
 
   return (
-    <Layout>
-      <div className="min-h-screen bg-gray-50 pt-[100px]">
+    <div className="min-h-screen bg-gray-50 pt-[100px]">
         <div className="container mx-auto px-20 py-8">
           <div className="flex flex-col lg:flex-row gap-8">
             <SidebarProfile />
@@ -547,7 +545,6 @@ const ViewEditInfor = () => {
           </div>
         </div>
       </div>
-    </Layout>
   );
 };
 
