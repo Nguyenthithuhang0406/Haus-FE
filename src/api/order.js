@@ -106,3 +106,21 @@ export const getOrderStatistics = async () => {
     throw error;
   }
 };
+
+export const getBestSellerProducts = async (pageNum = 1, pageSize = 10) => {
+  try {
+    const response = await request(axiosPrivate, {
+      method: "GET",
+      url: "/statistics/get-best-seller",
+      params: {
+        pageNum,
+        pageSize,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi lấy sản phẩm bán chạy:", error);
+    throw error;
+  }
+};
