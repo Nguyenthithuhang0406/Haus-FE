@@ -10,6 +10,7 @@ import { setCookie } from "@/utils/cookies";
 import { useDispatch } from "react-redux";
 import { syncFavoritesToServer, loadFavorites } from "@/store/favoriteSlice";
 import { syncLocalCartToServer, loadCartQuantity } from "@/store/orderSlice";
+import { getReturnUrl } from "@/utils/returnUrl";
 
 export default function AuthForm() {
   const [isLogin, setIsLogin] = useState(true);
@@ -47,7 +48,10 @@ export default function AuthForm() {
           await dispatch(loadCartQuantity());
 
           toast.success("Đăng nhập thành công!");
-          navigate("/");
+
+          // Kiểm tra return URL và redirect về đó, nếu không có thì về home
+          const returnUrl = getReturnUrl();
+          navigate(returnUrl || "/");
         }
       } catch (error) {
         if (axios.isAxiosError(error) && error.response) {

@@ -1,25 +1,14 @@
-/* eslint-disable */
 import React, { useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { IoSend } from "react-icons/io5";
 import { FaStar } from "react-icons/fa6";
 import { addProductReview } from "@/api/review";
-import { isLoggedIn } from "@/utils/checkLogin";
-import { useNavigate } from "react-router-dom";
-const CommentForm = ({ setIsShowAddComment, product }) => {
+const CommentForm = ({ setIsShowAddComment, product, onSuccess }) => {
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
-  const navigator = useNavigate();
 
   const handleAddComment = async () => {
-
-    if (!isLoggedIn()) {
-      alert("Bạn cần đăng nhập để đánh giá sản phẩm!");
-      navigator("/auth")
-      return;
-    }
-
     if (rating === 0) {
       alert("Vui lòng chọn số sao đánh giá!");
       return;
@@ -29,16 +18,28 @@ const CommentForm = ({ setIsShowAddComment, product }) => {
       return;
     }
     try {
+      console.log("product", product);
+      console.log("product.id", product.id);
       await addProductReview(product.id, {
         rating: rating,
         content: comment,
       });
 
-      alert("Đánh giá thành công!");
       setIsShowAddComment(false);
+      // Gọi callback để reload reviews sau khi add comment thành công
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (error) {
       if (error.response && error.response.status === 401) {
         alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
+      } else if (
+        error.response &&
+        error.response.status === 409 &&
+        error.response.data?.message ===
+          "exception.review.not.review.before.buy"
+      ) {
+        alert("Bạn chưa mua hàng này nên không thể đánh giá !");
       } else {
         alert("Lỗi khi gửi đánh giá!");
       }
@@ -80,10 +81,11 @@ const CommentForm = ({ setIsShowAddComment, product }) => {
               onClick={() => setRating(star)}
               onMouseEnter={() => setHoverRating(star)}
               onMouseLeave={() => setHoverRating(0)}
-              className={`w-6 h-6 cursor-pointer transition-colors ${(hoverRating || rating) >= star
-                ? "text-yellow-400"
-                : "text-gray-300"
-                }`}
+              className={`w-6 h-6 cursor-pointer transition-colors ${
+                (hoverRating || rating) >= star
+                  ? "text-yellow-400"
+                  : "text-gray-300"
+              }`}
             />
           ))}
         </div>

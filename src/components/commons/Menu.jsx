@@ -17,6 +17,7 @@ import { loadCartQuantity } from "@/store/orderSlice";
 const Menu = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
   const [projectCategorys, setProjectCategorys] = useState(menuProjects);
   const [categories, setCategories] = useState([]);
 
@@ -26,6 +27,27 @@ const Menu = () => {
 
   const childRef = useRef(null);
   const menuMbRef = useRef(null);
+
+  // Cập nhật isLogin khi location thay đổi hoặc khi token được refresh
+  useEffect(() => {
+    setIsLogin(isLoggedIn());
+  }, [location.pathname]);
+
+  // Check lại isLogin định kỳ để detect khi token được refresh
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const currentLoginStatus = isLoggedIn();
+      setIsLogin((prev) => {
+        // Chỉ update nếu thay đổi để tránh re-render không cần thiết
+        if (prev !== currentLoginStatus) {
+          return currentLoginStatus;
+        }
+        return prev;
+      });
+    }, 2000); // Check mỗi 2 giây
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event) {

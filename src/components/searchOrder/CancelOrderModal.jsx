@@ -16,24 +16,26 @@ const CancelOrderModal = ({ visible, order, onCancel, onConfirm }) => {
     "Muốn thay đổi sản phẩm/màu sắc/kích thước",
     "Tìm thấy mã giảm giá tốt hơn",
     "Đặt nhầm sản phẩm",
-    "Lý do khác"
+    "Lý do khác",
   ];
 
   // Validation schema với Yup
   const validationSchema = Yup.object({
-    selectedReason: Yup.string()
-      .required("Vui lòng chọn lý do hủy đơn"),
-    customReason: Yup.string()
-      .when("selectedReason", {
-        is: "Lý do khác",
-        then: (schema) => schema
+    selectedReason: Yup.string().required("Vui lòng chọn lý do hủy đơn"),
+    customReason: Yup.string().when("selectedReason", {
+      is: "Lý do khác",
+      then: (schema) =>
+        schema
           .required("Vui lòng nhập lý do hủy đơn")
           .min(10, "Lý do phải có ít nhất 10 ký tự")
           .max(500, "Lý do không được vượt quá 500 ký tự"),
-        otherwise: (schema) => schema.max(300, "Ghi chú không được vượt quá 300 ký tự")
-      }),
-    agreePolicy: Yup.boolean()
-      .oneOf([true], "Vui lòng đồng ý với chính sách hủy đơn")
+      otherwise: (schema) =>
+        schema.max(300, "Ghi chú không được vượt quá 300 ký tự"),
+    }),
+    agreePolicy: Yup.boolean().oneOf(
+      [true],
+      "Vui lòng đồng ý với chính sách hủy đơn"
+    ),
   });
 
   // Formik setup
@@ -41,7 +43,7 @@ const CancelOrderModal = ({ visible, order, onCancel, onConfirm }) => {
     initialValues: {
       selectedReason: "",
       customReason: "",
-      agreePolicy: false
+      agreePolicy: false,
     },
     validationSchema,
     validateOnChange: true,
@@ -50,16 +52,18 @@ const CancelOrderModal = ({ visible, order, onCancel, onConfirm }) => {
       try {
         const cancelData = {
           orderId: order?.id,
-          reason: values.selectedReason === "Lý do khác"
-            ? values.customReason
-            : values.selectedReason,
-          note: values.selectedReason !== "Lý do khác" && values.customReason
-            ? values.customReason
-            : null,
-          timestamp: new Date().toISOString()
+          reason:
+            values.selectedReason === "Lý do khác"
+              ? values.customReason
+              : values.selectedReason,
+          note:
+            values.selectedReason !== "Lý do khác" && values.customReason
+              ? values.customReason
+              : null,
+          timestamp: new Date().toISOString(),
         };
 
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         onConfirm(order?.id, cancelData);
 
@@ -73,7 +77,7 @@ const CancelOrderModal = ({ visible, order, onCancel, onConfirm }) => {
       } finally {
         setSubmitting(false);
       }
-    }
+    },
   });
 
   const handleClose = () => {
@@ -115,12 +119,24 @@ const CancelOrderModal = ({ visible, order, onCancel, onConfirm }) => {
           <div className="bg-gray-50 p-4 rounded-lg">
             <h4 className="font-semibold mb-2">Thông tin đơn hàng</h4>
             <div className="space-y-1 text-sm">
-              <p><span className="text-gray-600">Mã đơn:</span> <span className="font-medium">#{order?.id}</span></p>
-              <p><span className="text-gray-600">Sản phẩm:</span> <span className="font-medium">{order?.name}</span></p>
-              <p><span className="text-gray-600">Tổng tiền:</span> <span className="font-medium text-red-600">
-                {(order?.total || order?.totalAmount || 0).toLocaleString()}đ
-              </span></p>
-              <p><span className="text-gray-600">Trạng thái:</span> <span className="font-medium">{order?.status}</span></p>
+              <p>
+                <span className="text-gray-600">Mã đơn:</span>{" "}
+                <span className="font-medium">#{order?.orderNumber}</span>
+              </p>
+              <p>
+                <span className="text-gray-600">Sản phẩm:</span>{" "}
+                <span className="font-medium">{order?.name}</span>
+              </p>
+              <p>
+                <span className="text-gray-600">Tổng tiền:</span>{" "}
+                <span className="font-medium text-red-600">
+                  {(order?.total || order?.totalAmount || 0).toLocaleString()}đ
+                </span>
+              </p>
+              <p>
+                <span className="text-gray-600">Trạng thái:</span>{" "}
+                <span className="font-medium">{order?.status}</span>
+              </p>
             </div>
           </div>
 
@@ -128,10 +144,14 @@ const CancelOrderModal = ({ visible, order, onCancel, onConfirm }) => {
           {cancellationFee > 0 && (
             <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
               <p className="text-yellow-800 font-medium">
-                Phí hủy đơn: <span className="text-red-600">{cancellationFee.toLocaleString()}đ</span>
+                Phí hủy đơn:{" "}
+                <span className="text-red-600">
+                  {cancellationFee.toLocaleString()}đ
+                </span>
               </p>
               <p className="text-sm text-yellow-700 mt-1">
-                Do đơn hàng đang được giao, bạn sẽ bị tính phí hủy 10% giá trị đơn hàng
+                Do đơn hàng đang được giao, bạn sẽ bị tính phí hủy 10% giá trị
+                đơn hàng
               </p>
             </div>
           )}
@@ -144,11 +164,17 @@ const CancelOrderModal = ({ visible, order, onCancel, onConfirm }) => {
             <Select
               placeholder="Chọn lý do hủy đơn"
               value={formik.values.selectedReason || undefined}
-              onChange={(value) => formik.setFieldValue("selectedReason", value)}
+              onChange={(value) =>
+                formik.setFieldValue("selectedReason", value)
+              }
               onBlur={() => formik.setFieldTouched("selectedReason", true)}
               className="w-full"
               size="large"
-              status={formik.touched.selectedReason && formik.errors.selectedReason ? "error" : ""}
+              status={
+                formik.touched.selectedReason && formik.errors.selectedReason
+                  ? "error"
+                  : ""
+              }
             >
               {cancelReasons.map((reason) => (
                 <Option key={reason} value={reason}>
@@ -157,7 +183,9 @@ const CancelOrderModal = ({ visible, order, onCancel, onConfirm }) => {
               ))}
             </Select>
             {formik.touched.selectedReason && formik.errors.selectedReason && (
-              <div className="text-red-500 text-sm mt-1">{formik.errors.selectedReason}</div>
+              <div className="text-red-500 text-sm mt-1">
+                {formik.errors.selectedReason}
+              </div>
             )}
           </div>
 
@@ -176,43 +204,61 @@ const CancelOrderModal = ({ visible, order, onCancel, onConfirm }) => {
                 rows={4}
                 maxLength={500}
                 showCount
-                status={formik.touched.customReason && formik.errors.customReason ? "error" : ""}
+                status={
+                  formik.touched.customReason && formik.errors.customReason
+                    ? "error"
+                    : ""
+                }
               />
               {formik.touched.customReason && formik.errors.customReason && (
-                <div className="text-red-500 text-sm mt-1">{formik.errors.customReason}</div>
+                <div className="text-red-500 text-sm mt-1">
+                  {formik.errors.customReason}
+                </div>
               )}
             </div>
           )}
 
           {/* Ghi chú thêm */}
-          {formik.values.selectedReason && formik.values.selectedReason !== "Lý do khác" && (
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Ghi chú thêm (không bắt buộc)
-              </label>
-              <TextArea
-                placeholder="Bạn có thể thêm ghi chú..."
-                name="customReason"
-                value={formik.values.customReason}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                rows={3}
-                maxLength={300}
-                showCount
-                status={formik.touched.customReason && formik.errors.customReason ? "error" : ""}
-              />
-              {formik.touched.customReason && formik.errors.customReason && (
-                <div className="text-red-500 text-sm mt-1">{formik.errors.customReason}</div>
-              )}
-            </div>
-          )}
+          {formik.values.selectedReason &&
+            formik.values.selectedReason !== "Lý do khác" && (
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Ghi chú thêm (không bắt buộc)
+                </label>
+                <TextArea
+                  placeholder="Bạn có thể thêm ghi chú..."
+                  name="customReason"
+                  value={formik.values.customReason}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  rows={3}
+                  maxLength={300}
+                  showCount
+                  status={
+                    formik.touched.customReason && formik.errors.customReason
+                      ? "error"
+                      : ""
+                  }
+                />
+                {formik.touched.customReason && formik.errors.customReason && (
+                  <div className="text-red-500 text-sm mt-1">
+                    {formik.errors.customReason}
+                  </div>
+                )}
+              </div>
+            )}
 
           {/* Chính sách hoàn tiền */}
           <div className="bg-blue-50 p-4 rounded-lg text-sm">
-            <h5 className="font-semibold text-blue-900 mb-2">📋 Chính sách hoàn tiền:</h5>
+            <h5 className="font-semibold text-blue-900 mb-2">
+              📋 Chính sách hoàn tiền:
+            </h5>
             <ul className="space-y-1 text-blue-800">
               <li>• Đơn hàng "Đang chờ": Hoàn 100% giá trị</li>
-              <li>• Đơn hàng "Đang giao": Hoàn 90% giá trị (trừ 10% phí vận chuyển)</li>
+              <li>
+                • Đơn hàng "Đang giao": Hoàn 90% giá trị (trừ 10% phí vận
+                chuyển)
+              </li>
               <li>• Thời gian hoàn tiền: 3-5 ngày làm việc</li>
             </ul>
           </div>
@@ -222,7 +268,9 @@ const CancelOrderModal = ({ visible, order, onCancel, onConfirm }) => {
             <Checkbox
               name="agreePolicy"
               checked={formik.values.agreePolicy}
-              onChange={(e) => formik.setFieldValue("agreePolicy", e.target.checked)}
+              onChange={(e) =>
+                formik.setFieldValue("agreePolicy", e.target.checked)
+              }
               onBlur={() => formik.setFieldTouched("agreePolicy", true)}
             >
               <span className="text-sm">
@@ -233,7 +281,9 @@ const CancelOrderModal = ({ visible, order, onCancel, onConfirm }) => {
               </span>
             </Checkbox>
             {formik.touched.agreePolicy && formik.errors.agreePolicy && (
-              <div className="text-red-500 text-sm mt-1">{formik.errors.agreePolicy}</div>
+              <div className="text-red-500 text-sm mt-1">
+                {formik.errors.agreePolicy}
+              </div>
             )}
           </div>
 

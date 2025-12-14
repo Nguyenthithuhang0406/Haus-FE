@@ -3,7 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import CommentForm from "./CommentForm";
 
-const CommentModal = ({ isOpen, onClose, product }) => {
+const CommentModal = ({ isOpen, onClose, product, onSuccess }) => {
   if (!isOpen) return null;
 
   return ReactDOM.createPortal(
@@ -13,7 +13,11 @@ const CommentModal = ({ isOpen, onClose, product }) => {
         onClick={onClose}
       ></div>
       <div className="relative z-20">
-        <CommentForm setIsShowAddComment={onClose} product={product} />
+        <CommentForm
+          setIsShowAddComment={onClose}
+          product={product}
+          onSuccess={onSuccess}
+        />
       </div>
     </div>,
     document.body

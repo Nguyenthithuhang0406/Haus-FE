@@ -142,12 +142,14 @@ const RightComponent = ({
         <span className="font-semibold">Tình trạng: </span>
         <span
           className={`${
-            product?.soldQuantity !== product?.inventoryQuantity
+            (product?.productVariations[selectedVariantIndex]
+              ?.inventoryQuantity || 0) > 0
               ? "text-[#28a745]"
               : "text-red-500"
           }`}
         >
-          {product?.soldQuantity !== product?.inventoryQuantity
+          {(product?.productVariations[selectedVariantIndex]
+            ?.inventoryQuantity || 0) > 0
             ? "Còn hàng"
             : "Hết hàng"}
         </span>
@@ -252,9 +254,12 @@ const RightComponent = ({
           <div className="w-full flex items-center break-words">
             <IoIosFlash className="text-[24px] text-[#ad7555] mr-[10px]" />
             <p className="font-medium">
-              Sản phẩm hiện có{" "}
-              <span className="text-[#ad7555]">{countInCart}</span> người thêm
-              vào giỏ hàng.
+              Đã bán{" "}
+              <span className="text-[#ad7555]">
+                {product?.productVariations[selectedVariantIndex]
+                  ?.soldQuantity || 0}
+              </span>{" "}
+              sản phẩm.
             </p>
           </div>
         </div>
