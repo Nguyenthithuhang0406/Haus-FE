@@ -124,3 +124,17 @@ export const getBestSellerProducts = async (pageNum = 1, pageSize = 10) => {
     throw error;
   }
 };
+
+export const searchOrderByNumber = async (orderNumber) => {
+  try {
+    const response = await request(axiosPrivate, {
+      method: "GET",
+      url: `/order/search/${orderNumber}`,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi tra cứu đơn hàng:", error);
+    throw error;
+  }
+};

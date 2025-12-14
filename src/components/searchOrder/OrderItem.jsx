@@ -67,9 +67,13 @@ const OrderItem = ({ order, onCancelOrder }) => {
       <div className="bg-pink-50 rounded-lg p-3 sm:p-4 mb-4 shadow-sm">
         <div className="flex justify-between items-center mb-3 pb-2 border-b border-pink-200">
           <span className="text-xs sm:text-sm text-gray-600">
-            Mã đơn: <span className="font-semibold">#{order.id}</span>
+            Mã đơn: <span className="font-semibold">#{order.orderNumber}</span>
           </span>
-          <span className={`px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${getStatusColor(order.status)}`}>
+          <span
+            className={`px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${getStatusColor(
+              order.status
+            )}`}
+          >
             {order.status}
           </span>
         </div>
@@ -108,7 +112,10 @@ const OrderItem = ({ order, onCancelOrder }) => {
               {products.length} sản phẩm • Tổng tiền:{" "}
             </span>
             <span className="text-base sm:text-lg font-bold text-red-600">
-              {typeof order.total === "number" ? order.total.toLocaleString() : 0}đ
+              {typeof order.total === "number"
+                ? order.total.toLocaleString()
+                : 0}
+              đ
             </span>
           </div>
           <div className="self-center sm:self-auto">

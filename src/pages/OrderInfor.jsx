@@ -1,24 +1,28 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { Input, Pagination, Select, message } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import SidebarProfile from "@/components/auth/SidebarProfile";
 import OrderItem from "@/components/searchOrder/OrderItem";
 import InvoiceButton from "@/components/payment/bill/InvoiceButton";
-import { getAllOrder, getOrderById } from "@/api/order";
+import { getAllOrder, searchOrderByNumber } from "@/api/order";
 
 const { Option } = Select;
 
 const OrderInfor = () => {
   const [orders, setOrders] = useState([]);
-  const [filteredOrders, setFilteredOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [totalElements, setTotalElements] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const searchTimeoutRef = useRef(null);
 
   const pageSize = 2;
 
   const mapOrderStatusToUI = (status) => {
-    switch (status) {
+    // Xử lý cả uppercase và lowercase
+    const statusUpper = status?.toUpperCase();
+    switch (statusUpper) {
       case "PENDING":
       case "CONFIRMED":
       case "PROCESSING":
@@ -28,6 +32,7 @@ const OrderInfor = () => {
       case "COMPLETED":
         return "Đã giao";
       case "CANCELLED":
+      case "CANCELED":
       case "RETURNED":
       case "REFUNDED":
       case "FAIL":
@@ -38,12 +43,16 @@ const OrderInfor = () => {
   };
 
   const mapPaymentStatusToUI = (status) => {
-    switch (status) {
+    if (!status) return "Chưa thanh toán";
+    // Xử lý cả uppercase và lowercase
+    const statusUpper = status.toUpperCase();
+    switch (statusUpper) {
       case "COMPLETED":
         return "Đã thanh toán";
       case "PENDING":
       case "EXPIRED":
       case "CANCELLED":
+      case "CANCELED":
       case "REFUNDED":
         return "Chưa thanh toán";
       default:
@@ -51,17 +60,33 @@ const OrderInfor = () => {
     }
   };
 
-  const fetchOrders = async () => {
-    try {
-      const response = await getAllOrder({ pageNum: 1, pageSize: 100 });
+  const formatOrder = (order) => {
+    // Xử lý địa chỉ từ recipientInfo (có thể null)
+    const recipientInfo = order.recipientInfo || {};
+    const addressParts = [
+      recipientInfo.detailAddress,
+      recipientInfo.commune,
+      recipientInfo.district,
+      recipientInfo.city,
+      recipientInfo.country,
+    ].filter(Boolean);
+    const shippingAddress = addressParts.join(", ") || "";
 
-      console.log("response order:", response);
-      // API trả về danh sách => response.data.list
-      const list = response.data?.list || [];
+    // Kiểm tra status để xác định có bị hoàn không
+    const statusUI = mapOrderStatusToUI(order.status);
+    const isCancelled = [
+      "CANCELLED",
+      "CANCELED",
+      "RETURNED",
+      "REFUNDED",
+      "FAIL",
+    ].includes(order.status?.toUpperCase());
 
-      const formatted = list.map((order) => ({
-        id: order.id,
-        products: order.products?.map((p) => ({
+    return {
+      orderNumber: order.orderNumber,
+      id: order.id,
+      products:
+        order.products?.map((p) => ({
           id: p.productId,
           name: p.productName,
           type: `${p.color || ""} ${p.size || ""}`.trim(),
@@ -69,34 +94,149 @@ const OrderInfor = () => {
           price: p.priceAtSale || 0,
           image: p.image,
           total: p.total || 0,
-        })),
-        total: order.totalAmount || 0,
-        status: mapOrderStatusToUI(order.status),
-        shippingAddress: order.recipientInfo?.detailAddress || "",
-        phone: order.recipientInfo?.phoneNumber || "",
-        shippingFee: order.shippingFee || 30000,
-        trackingCode: order.orderNumber,
-        paymentMethod:
-          order.payment?.type === "CASH_ON_DELIVERY"
-            ? "Thanh toán khi nhận hàng"
-            : order.payment?.type,
-        paymentStatus: mapPaymentStatusToUI(order.payment?.status),
-        createdAt: order.orderDate,
-        cancelReason:
-          order.status === "Bị hoàn" ? "Đơn hàng đã bị hủy/hoàn" : null,
-        canceledAt: order.status === "Bị hoàn" ? order.updatedAt : null,
-      }));
+        })) || [],
+      total: order.totalAmount || 0,
+      status: statusUI,
+      shippingAddress: shippingAddress,
+      phone: recipientInfo.phoneNumber || "",
+      shippingFee: order.shippingFee || 0,
+      trackingCode: order.orderNumber,
+      paymentMethod:
+        order.payment?.type === "CASH_ON_DELIVERY"
+          ? "Thanh toán khi nhận hàng"
+          : order.payment?.type || "",
+      paymentStatus: mapPaymentStatusToUI(order.payment?.status),
+      createdAt: order.orderDate || order.createdAt,
+      cancelReason: isCancelled ? "Đơn hàng đã bị hủy/hoàn" : null,
+      canceledAt: isCancelled ? order.updatedAt : null,
+    };
+  };
+
+  const fetchOrders = async (
+    pageNum = 1,
+    status = "all",
+    customPageSize = null
+  ) => {
+    try {
+      setLoading(true);
+      // Map status filter từ UI sang API
+      let apiStatus = undefined;
+      if (status !== "all") {
+        // Map từ UI status sang API status
+        const statusMap = {
+          "Đang chờ": ["pending", "confirmed", "processing"],
+          "Đang giao": "delivered",
+          "Đã giao": "completed",
+          "Bị hoàn": ["cancelled", "returned", "refunded", "fail"],
+        };
+
+        if (statusMap[status]) {
+          if (typeof statusMap[status] === "string") {
+            apiStatus = statusMap[status];
+          }
+        }
+      }
+
+      const response = await getAllOrder({
+        pageNum,
+        pageSize: customPageSize || pageSize,
+        status: apiStatus,
+      });
+
+      const list = response.data?.items || [];
+      const formatted = list.map(formatOrder);
 
       setOrders(formatted);
-      setFilteredOrders(formatted);
+
+      if (response.data?.pageCustom) {
+        setTotalElements(response.data.pageCustom.totalElement || 0);
+      }
     } catch (error) {
       console.log(error);
       message.error("Lấy danh sách đơn hàng thất bại!");
+    } finally {
+      setLoading(false);
     }
   };
 
+  const handleSearchOrder = async (orderNumber) => {
+    try {
+      setLoading(true);
+      const response = await searchOrderByNumber(orderNumber);
+
+      // API trả về response.data chứa thông tin đơn hàng
+      if (response.data) {
+        const formatted = formatOrder(response.data);
+        setOrders([formatted]);
+        setTotalElements(1);
+      } else {
+        setOrders([]);
+        setTotalElements(0);
+        message.info("Không tìm thấy đơn hàng với mã này");
+      }
+    } catch (error) {
+      console.log(error);
+      setOrders([]);
+      setTotalElements(0);
+      // Kiểm tra nếu là lỗi 404 hoặc không tìm thấy
+      if (error.response?.status === 404 || error.response?.status === 400) {
+        message.warning("Không tìm thấy đơn hàng với mã này");
+      } else {
+        message.error("Lỗi khi tra cứu đơn hàng!");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Xử lý search theo mã đơn hàng với debounce
   useEffect(() => {
-    fetchOrders();
+    const text = searchText.trim();
+
+    // Clear timeout cũ nếu có
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+      searchTimeoutRef.current = null;
+    }
+
+    // Nếu không có search, reset về trang 1 và gọi API ngay lập tức
+    if (text === "") {
+      setCurrentPage(1);
+      fetchOrders(1, statusFilter);
+      return;
+    }
+
+    // Debounce: chỉ gọi API sau 800ms khi người dùng dừng nhập
+    // Tăng thời gian debounce để tránh gọi API quá nhiều
+    searchTimeoutRef.current = setTimeout(() => {
+      handleSearchOrder(text);
+      searchTimeoutRef.current = null;
+    }, 800);
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+        searchTimeoutRef.current = null;
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchText]);
+
+  // Xử lý filter status và pagination
+  useEffect(() => {
+    const text = searchText.trim();
+
+    // Chỉ gọi API khi không có search
+    if (text === "") {
+      fetchOrders(currentPage, statusFilter);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, statusFilter]);
+
+  // Load dữ liệu ban đầu
+  useEffect(() => {
+    fetchOrders(1, "all");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleCancelOrder = (orderId, cancelData) => {
@@ -114,89 +254,24 @@ const OrderInfor = () => {
     );
   };
 
-  useEffect(() => {
-    const fetchById = async (id) => {
-      try {
-        const orderData = await getOrderById(id);
+  // Hiển thị orders (khi search thì đã gọi API và set orders rồi)
+  const displayOrders = useMemo(() => {
+    return orders;
+  }, [orders]);
 
-        if (!orderData) {
-          setFilteredOrders([]);
-          return;
-        }
-
-        const formattedOrder = {
-          id: orderData.id,
-          products: orderData.products?.map((p) => ({
-            id: p.productId,
-            name: p.productName,
-            type: `${p.color || ""} ${p.size || ""}`.trim(),
-            quantity: p.quantity,
-            price: p.priceAtSale || 0,
-            image: p.image,
-            total: p.total || 0,
-          })),
-          total: orderData.totalAmount || 0,
-          status: mapOrderStatusToUI(orderData.status),
-          shippingAddress: orderData.recipientInfo?.detailAddress || "",
-          phone: orderData.recipientInfo?.phoneNumber || "",
-          shippingFee: orderData.shippingFee || 30000,
-          trackingCode: orderData.orderNumber,
-          paymentMethod:
-            orderData.payment?.type === "CASH_ON_DELIVERY"
-              ? "Thanh toán khi nhận hàng"
-              : orderData.payment?.type,
-          paymentStatus: mapPaymentStatusToUI(orderData.payment?.status),
-          createdAt: orderData.orderDate,
-          cancelReason:
-            orderData.status === "Bị hoàn" ? "Đơn hàng đã bị hủy/hoàn" : null,
-          canceledAt:
-            orderData.status === "Bị hoàn" ? orderData.updatedAt : null,
-        };
-
-        setFilteredOrders([formattedOrder]);
-      } catch (error) {
-        if (error?.response?.status === 404) {
-          message.error("Đơn hàng không tồn tại!");
-        } else {
-          message.error("Không thể tìm đơn hàng!");
-        }
-        setFilteredOrders([]);
-      }
-    };
-
-    let result = [...orders];
+  // Cập nhật totalElements khi search
+  const displayTotal = useMemo(() => {
     const text = searchText.trim();
-
-    // Search
     if (text !== "") {
-      if (!isNaN(Number(text))) {
-        fetchById(Number(text));
-        return;
-      } else {
-        result = result.filter((order) =>
-          order.products?.some((p) =>
-            p.name.toLowerCase().includes(text.toLowerCase())
-          )
-        );
-      }
+      // Khi search, total là số orders từ API
+      return totalElements;
     }
-
-    // Filter trạng thái
-    if (statusFilter !== "all") {
-      result = result.filter((order) => order.status === statusFilter);
-    }
-
-    setFilteredOrders(result);
-    setCurrentPage(1);
-  }, [searchText, statusFilter, orders]);
-
-  const getCurrentPageOrders = () => {
-    const start = (currentPage - 1) * pageSize;
-    return filteredOrders.slice(start, start + pageSize);
-  };
+    return totalElements;
+  }, [totalElements, searchText]);
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-[80px] sm:pt-[100px]">
+    <>
+      <div className="min-h-screen bg-gray-50 pt-[80px] sm:pt-[100px]">
         <div className="container mx-auto px-4 sm:px-8 md:px-12 lg:px-20 py-4 sm:py-8">
           <div className="flex flex-col lg:flex-row gap-4 sm:gap-8">
             <SidebarProfile />
@@ -213,12 +288,26 @@ const OrderInfor = () => {
                 <div className="p-6 border-b">
                   <div className="flex flex-col md:flex-row gap-4">
                     <Input
-                      placeholder="Tìm kiếm theo tên sản phẩm hoặc mã đơn hàng"
+                      placeholder="Tìm kiếm theo mã đơn hàng"
                       prefix={<SearchOutlined />}
                       value={searchText}
                       onChange={(e) => setSearchText(e.target.value)}
                       className="flex-1"
                       size="large"
+                      onPressEnter={(e) => {
+                        const text = e.target.value.trim();
+                        // Clear timeout để tránh duplicate calls và gọi API ngay lập tức
+                        if (searchTimeoutRef.current) {
+                          clearTimeout(searchTimeoutRef.current);
+                          searchTimeoutRef.current = null;
+                        }
+                        if (text !== "") {
+                          handleSearchOrder(text);
+                        } else {
+                          setCurrentPage(1);
+                          fetchOrders(1, statusFilter);
+                        }
+                      }}
                     />
 
                     <Select
@@ -237,32 +326,54 @@ const OrderInfor = () => {
                 </div>
 
                 {/* Orders */}
-                <div className="p-4 sm:p-6">
-                  {getCurrentPageOrders().length > 0 ? (
-                    getCurrentPageOrders().map((order) => (
-                      <OrderItem
-                        key={order.id}
-                        order={order}
-                        onCancelOrder={handleCancelOrder}
-                      />
-                    ))
-                  ) : (
+                <div className="p-4 sm:p-6 min-h-[400px] relative">
+                  {displayOrders.length > 0 ? (
+                    <div
+                      className={`transition-opacity duration-300 ${
+                        loading
+                          ? "opacity-50 pointer-events-none"
+                          : "opacity-100"
+                      }`}
+                    >
+                      {displayOrders.map((order) => (
+                        <OrderItem
+                          key={order.id}
+                          order={order}
+                          onCancelOrder={handleCancelOrder}
+                        />
+                      ))}
+                    </div>
+                  ) : !loading ? (
                     <div className="text-center py-12 text-gray-500">
                       <p className="text-sm sm:text-base">
                         Không tìm thấy đơn hàng nào
                       </p>
                     </div>
+                  ) : (
+                    <div className="text-center py-12 text-gray-500">
+                      <p className="text-sm sm:text-base">
+                        Đang tải dữ liệu...
+                      </p>
+                    </div>
+                  )}
+                  {loading && displayOrders.length > 0 && (
+                    <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                      <div className="flex flex-col items-center gap-3 bg-white bg-opacity-90 px-4 py-2 rounded-lg">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#ad7555]"></div>
+                        <p className="text-xs text-gray-500">Đang tải...</p>
+                      </div>
+                    </div>
                   )}
                 </div>
 
-                {/* Pagination */}
-                {filteredOrders.length > 0 && (
+                {/* Pagination - chỉ hiển thị khi không search */}
+                {displayTotal > 0 && searchText.trim() === "" && (
                   <div className="p-4 sm:p-6 border-t flex justify-center">
                     <Pagination
                       current={currentPage}
-                      total={filteredOrders.length}
+                      total={displayTotal}
                       pageSize={pageSize}
-                      onChange={setCurrentPage}
+                      onChange={(page) => setCurrentPage(page)}
                       showSizeChanger={false}
                       responsive
                       size="small"
@@ -275,9 +386,8 @@ const OrderInfor = () => {
         </div>
       </div>
 
-      {getCurrentPageOrders()[0] && (
-        <InvoiceButton orderId={getCurrentPageOrders()[0].id} />
-      )}
+      {displayOrders[0] && <InvoiceButton orderId={displayOrders[0].id} />}
+    </>
   );
 };
 
