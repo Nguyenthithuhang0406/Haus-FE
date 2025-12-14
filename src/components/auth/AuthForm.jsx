@@ -48,7 +48,7 @@ export default function AuthForm() {
           await dispatch(loadCartQuantity());
 
           toast.success("Đăng nhập thành công!");
-          
+
           // Kiểm tra return URL và redirect về đó, nếu không có thì về home
           const returnUrl = getReturnUrl();
           navigate(returnUrl || "/");

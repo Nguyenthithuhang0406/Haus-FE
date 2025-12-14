@@ -32,4 +32,3 @@ export const getReturnUrl = () => {
 export const clearReturnUrl = () => {
   sessionStorage.removeItem(RETURN_URL_KEY);
 };
-
