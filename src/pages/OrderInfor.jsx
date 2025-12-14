@@ -19,24 +19,6 @@ const OrderInfor = () => {
 
   const pageSize = 2;
 
-  // Map status từ tiếng Anh sang tiếng Việt (đồng bộ với admin)
-  const mapStatusToVietnamese = (status) => {
-    if (!status) return status;
-    const statusLower = status.toLowerCase();
-    const statusMap = {
-      pending: "Đang chờ",
-      confirmed: "Đã xác nhận",
-      processing: "Đang xử lý",
-      delivered: "Đã giao",
-      completed: "Hoàn thành",
-      returned: "Đã trả hàng",
-      cancelled: "Đã hủy",
-      canceled: "Đã hủy",
-      refunded: "Đã hoàn tiền",
-    };
-    return statusMap[statusLower] || status;
-  };
-
   const mapPaymentStatusToUI = (status) => {
     if (!status) return "Chưa thanh toán";
     // Xử lý cả uppercase và lowercase
@@ -112,17 +94,11 @@ const OrderInfor = () => {
   ) => {
     try {
       setLoading(true);
-      // Sử dụng status trực tiếp từ filter (không cần map)
-      let apiStatus = undefined;
-      if (status !== "all") {
-        // Chuyển từ format hiển thị về format API (lowercase)
-        apiStatus = status.toLowerCase();
-      }
-
+      // Sử dụng status trực tiếp từ filter (giống admin - lowercase)
       const response = await getAllOrder({
+        status: status && status !== "all" ? status : undefined,
         pageNum,
         pageSize: customPageSize || pageSize,
-        status: apiStatus,
       });
 
       const list = response.data?.items || [];

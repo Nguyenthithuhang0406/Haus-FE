@@ -1,13 +1,16 @@
 import React, { useState } from "react";
-import { DownOutlined, UpOutlined } from "@ant-design/icons";
+import { DownOutlined, UpOutlined, DownloadOutlined } from "@ant-design/icons";
+import { message } from "antd";
 import CancelOrderModal from "./CancelOrderModal";
 import OrderDetailModal from "./OrderDetailModal";
 import ProductRow from "./ProductRow";
+import { getInvoicePdf } from "@/api/order";
 
 const OrderItem = ({ order, onCancelOrder }) => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   const products = order.products || [
     {
@@ -113,6 +116,38 @@ const OrderItem = ({ order, onCancelOrder }) => {
     onCancelOrder(orderId, cancelData);
   };
 
+  const handleDownloadInvoice = async () => {
+    try {
+      setDownloading(true);
+      const response = await getInvoicePdf(order.id);
+
+      // Tạo blob từ response
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute(
+        "download",
+        `invoice_${order.orderNumber || order.id}.pdf`
+      );
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      message.success("Tải hóa đơn thành công!");
+    } catch (error) {
+      console.error("Lỗi tải hóa đơn PDF:", error);
+      if (error?.response?.status === 404) {
+        message.error("Không tìm thấy hóa đơn!");
+      } else {
+        message.error("Lỗi khi tải hóa đơn PDF!");
+      }
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   const getStatusAction = (status) => {
     if (!status) return null;
     const statusLower = status.toLowerCase();
@@ -150,16 +185,38 @@ const OrderItem = ({ order, onCancelOrder }) => {
           <span className="text-xs sm:text-sm text-gray-600">
             Mã đơn: <span className="font-semibold">#{order.orderNumber}</span>
           </span>
-          {(() => {
-            const statusConfig = getStatusConfig(order.status);
-            return (
-              <span
-                className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ${statusConfig.bg} ${statusConfig.text} border ${statusConfig.border}`}
+          <div className="flex items-center gap-2">
+            {(() => {
+              const statusConfig = getStatusConfig(order.status);
+              return (
+                <span
+                  className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ${statusConfig.bg} ${statusConfig.text} border ${statusConfig.border}`}
+                >
+                  {mapStatusToVietnamese(order.status)}
+                </span>
+              );
+            })()}
+            {order.status?.toLowerCase() === "completed" && (
+              <button
+                onClick={handleDownloadInvoice}
+                disabled={downloading}
+                className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Tải hóa đơn"
               >
-                {mapStatusToVietnamese(order.status)}
-              </span>
-            );
-          })()}
+                {downloading ? (
+                  <>
+                    <span className="animate-spin">⏳</span>
+                    <span className="hidden sm:inline">Đang tải...</span>
+                  </>
+                ) : (
+                  <>
+                    <DownloadOutlined className="text-xs" />
+                    <span className="hidden sm:inline">Hóa đơn</span>
+                  </>
+                )}
+              </button>
+            )}
+          </div>
         </div>
         <div className="space-y-3">
           {displayedProducts.map((product, index) => (
