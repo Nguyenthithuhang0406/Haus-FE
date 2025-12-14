@@ -13,9 +13,9 @@ const ReComment = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-
         const reviewRes = await getTopReviews(1, 10);
-        setReviews(reviewRes.items || []);
+        // API trả về: { status, message, data: { items, pageCustom } }
+        setReviews(reviewRes.data?.items || []);
 
       } catch (error) {
         console.error("Lỗi tải dữ liệu:", error);
