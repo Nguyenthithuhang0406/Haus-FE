@@ -1,9 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { FaStar, FaRegStar, FaRegStarHalfStroke } from "react-icons/fa6";
 import { Pagination } from "antd";
+import { useNavigate } from "react-router-dom";
 import CommentModal from "./CommentModal";
 import { getProductReviews, getProductReviewsByRating } from "@/api/review";
 import { detailProduct } from "@/utils/contants/product";
+import { isLoggedIn } from "@/utils/checkLogin";
+import { saveReturnUrl } from "@/utils/returnUrl";
 
 const ReviewComponent = ({ product }) => {
   const [isShowAddComment, setIsShowAddComment] = useState(false);
@@ -14,8 +17,20 @@ const ReviewComponent = ({ product }) => {
   const [totalItems, setTotalItems] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const pageSize = 10;
+  const navigate = useNavigate();
 
   const fakeProduct = detailProduct;
+
+  // Xử lý click nút "Gửi đánh giá của bạn"
+  const handleClickAddComment = () => {
+    if (!isLoggedIn()) {
+      alert("Bạn cần đăng nhập để đánh giá sản phẩm!");
+      saveReturnUrl(); // Lưu URL hiện tại để quay lại sau khi đăng nhập
+      navigate("/auth");
+      return;
+    }
+    setIsShowAddComment(true);
+  };
 
   // Hàm load review: nếu có rating thì gọi API lọc theo rating
   const loadReviews = useCallback(
@@ -86,7 +101,7 @@ const ReviewComponent = ({ product }) => {
 
           <button
             className="bg-[#80BB35] text-white px-[17px] py-[8px] border border-[#80BB35] rounded-md hover:bg-transparent hover:text-[#80BB35] transition"
-            onClick={() => setIsShowAddComment(true)}
+            onClick={handleClickAddComment}
           >
             Gửi đánh giá của bạn
           </button>

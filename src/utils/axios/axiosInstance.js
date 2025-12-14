@@ -2,6 +2,7 @@ import axios from "axios";
 import { get, set } from "lodash";
 import { getCookie, removeAllCookies } from "../cookies";
 import { refreshToken } from "@/api/auth";
+import { saveReturnUrl } from "../returnUrl";
 
 const createAxiosInstance = (baseURL) => {
   return axios.create({
@@ -93,6 +94,7 @@ axiosPrivate.interceptors.response.use(
       } catch (error) {
         processQueue(error, null);
         removeAllCookies();
+        saveReturnUrl(); // Lưu URL hiện tại để quay lại sau khi đăng nhập
         window.location.href = "/auth";
         return Promise.reject(error);
       } finally {

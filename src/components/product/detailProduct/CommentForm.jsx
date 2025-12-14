@@ -3,21 +3,12 @@ import { IoMdClose } from "react-icons/io";
 import { IoSend } from "react-icons/io5";
 import { FaStar } from "react-icons/fa6";
 import { addProductReview } from "@/api/review";
-import { isLoggedIn } from "@/utils/checkLogin";
-import { useNavigate } from "react-router-dom";
 const CommentForm = ({ setIsShowAddComment, product, onSuccess }) => {
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
-  const navigator = useNavigate();
 
   const handleAddComment = async () => {
-    if (!isLoggedIn()) {
-      alert("Bạn cần đăng nhập để đánh giá sản phẩm!");
-      navigator("/auth");
-      return;
-    }
-
     if (rating === 0) {
       alert("Vui lòng chọn số sao đánh giá!");
       return;

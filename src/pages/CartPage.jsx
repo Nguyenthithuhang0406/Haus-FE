@@ -6,6 +6,7 @@ import CartSummary from "@/components/cart/CartSummary";
 import PaginationComponent from "@/components/cart/Pagination";
 import { useNavigate } from "react-router-dom";
 import { isLoggedIn } from "@/utils/checkLogin";
+import { saveReturnUrl } from "@/utils/returnUrl";
 import { useDispatch, useSelector } from "react-redux";
 import {
   clearCart,
@@ -681,6 +682,7 @@ const CartPage = () => {
     if (isLoggedIn()) {
       navigate("/paymentPage");
     } else {
+      saveReturnUrl(); // Lưu URL hiện tại để quay lại sau khi đăng nhập
       navigate("/auth");
     }
   };

@@ -13,8 +13,8 @@ const CommentModal = ({ isOpen, onClose, product, onSuccess }) => {
         onClick={onClose}
       ></div>
       <div className="relative z-20">
-        <CommentForm 
-          setIsShowAddComment={onClose} 
+        <CommentForm
+          setIsShowAddComment={onClose}
           product={product}
           onSuccess={onSuccess}
         />
