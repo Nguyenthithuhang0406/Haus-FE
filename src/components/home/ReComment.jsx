@@ -7,7 +7,6 @@ import { FaQuoteRight } from "react-icons/fa6";
 import { getTopReviews } from "@/api/review";
 
 const ReComment = () => {
-
   const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
@@ -16,7 +15,6 @@ const ReComment = () => {
         const reviewRes = await getTopReviews(1, 10);
         // API trả về: { status, message, data: { items, pageCustom } }
         setReviews(reviewRes.data?.items || []);
-
       } catch (error) {
         console.error("Lỗi tải dữ liệu:", error);
       }

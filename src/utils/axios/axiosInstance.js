@@ -79,19 +79,33 @@ axiosPrivate.interceptors.response.use(
           });
       }
 
+      const refreshTokenCookie = getCookie("refreshToken");
+      if (!refreshTokenCookie) {
+        removeAllCookies();
+        saveReturnUrl();
+        window.location.href = "/auth";
+        return Promise.reject(new Error("No refresh token available"));
+      }
+
       originalRequest._retry = true;
       isRefreshing = true;
 
       try {
         const response = await refreshToken();
         const { accessToken } = response.data;
+
+        // Cập nhật header mặc định
         axiosPrivate.defaults.headers.common["Authorization"] =
           "Bearer " + accessToken;
+
+        // Cập nhật header cho request hiện tại
+        originalRequest.headers["Authorization"] = "Bearer " + accessToken;
 
         processQueue(null, accessToken);
 
         return axiosPrivate(originalRequest);
       } catch (error) {
+        console.error("Refresh token failed:", error);
         processQueue(error, null);
         removeAllCookies();
         saveReturnUrl(); // Lưu URL hiện tại để quay lại sau khi đăng nhập
@@ -107,7 +121,7 @@ axiosPrivate.interceptors.response.use(
     //   window.location.href = "/auth";
     //   return Promise.reject(error);
     // }
-    
+
     const errorResponse = {
       status: get(error, "response.status", null),
       message: get(error, "response.data.message", null),

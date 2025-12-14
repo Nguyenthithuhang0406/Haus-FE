@@ -9,27 +9,45 @@ import { toast } from "react-toastify";
 import { getAllOrder, updateOrderStatus } from "@/api/order";
 
 const mapOrderData = (apiOrder) => {
-  const user = apiOrder.user || {};
-  const customerName =
-    `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
-    user.username ||
-    "";
+  // Lấy thông tin khách hàng từ recipientInfo
+  const recipientInfo = apiOrder.recipientInfo || {};
+  const customerName = recipientInfo.recipientName || "";
+  const phone = recipientInfo.phoneNumber || "";
+
+  // Tạo địa chỉ giao hàng từ recipientInfo
+  const addressParts = [
+    recipientInfo.detailAddress,
+    recipientInfo.commune,
+    recipientInfo.district,
+    recipientInfo.city,
+    recipientInfo.country,
+  ].filter(Boolean);
+  const shippingAddress = addressParts.join(", ") || "";
 
   // Calculate subtotal and discount
   const totalAmount = apiOrder.totalAmount || 0;
   const shippingFee = apiOrder.shippingFee || 0;
   const discountPercent = apiOrder.promotion?.discountPercent || 0;
+
+  // Calculate from products total (similar to OrderDetail)
+  const productsTotal =
+    apiOrder.products?.reduce(
+      (sum, product) => sum + (product.total || 0),
+      0
+    ) || 0;
   const discountAmount =
-    discountPercent > 0 ? Math.round((totalAmount * discountPercent) / 100) : 0;
-  const subtotal = totalAmount - shippingFee + discountAmount;
+    discountPercent > 0
+      ? Math.round((productsTotal * discountPercent) / 100)
+      : 0;
+  const subtotal = productsTotal - discountAmount;
 
   return {
     id: apiOrder.id,
     orderNumber: apiOrder.orderNumber || "",
     orderCode: apiOrder.orderNumber || "", // Keep for backward compatibility
     customerName: customerName,
-    phone: user.phone || "",
-    email: user.email || "",
+    phone: phone,
+    email: "", // Không có email trong recipientInfo
     orderDate: apiOrder.orderDate || "",
     deliveryDate: apiOrder.deliveryDate || null,
     status: apiOrder.status || "pending",
@@ -37,12 +55,12 @@ const mapOrderData = (apiOrder) => {
     shippingFee: shippingFee,
     subtotal: subtotal,
     discount: discountAmount,
-    paymentMethod: apiOrder.payment?.type || apiOrder.paymentMethod || "COD",
+    paymentMethod: apiOrder.payment?.type || "COD",
     payment: apiOrder.payment || null,
     promotion: apiOrder.promotion || null,
-    shippingAddress: apiOrder.shippingAddress || "",
-    items: apiOrder.items || [],
-    user: apiOrder.user || null, // Keep user object for detail view
+    shippingAddress: shippingAddress,
+    items: apiOrder.products || [], // Lấy từ products thay vì items
+    recipientInfo: recipientInfo, // Giữ nguyên recipientInfo cho detail view
   };
 };
 
@@ -96,6 +114,7 @@ const OrderManagement = () => {
       setFilters((prev) => ({ ...prev, pageNum: 1 }));
       setCurrentPage(1);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.status]);
 
   useEffect(() => {
@@ -109,6 +128,7 @@ const OrderManagement = () => {
       setFilters((prev) => ({ ...prev, pageNum: 1 }));
       setCurrentPage(1);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     filters.orderCode,
     filters.customerName,

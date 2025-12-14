@@ -16,23 +16,23 @@ const Heada = ({ toggleMenu, activeItem, isMenuOpen }) => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
   const handleLogout = () => {
     // Xóa token/thông tin đăng nhập nếu có
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     sessionStorage.clear();
-    
+
     // Đóng dropdown
     setIsDropdownOpen(false);
-    
+
     // Chuyển về trang đăng nhập
-    navigate('/auth');
+    navigate("/auth");
   };
 
   return (
@@ -54,18 +54,21 @@ const Heada = ({ toggleMenu, activeItem, isMenuOpen }) => {
       </div>
 
       <div className="flex items-center space-x-4 text-white">
-        <Logo className="h-16 w-10" />
-        
+        <Logo
+          className="h-16 w-10 cursor-pointer"
+          onClick={() => navigate("/")}
+        />
+
         <div className="relative" ref={dropdownRef}>
-          <button 
+          <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="flex items-center space-x-2 text-white hover:text-[#FFE4B5] transition-colors duration-200 focus:outline-none"
           >
             <span>Admin</span>
-            <ChevronDown 
+            <ChevronDown
               className={`w-4 h-4 transform transition-transform duration-200 ${
-                isDropdownOpen ? 'rotate-180' : ''
-              }`} 
+                isDropdownOpen ? "rotate-180" : ""
+              }`}
             />
           </button>
 
