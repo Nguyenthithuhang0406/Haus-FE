@@ -176,6 +176,10 @@ const ReviewComponent = ({ product }) => {
           isOpen={isShowAddComment}
           onClose={() => setIsShowAddComment(false)}
           product={product}
+          onSuccess={() => {
+            // Reload reviews sau khi add comment thành công
+            loadReviews(filterStar, currentPage);
+          }}
         />
       )}
     </div>

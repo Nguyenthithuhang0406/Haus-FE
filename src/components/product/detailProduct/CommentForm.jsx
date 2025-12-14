@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { IoSend } from "react-icons/io5";
@@ -6,7 +5,7 @@ import { FaStar } from "react-icons/fa6";
 import { addProductReview } from "@/api/review";
 import { isLoggedIn } from "@/utils/checkLogin";
 import { useNavigate } from "react-router-dom";
-const CommentForm = ({ setIsShowAddComment, product }) => {
+const CommentForm = ({ setIsShowAddComment, product, onSuccess }) => {
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -35,8 +34,11 @@ const CommentForm = ({ setIsShowAddComment, product }) => {
         content: comment,
       });
 
-      alert("Đánh giá thành công!");
       setIsShowAddComment(false);
+      // Gọi callback để reload reviews sau khi add comment thành công
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (error) {
       if (error.response && error.response.status === 401) {
         alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
