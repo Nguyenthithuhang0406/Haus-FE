@@ -19,27 +19,22 @@ const OrderInfor = () => {
 
   const pageSize = 2;
 
-  const mapOrderStatusToUI = (status) => {
-    // Xử lý cả uppercase và lowercase
-    const statusUpper = status?.toUpperCase();
-    switch (statusUpper) {
-      case "PENDING":
-      case "CONFIRMED":
-      case "PROCESSING":
-        return "Đang chờ";
-      case "DELIVERED":
-        return "Đang giao";
-      case "COMPLETED":
-        return "Đã giao";
-      case "CANCELLED":
-      case "CANCELED":
-      case "RETURNED":
-      case "REFUNDED":
-      case "FAIL":
-        return "Bị hoàn";
-      default:
-        return status;
-    }
+  // Map status từ tiếng Anh sang tiếng Việt (đồng bộ với admin)
+  const mapStatusToVietnamese = (status) => {
+    if (!status) return status;
+    const statusLower = status.toLowerCase();
+    const statusMap = {
+      pending: "Đang chờ",
+      confirmed: "Đã xác nhận",
+      processing: "Đang xử lý",
+      delivered: "Đã giao",
+      completed: "Hoàn thành",
+      returned: "Đã trả hàng",
+      cancelled: "Đã hủy",
+      canceled: "Đã hủy",
+      refunded: "Đã hoàn tiền",
+    };
+    return statusMap[statusLower] || status;
   };
 
   const mapPaymentStatusToUI = (status) => {
@@ -72,14 +67,12 @@ const OrderInfor = () => {
     ].filter(Boolean);
     const shippingAddress = addressParts.join(", ") || "";
 
-    // Kiểm tra status để xác định có bị hoàn không
-    const statusUI = mapOrderStatusToUI(order.status);
+    // Giữ nguyên status gốc (tiếng Anh) để dùng cho màu sắc
     const isCancelled = [
       "CANCELLED",
       "CANCELED",
       "RETURNED",
       "REFUNDED",
-      "FAIL",
     ].includes(order.status?.toUpperCase());
 
     return {
@@ -96,7 +89,7 @@ const OrderInfor = () => {
           total: p.total || 0,
         })) || [],
       total: order.totalAmount || 0,
-      status: statusUI,
+      status: order.status, // Giữ nguyên status gốc (tiếng Anh)
       shippingAddress: shippingAddress,
       phone: recipientInfo.phoneNumber || "",
       shippingFee: order.shippingFee || 0,
@@ -119,22 +112,11 @@ const OrderInfor = () => {
   ) => {
     try {
       setLoading(true);
-      // Map status filter từ UI sang API
+      // Sử dụng status trực tiếp từ filter (không cần map)
       let apiStatus = undefined;
       if (status !== "all") {
-        // Map từ UI status sang API status
-        const statusMap = {
-          "Đang chờ": ["pending", "confirmed", "processing"],
-          "Đang giao": "delivered",
-          "Đã giao": "completed",
-          "Bị hoàn": ["cancelled", "returned", "refunded", "fail"],
-        };
-
-        if (statusMap[status]) {
-          if (typeof statusMap[status] === "string") {
-            apiStatus = statusMap[status];
-          }
-        }
+        // Chuyển từ format hiển thị về format API (lowercase)
+        apiStatus = status.toLowerCase();
       }
 
       const response = await getAllOrder({
@@ -317,10 +299,14 @@ const OrderInfor = () => {
                       className="w-full md:w-48"
                     >
                       <Option value="all">Tất cả trạng thái</Option>
-                      <Option value="Đang chờ">Đang chờ</Option>
-                      <Option value="Đang giao">Đang giao</Option>
-                      <Option value="Đã giao">Đã giao</Option>
-                      <Option value="Bị hoàn">Bị hoàn</Option>
+                      <Option value="pending">Đang chờ</Option>
+                      <Option value="confirmed">Đã xác nhận</Option>
+                      <Option value="processing">Đang xử lý</Option>
+                      <Option value="delivered">Đã giao</Option>
+                      <Option value="completed">Hoàn thành</Option>
+                      <Option value="returned">Đã trả hàng</Option>
+                      <Option value="cancelled">Đã hủy</Option>
+                      <Option value="refunded">Đã hoàn tiền</Option>
                     </Select>
                   </div>
                 </div>

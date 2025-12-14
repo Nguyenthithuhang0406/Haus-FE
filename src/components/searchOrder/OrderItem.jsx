@@ -9,26 +9,96 @@ const OrderItem = ({ order, onCancelOrder }) => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
-  const products = order.products || [{
-    id: order.id,
-    name: order.name,
-    type: order.type,
-    quantity: order.quantity,
-    price: order.price,
-    image: order.image
-  }];
+  const products = order.products || [
+    {
+      id: order.id,
+      name: order.name,
+      type: order.type,
+      quantity: order.quantity,
+      price: order.price,
+      image: order.image,
+    },
+  ];
   const hasMultipleProducts = products.length > 1;
   const displayedProducts = expanded ? products : products.slice(0, 1);
   const hiddenCount = products.length - 1;
 
-  const getStatusColor = (status) => {
-    const colors = {
-      "Đang chờ": "bg-yellow-100 text-yellow-800",
-      "Đang giao": "bg-blue-100 text-blue-800",
-      "Đã giao": "bg-green-100 text-green-800",
-      "Bị hoàn": "bg-red-100 text-red-800"
+  // Map status từ tiếng Anh sang tiếng Việt (đồng bộ với admin)
+  const mapStatusToVietnamese = (status) => {
+    if (!status) return status;
+    const statusLower = status.toLowerCase();
+    const statusMap = {
+      pending: "Đang chờ",
+      confirmed: "Đã xác nhận",
+      processing: "Đang xử lý",
+      delivered: "Đã giao",
+      completed: "Hoàn thành",
+      returned: "Đã trả hàng",
+      cancelled: "Đã hủy",
+      canceled: "Đã hủy",
+      refunded: "Đã hoàn tiền",
     };
-    return colors[status] || "bg-gray-100 text-gray-800";
+    return statusMap[statusLower] || status;
+  };
+
+  // Lấy config màu status (đồng bộ với admin)
+  const getStatusConfig = (status) => {
+    if (!status) {
+      return {
+        bg: "bg-gray-100",
+        text: "text-gray-800",
+        border: "border-gray-200",
+      };
+    }
+    const statusLower = status.toLowerCase();
+    const statusConfig = {
+      pending: {
+        bg: "bg-yellow-100",
+        text: "text-yellow-800",
+        border: "border-yellow-200",
+      },
+      confirmed: {
+        bg: "bg-blue-100",
+        text: "text-blue-800",
+        border: "border-blue-200",
+      },
+      processing: {
+        bg: "bg-indigo-100",
+        text: "text-indigo-800",
+        border: "border-indigo-200",
+      },
+      delivered: {
+        bg: "bg-green-100",
+        text: "text-green-800",
+        border: "border-green-200",
+      },
+      completed: {
+        bg: "bg-emerald-100",
+        text: "text-emerald-800",
+        border: "border-emerald-200",
+      },
+      returned: {
+        bg: "bg-orange-100",
+        text: "text-orange-800",
+        border: "border-orange-200",
+      },
+      cancelled: {
+        bg: "bg-red-100",
+        text: "text-red-800",
+        border: "border-red-200",
+      },
+      canceled: {
+        bg: "bg-red-100",
+        text: "text-red-800",
+        border: "border-red-200",
+      },
+      refunded: {
+        bg: "bg-purple-100",
+        text: "text-purple-800",
+        border: "border-purple-200",
+      },
+    };
+    return statusConfig[statusLower] || statusConfig.pending;
   };
 
   const handleCancelClick = () => {
@@ -36,11 +106,23 @@ const OrderItem = ({ order, onCancelOrder }) => {
   };
 
   const handleConfirmCancel = (orderId, cancelData) => {
-    console.log("OrderItem - handleConfirmCancel called", { orderId, cancelData });
+    console.log("OrderItem - handleConfirmCancel called", {
+      orderId,
+      cancelData,
+    });
     onCancelOrder(orderId, cancelData);
   };
 
   const getStatusAction = (status) => {
+    if (!status) return null;
+    const statusLower = status.toLowerCase();
+    const canCancel = [
+      "pending",
+      "confirmed",
+      "processing",
+      "delivered",
+    ].includes(statusLower);
+
     return (
       <div className="flex flex-col sm:flex-row gap-2">
         <button
@@ -49,7 +131,7 @@ const OrderItem = ({ order, onCancelOrder }) => {
         >
           Xem chi tiết
         </button>
-        {(status === "Đang chờ" || status === "Đang giao") && (
+        {canCancel && (
           <button
             onClick={handleCancelClick}
             className="text-red-500 hover:text-red-700 font-medium text-xs sm:text-sm transition-colors whitespace-nowrap"
@@ -61,7 +143,6 @@ const OrderItem = ({ order, onCancelOrder }) => {
     );
   };
 
-
   return (
     <>
       <div className="bg-pink-50 rounded-lg p-3 sm:p-4 mb-4 shadow-sm">
@@ -69,13 +150,16 @@ const OrderItem = ({ order, onCancelOrder }) => {
           <span className="text-xs sm:text-sm text-gray-600">
             Mã đơn: <span className="font-semibold">#{order.orderNumber}</span>
           </span>
-          <span
-            className={`px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${getStatusColor(
-              order.status
-            )}`}
-          >
-            {order.status}
-          </span>
+          {(() => {
+            const statusConfig = getStatusConfig(order.status);
+            return (
+              <span
+                className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ${statusConfig.bg} ${statusConfig.text} border ${statusConfig.border}`}
+              >
+                {mapStatusToVietnamese(order.status)}
+              </span>
+            );
+          })()}
         </div>
         <div className="space-y-3">
           {displayedProducts.map((product, index) => (
