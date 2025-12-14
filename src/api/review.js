@@ -17,7 +17,7 @@ export const getProductReviews = async (
   pageSize = 10
 ) => {
   try {
-    const response = await axiosPrivate.get(`/product/${productId}/review`, {
+    const response = await axiosPublic.get(`/product/${productId}/review`, {
       params: {
         pageNum,
         pageSize,
@@ -55,7 +55,7 @@ export const getProductReviewsByRating = async (
   pageSize = 10
 ) => {
   try {
-    const response = await axiosPrivate.get(
+    const response = await axiosPublic.get(
       `/product/${productId}/review/rating/${rating}`,
       {
         params: { pageNum, pageSize },
