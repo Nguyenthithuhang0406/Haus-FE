@@ -119,7 +119,7 @@ const ProductItem = ({ product, onRemoveFavorite }) => {
       <div className="w-full flex items-center justify-center absolute top-[140px] lg:top-[140px] xl:top-[200px] left-0">
         <button
           onClick={(e) => {
-            product?.soldQuantity !== product?.inventoryQuantity &&
+            (product?.inventoryQuantity || 0) > 0 &&
               (!product?.productVariations ||
                 product?.productVariations.length === 1) &&
               handleClickAddToCart(e);
@@ -127,12 +127,12 @@ const ProductItem = ({ product, onRemoveFavorite }) => {
           className={` w-[70%] z-10 bg-white text-[15px] font-medium px-3 py-2 rounded-xl
           opacity-0 translate-y-6 invisible group-hover:opacity-100 group-hover:translate-y-0 group-hover:visible transition-all duration-300
           hover:bg-[#ad7555] hover:text-white ${
-            product?.soldQuantity === product?.inventoryQuantity
+            (product?.inventoryQuantity || 0) === 0
               ? "cursor-not-allowed"
               : "cursor-pointer"
           }`}
         >
-          {product?.soldQuantity === product?.inventoryQuantity
+          {(product?.inventoryQuantity || 0) === 0
             ? "Hết hàng"
             : product?.productVariations &&
               product?.productVariations.length > 1
@@ -176,8 +176,10 @@ const ProductItem = ({ product, onRemoveFavorite }) => {
       {/* Đã bán */}
       <div className="absolute hidden lg:block bottom-[50px] w-full px-5">
         <SaleProgressBar
-          sold={product?.sell || 0}
-          total={product?.inventoryQuantity}
+          sold={product?.soldQuantity || 0}
+          total={
+            (product?.inventoryQuantity || 0) + (product?.soldQuantity || 0)
+          }
         />
       </div>
 
