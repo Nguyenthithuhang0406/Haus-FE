@@ -183,7 +183,7 @@ const OrderItem = ({ order, onCancelOrder }) => {
       <div className="bg-pink-50 rounded-lg p-3 sm:p-4 mb-4 shadow-sm">
         <div className="flex justify-between items-center mb-3 pb-2 border-b border-pink-200">
           <span className="text-xs sm:text-sm text-gray-600">
-            Mã đơn: <span className="font-semibold">#{order.orderNumber}</span>
+            Mã đơn: <span className="font-semibold">{order.orderNumber}</span>
           </span>
           <div className="flex items-center gap-2">
             {(() => {
