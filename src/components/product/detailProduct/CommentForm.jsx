@@ -33,6 +33,13 @@ const CommentForm = ({ setIsShowAddComment, product, onSuccess }) => {
     } catch (error) {
       if (error.response && error.response.status === 401) {
         alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
+      } else if (
+        error.response &&
+        error.response.status === 409 &&
+        error.response.data?.message ===
+          "exception.review.not.review.before.buy"
+      ) {
+        alert("Bạn chưa mua hàng này nên không thể đánh giá !");
       } else {
         alert("Lỗi khi gửi đánh giá!");
       }
