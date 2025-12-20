@@ -90,7 +90,6 @@ export const handleCodPayment = async ({
       note: orderNote?.trim() || "",
     });
 
-    console.log("Payment COD response:", paymentResponse);
 
     const isSuccess = paymentResponse?.status === 200 || paymentResponse?.data;
 
@@ -122,7 +121,6 @@ export const handleMomoPayment = async ({ orderId }) => {
       orderId: orderId,
     });
 
-    console.log("Payment MOMO response:", paymentResponse);
 
     if (paymentResponse?.status === 200 || paymentResponse?.data) {
       const paymentUrl = paymentResponse?.data?.payUrl;
@@ -158,7 +156,6 @@ export const handleMomoPayment = async ({ orderId }) => {
 export const handleVnpayPayment = async ({ orderId }) => {
   try {
     const response = await getUrlVnpay({ orderId: orderId });
-    console.log("response vnpay:", response);
     // TODO: Redirect đến VNPay nếu có URL
     window.location.href = response?.data;
     toast.success("Đơn hàng đã được tạo thành công!");
@@ -202,13 +199,11 @@ export const processOrder = async ({
   });
 
   try {
-    console.log("order:", orderData);
     const response = await createOrder(orderData);
 
     const orderId = response?.data?.orderId || response.data;
 
     if (!orderId) {
-      console.error("Order response:", response);
       toast.error("Không thể lấy thông tin đơn hàng. Vui lòng thử lại.");
       return;
     }
@@ -228,6 +223,15 @@ export const processOrder = async ({
     }
   } catch (error) {
     console.error("Failed to create order:", error);
-    toast.error("Có lỗi xảy ra khi tạo đơn hàng. Vui lòng thử lại.");
+    
+    // Kiểm tra lỗi 409 với message exception.cart.quantity.invalid
+    if (
+      error?.response?.status === 409 &&
+      error?.response?.data?.message === "exception.cart.quantity.invalid"
+    ) {
+      toast.error("Mặt hàng đã hết");
+    } else {
+      toast.error("Có lỗi xảy ra khi tạo đơn hàng. Vui lòng thử lại.");
+    }
   }
 };

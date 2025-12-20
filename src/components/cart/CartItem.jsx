@@ -78,11 +78,15 @@ const CartItem = ({
               )
             }
           >
-            {item?.productVariations?.map((variant) => (
-              <option key={variant?.id} value={variant?.id}>
-                {variant?.color}, {variant?.size}
-              </option>
-            ))}
+            {item?.productVariations
+              ?.filter(
+                (v) => (v?.inventoryQuantity || 0) > 0 || v?.id === variant?.id
+              )
+              ?.map((variant) => (
+                <option key={variant?.id} value={variant?.id}>
+                  {variant?.color}, {variant?.size}
+                </option>
+              ))}
           </select>
 
           {/* <div className="mb-3">
@@ -181,11 +185,15 @@ const CartItem = ({
               )
             }
           >
-            {item?.productVariations?.map((variant) => (
-              <option key={variant?.id} value={variant?.id}>
-                {variant?.color}, {variant?.size}
-              </option>
-            ))}
+            {item?.productVariations
+              ?.filter(
+                (v) => (v?.inventoryQuantity || 0) > 0 || v?.id === variant?.id
+              )
+              ?.map((variant) => (
+                <option key={variant?.id} value={variant?.id}>
+                  {variant?.color}, {variant?.size}
+                </option>
+              ))}
           </select>
         </div>
 

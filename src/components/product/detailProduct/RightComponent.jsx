@@ -75,6 +75,11 @@ const RightComponent = ({
   };
 
   const handleAddToCart = async () => {
+    if (
+      product?.productVariations[selectedVariantIndex]?.inventoryQuantity == 0
+    ) {
+      toast.error("Sản phẩm đã hết hàng");
+    }
     const imageUrl = product.productVariations[selectedVariantIndex].media?.url;
 
     if (isLoggedIn()) {
