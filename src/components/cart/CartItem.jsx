@@ -1,5 +1,6 @@
 import React from "react";
 import { Minus, Plus, X, Check } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const CartItem = ({
   item,
@@ -10,9 +11,16 @@ const CartItem = ({
   handleChangeVariant,
   onToggleSelect,
 }) => {
+  const navigate = useNavigate();
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat("vi-VN").format(price) + "đ";
+  };
+
+  const handleProductClick = () => {
+    if (item?.id) {
+      navigate(`/detailProduct/${item.id}`);
+    }
   };
   return (
     <div
@@ -38,12 +46,16 @@ const CartItem = ({
         <img
           src={variant?.media?.url || item?.medias?.[0]?.url}
           alt={item?.productName}
-          className="w-20 h-20 object-cover rounded flex-shrink-0"
+          className="w-20 h-20 object-cover rounded flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+          onClick={handleProductClick}
         />
 
         <div className="flex-1 min-w-0">
           <div className="flex justify-between items-start mb-2">
-            <h3 className="font-semibold text-base text-gray-900 line-clamp-2 pr-2">
+            <h3
+              className="font-semibold text-base text-gray-900 line-clamp-2 pr-2 cursor-pointer hover:text-[#ad7555] transition-colors"
+              onClick={handleProductClick}
+            >
               {item?.productName}
             </h3>
             <button
@@ -86,10 +98,7 @@ const CartItem = ({
             <div className="flex items-center gap-2 border rounded-lg px-2 py-1">
               <button
                 onClick={() => {
-                  onUpdateQuantity(
-                    variant?.id,
-                    variant?.cartQuantity - 1
-                  );
+                  onUpdateQuantity(variant?.id, variant?.cartQuantity - 1);
                 }}
                 className="text-gray-600 hover:text-gray-900 p-1 disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={variant?.cartQuantity <= 1}
@@ -101,10 +110,7 @@ const CartItem = ({
               </span>
               <button
                 onClick={() => {
-                  onUpdateQuantity(
-                    variant?.id,
-                    variant?.cartQuantity + 1
-                  );
+                  onUpdateQuantity(variant?.id, variant?.cartQuantity + 1);
                 }}
                 className="text-gray-600 hover:text-gray-900 p-1"
               >
@@ -125,8 +131,7 @@ const CartItem = ({
               )}
               <p className="text-base font-bold text-[#ad7555]">
                 {formatPrice(
-                  (variant?.price *
-                    (100 - (variant?.discountPercent || 0))) /
+                  (variant?.price * (100 - (variant?.discountPercent || 0))) /
                     100
                 )}
               </p>
@@ -153,11 +158,15 @@ const CartItem = ({
         <img
           src={variant?.media?.url || item?.medias?.[0]?.url}
           alt={item?.productName}
-          className="w-24 h-24 object-cover rounded"
+          className="w-24 h-24 object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
+          onClick={handleProductClick}
         />
 
         <div className="flex-1">
-          <h3 className="font-semibold text-lg text-gray-900 mb-1">
+          <h3
+            className="font-semibold text-lg text-gray-900 mb-1 cursor-pointer hover:text-[#ad7555] transition-colors"
+            onClick={handleProductClick}
+          >
             {item?.productName}
           </h3>
           <select
@@ -190,10 +199,7 @@ const CartItem = ({
         <div className="flex items-center gap-3 border rounded-lg px-3 py-2">
           <button
             onClick={() => {
-              onUpdateQuantity(
-                variant?.id,
-                variant?.cartQuantity - 1
-              );
+              onUpdateQuantity(variant?.id, variant?.cartQuantity - 1);
             }}
             className="text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={variant?.cartQuantity <= 1}
@@ -205,10 +211,7 @@ const CartItem = ({
           </span>
           <button
             onClick={() => {
-              onUpdateQuantity(
-                variant?.id,
-                variant?.cartQuantity + 1
-              );
+              onUpdateQuantity(variant?.id, variant?.cartQuantity + 1);
             }}
             className="text-gray-600 hover:text-gray-900"
           >
