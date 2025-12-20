@@ -18,8 +18,6 @@ const CommentForm = ({ setIsShowAddComment, product, onSuccess }) => {
       return;
     }
     try {
-      console.log("product", product);
-      console.log("product.id", product.id);
       await addProductReview(product.id, {
         rating: rating,
         content: comment,

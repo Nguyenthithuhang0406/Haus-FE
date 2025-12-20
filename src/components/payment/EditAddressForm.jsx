@@ -104,7 +104,6 @@ const EditAddressForm = ({ addressId, onClose }) => {
   }, [addressId, wards, districts, provinces]);
 
   const handleSubmit = async (values) => {
-    console.log("values edit:", values);
     try {
       const data = {
         id: addressId,

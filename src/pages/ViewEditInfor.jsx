@@ -126,7 +126,6 @@ const ViewEditInfor = () => {
   const handleSubmit = async () => {
     if (validateForm()) {
       try {
-        console.log(editForm);
         const data = {
           passwordConfirm: editForm.password,
           firstName: editForm.firstName,

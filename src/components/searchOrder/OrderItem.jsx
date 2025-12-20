@@ -109,10 +109,6 @@ const OrderItem = ({ order, onCancelOrder }) => {
   };
 
   const handleConfirmCancel = (orderId, cancelData) => {
-    console.log("OrderItem - handleConfirmCancel called", {
-      orderId,
-      cancelData,
-    });
     onCancelOrder(orderId, cancelData);
   };
 
