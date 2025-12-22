@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { getOrderStatistics, getBestSellerProducts } from "@/api/order";
+import {
+  getOrderStatistics,
+  getBestSellerProducts,
+  getSaleByParentCategory,
+} from "@/api/order";
 import {
   LineChart,
   Line,
@@ -15,15 +19,8 @@ import {
 } from "recharts";
 
 const DashboardPage = () => {
-  const today = new Date();
-  const todayString = today.toISOString().split("T")[0];
-
-  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
-    .toISOString()
-    .split("T")[0];
-
-  const [startDate, setStartDate] = useState(firstDayOfMonth);
-  const [endDate, setEndDate] = useState(todayString);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [statistics, setStatistics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -43,17 +40,19 @@ const DashboardPage = () => {
   const handleStartDateChange = (e) => {
     const value = e.target.value;
     setStartDate(value);
-    if (endDate && value > endDate) setEndDate(value);
+    if (endDate && value && value > endDate) setEndDate(value);
   };
 
   const handleEndDateChange = (e) => {
     const value = e.target.value;
-    if (startDate && value < startDate) return;
+    if (startDate && value && value < startDate) return;
     setEndDate(value);
   };
 
   // State cho saleGraph riêng
   const [saleGraph, setSaleGraph] = useState(null);
+  // State cho categoryRevenue từ API
+  const [categoryRevenue, setCategoryRevenue] = useState([]);
 
   // Fetch statistics data
   useEffect(() => {
@@ -134,6 +133,69 @@ const DashboardPage = () => {
     };
   }, [bestSellersPageNum, bestSellersPageSize]);
 
+  // Fetch categoryRevenue từ API - luôn call API, kể cả khi chưa chọn ngày
+  useEffect(() => {
+    const fetchCategoryRevenue = async () => {
+      try {
+        // Truyền startDate và endDate (có thể là empty string hoặc undefined)
+        const response = await getSaleByParentCategory(
+          startDate || undefined,
+          endDate || undefined
+        );
+        // response từ getSaleByParentCategory() đã là response.data từ axios
+        // Nếu API trả về { status: 200, message: "...", data: {...} }
+        // thì response sẽ là { status: 200, message: "...", data: {...} }
+        // và response.data là object với key là "3.Phòng khách"
+        // Kiểm tra cả response.data.data (nếu có) và response.data
+        const categoryData =
+          response?.data?.data || response?.data || response || {};
+
+        console.log("Full response from API:", response);
+        console.log("Category data:", categoryData);
+        console.log("Number of categories:", Object.keys(categoryData).length);
+        console.log("Category keys:", Object.keys(categoryData));
+
+        // Transform dữ liệu từ API format sang format cho PieChart
+        // Sử dụng Map để tránh trùng lặp tên (nếu có)
+        const categoryMap = new Map();
+
+        Object.keys(categoryData).forEach((key) => {
+          // Loại bỏ số thứ tự và dấu chấm ở đầu (ví dụ: "3.Phòng khách" -> "Phòng khách")
+          const name = key.replace(/^\d+\./, "").trim();
+          const value = categoryData[key] || 0;
+
+          // Nếu tên đã tồn tại, cộng dồn giá trị
+          if (categoryMap.has(name)) {
+            categoryMap.set(name, categoryMap.get(name) + value);
+          } else {
+            categoryMap.set(name, value);
+          }
+        });
+
+        const transformedData = Array.from(categoryMap.entries())
+          .map(([name, value]) => ({
+            name: name,
+            value: value,
+          }))
+          .filter((item) => item.value > 0) // Chỉ hiển thị danh mục có doanh thu > 0
+          .sort((a, b) => b.value - a.value); // Sắp xếp theo doanh thu giảm dần
+
+        console.log("Transformed data:", transformedData);
+        console.log(
+          "Number of categories after transform:",
+          transformedData.length
+        );
+
+        setCategoryRevenue(transformedData);
+      } catch (err) {
+        console.error("Error fetching category revenue:", err);
+        setCategoryRevenue([]);
+      }
+    };
+
+    fetchCategoryRevenue();
+  }, [startDate, endDate]);
+
   // Format functions
   const formatVND = (value) => value.toLocaleString("vi-VN") + " ₫";
 
@@ -174,16 +236,7 @@ const DashboardPage = () => {
         })
     : [];
 
-  const categoryRevenue = [
-    { name: "Phòng ngủ", value: 13000000 },
-    { name: "Ngoài trời", value: 10000000 },
-    { name: "Phòng khách", value: 8000000 },
-    { name: "Nhà bếp & thiết bị", value: 7000000 },
-    { name: "Văn phòng tại nhà", value: 6000000 },
-    { name: "Phòng ăn", value: 4000000 },
-    { name: "Phòng trẻ em", value: 3500000 },
-    { name: "Phòng tắm", value: 3000000 },
-  ];
+  // categoryRevenue đã được fetch từ API và lưu trong state
 
   const COLORS = [
     "#4F46E5",
@@ -245,7 +298,11 @@ const DashboardPage = () => {
   }, []);
 
   const isSmallScreen = windowWidth < 1024;
-  const totalRevenue = stats[0]?.amount || 0;
+  // Tính tổng doanh thu từ categoryRevenue (từ API)
+  const totalRevenue =
+    categoryRevenue.reduce((sum, item) => sum + (item.value || 0), 0) ||
+    stats[0]?.amount ||
+    0;
 
   if (loading) {
     return (
@@ -302,8 +359,16 @@ const DashboardPage = () => {
               className="border px-3 py-1 rounded-md w-full md:w-auto"
               value={startDate}
               onChange={handleStartDateChange}
-              max={todayString}
             />
+            {startDate && (
+              <button
+                onClick={() => setStartDate("")}
+                className="text-gray-400 hover:text-red-600 text-sm"
+                title="Xóa"
+              >
+                ✕
+              </button>
+            )}
           </div>
           <div className="flex items-center space-x-2">
             <label className="text-sm text-gray-600">Đến:</label>
@@ -312,9 +377,17 @@ const DashboardPage = () => {
               className="border px-3 py-1 rounded-md w-full md:w-auto"
               value={endDate}
               onChange={handleEndDateChange}
-              max={todayString}
               min={startDate || undefined}
             />
+            {endDate && (
+              <button
+                onClick={() => setEndDate("")}
+                className="text-gray-400 hover:text-red-600 text-sm"
+                title="Xóa"
+              >
+                ✕
+              </button>
+            )}
           </div>
         </div>
 

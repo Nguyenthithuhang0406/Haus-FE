@@ -138,3 +138,22 @@ export const searchOrderByNumber = async (orderNumber) => {
     throw error;
   }
 };
+
+export const getSaleByParentCategory = async (startDate, endDate) => {
+  try {
+    const params = {};
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+
+    const response = await request(axiosPrivate, {
+      method: "GET",
+      url: "/statistics/get-sale-by-parent-category",
+      params: params,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi lấy thống kê doanh thu theo danh mục:", error);
+    throw error;
+  }
+};
