@@ -22,9 +22,19 @@ import {
 const DashboardPage = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
+  // Statistics state
   const [statistics, setStatistics] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [statisticsLoading, setStatisticsLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // SaleGraph state (không phụ thuộc ngày)
+  const [saleGraph, setSaleGraph] = useState(null);
+  const [saleGraphLoading, setSaleGraphLoading] = useState(false);
+
+  // CategoryRevenue state (phụ thuộc ngày)
+  const [categoryRevenue, setCategoryRevenue] = useState([]);
+  const [categoryRevenueLoading, setCategoryRevenueLoading] = useState(false);
 
   // Best sellers state
   const [bestSellers, setBestSellers] = useState([]);
@@ -50,16 +60,11 @@ const DashboardPage = () => {
     setEndDate(value);
   };
 
-  // State cho saleGraph riêng
-  const [saleGraph, setSaleGraph] = useState(null);
-  // State cho categoryRevenue từ API
-  const [categoryRevenue, setCategoryRevenue] = useState([]);
-
-  // Fetch statistics data - gọi API với startDate và endDate
+  // Fetch statistics data - gọi API với startDate và endDate (phụ thuộc ngày)
   useEffect(() => {
     const fetchStatistics = async () => {
       try {
-        setLoading(true);
+        setStatisticsLoading(true);
         setError(null);
         const response = await getOrderStatisticsByCriteria(
           startDate || undefined,
@@ -75,17 +80,18 @@ const DashboardPage = () => {
         console.error("Error fetching statistics:", err);
         setError("Không thể tải dữ liệu thống kê");
       } finally {
-        setLoading(false);
+        setStatisticsLoading(false);
       }
     };
 
     fetchStatistics();
   }, [startDate, endDate]);
 
-  // Fetch saleGraph riêng từ API order-by-month
+  // Fetch saleGraph riêng từ API order-by-month (KHÔNG phụ thuộc ngày - chỉ gọi 1 lần)
   useEffect(() => {
     const fetchSaleGraph = async () => {
       try {
+        setSaleGraphLoading(true);
         const response = await getOrderStatistics();
         // response từ getOrderStatistics() đã là response.data từ axios
         // Nếu API trả về { status: 200, message: "...", data: { saleGraph: {...} } }
@@ -99,6 +105,8 @@ const DashboardPage = () => {
         }
       } catch (err) {
         console.error("Error fetching sale graph:", err);
+      } finally {
+        setSaleGraphLoading(false);
       }
     };
 
@@ -149,10 +157,11 @@ const DashboardPage = () => {
     };
   }, [bestSellersPageNum, bestSellersPageSize, startDate, endDate]);
 
-  // Fetch categoryRevenue từ API - luôn call API, kể cả khi chưa chọn ngày
+  // Fetch categoryRevenue từ API - phụ thuộc ngày
   useEffect(() => {
     const fetchCategoryRevenue = async () => {
       try {
+        setCategoryRevenueLoading(true);
         // Truyền startDate và endDate (có thể là empty string hoặc undefined)
         const response = await getSaleByParentCategory(
           startDate || undefined,
@@ -165,11 +174,6 @@ const DashboardPage = () => {
         // Kiểm tra cả response.data.data (nếu có) và response.data
         const categoryData =
           response?.data?.data || response?.data || response || {};
-
-        console.log("Full response from API:", response);
-        console.log("Category data:", categoryData);
-        console.log("Number of categories:", Object.keys(categoryData).length);
-        console.log("Category keys:", Object.keys(categoryData));
 
         // Transform dữ liệu từ API format sang format cho PieChart
         // Sử dụng Map để tránh trùng lặp tên (nếu có)
@@ -196,16 +200,12 @@ const DashboardPage = () => {
           .filter((item) => item.value > 0) // Chỉ hiển thị danh mục có doanh thu > 0
           .sort((a, b) => b.value - a.value); // Sắp xếp theo doanh thu giảm dần
 
-        console.log("Transformed data:", transformedData);
-        console.log(
-          "Number of categories after transform:",
-          transformedData.length
-        );
-
         setCategoryRevenue(transformedData);
       } catch (err) {
         console.error("Error fetching category revenue:", err);
         setCategoryRevenue([]);
+      } finally {
+        setCategoryRevenueLoading(false);
       }
     };
 
@@ -320,17 +320,6 @@ const DashboardPage = () => {
     stats[0]?.amount ||
     0;
 
-  if (loading) {
-    return (
-      <div className="p-4 md:p-6 flex items-center justify-center h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Đang tải dữ liệu...</p>
-        </div>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="p-4 md:p-6 flex items-center justify-center h-screen">
@@ -408,7 +397,12 @@ const DashboardPage = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative">
+          {statisticsLoading && (
+            <div className="absolute inset-0 bg-white bg-opacity-80 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+          )}
           {stats.map((item, idx) => (
             <div
               key={idx}
@@ -429,8 +423,13 @@ const DashboardPage = () => {
 
         {/* LineChart + Best Sellers */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="bg-white shadow-md rounded-2xl p-4 lg:col-span-2">
+          <div className="bg-white shadow-md rounded-2xl p-4 lg:col-span-2 relative">
             <h3 className="font-semibold mb-4">Biểu đồ doanh thu theo tháng</h3>
+            {saleGraphLoading && (
+              <div className="absolute inset-0 bg-white bg-opacity-80 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              </div>
+            )}
             <div className="w-full h-[250px] sm:h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={chartData}>
@@ -559,8 +558,13 @@ const DashboardPage = () => {
           </div>
         </div>
 
-        <div className="bg-white shadow-md rounded-2xl p-4">
+        <div className="bg-white shadow-md rounded-2xl p-4 relative">
           <h3 className="font-semibold mb-4">Tỷ lệ doanh thu theo danh mục</h3>
+          {categoryRevenueLoading && (
+            <div className="absolute inset-0 bg-white bg-opacity-80 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+          )}
           <div className="text-center md:pl-30 xl:pr-40">
             <h4 className="text-gray-600 text-sm font-semibold">
               Tổng doanh thu
