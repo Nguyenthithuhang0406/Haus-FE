@@ -107,6 +107,25 @@ export const getOrderStatistics = async () => {
   }
 };
 
+export const getOrderStatisticsByCriteria = async (startDate, endDate) => {
+  try {
+    const params = {};
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+
+    const response = await request(axiosPrivate, {
+      method: "GET",
+      url: "/statistics/get-order-by-four-criteria",
+      params: params,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi lấy thống kê đơn hàng theo tiêu chí:", error);
+    throw error;
+  }
+};
+
 export const getBestSellerProducts = async (pageNum = 1, pageSize = 10) => {
   try {
     const response = await request(axiosPrivate, {

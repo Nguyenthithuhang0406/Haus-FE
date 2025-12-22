@@ -3,6 +3,7 @@ import {
   getOrderStatistics,
   getBestSellerProducts,
   getSaleByParentCategory,
+  getOrderStatisticsByCriteria,
 } from "@/api/order";
 import {
   LineChart,
@@ -54,14 +55,22 @@ const DashboardPage = () => {
   // State cho categoryRevenue từ API
   const [categoryRevenue, setCategoryRevenue] = useState([]);
 
-  // Fetch statistics data
+  // Fetch statistics data - gọi API với startDate và endDate
   useEffect(() => {
     const fetchStatistics = async () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await getOrderStatistics();
-        setStatistics(response.data);
+        const response = await getOrderStatisticsByCriteria(
+          startDate || undefined,
+          endDate || undefined
+        );
+        // response từ API đã là response.data từ axios
+        // Nếu API trả về { status: 200, message: "...", data: {...} }
+        // thì response sẽ là { status: 200, message: "...", data: {...} }
+        // và response.data là object chứa completedOrders, totalOrders, etc.
+        const statisticsData = response?.data || response || {};
+        setStatistics(statisticsData);
       } catch (err) {
         console.error("Error fetching statistics:", err);
         setError("Không thể tải dữ liệu thống kê");
@@ -71,7 +80,7 @@ const DashboardPage = () => {
     };
 
     fetchStatistics();
-  }, []);
+  }, [startDate, endDate]);
 
   // Fetch saleGraph riêng từ API order-by-month
   useEffect(() => {
