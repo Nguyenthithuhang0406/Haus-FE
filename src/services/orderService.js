@@ -90,7 +90,6 @@ export const handleCodPayment = async ({
       note: orderNote?.trim() || "",
     });
 
-
     const isSuccess = paymentResponse?.status === 200 || paymentResponse?.data;
 
     // Navigate đến trang kết quả thanh toán với thông tin COD
@@ -120,7 +119,6 @@ export const handleMomoPayment = async ({ orderId }) => {
     const paymentResponse = await paymentMomo({
       orderId: orderId,
     });
-
 
     if (paymentResponse?.status === 200 || paymentResponse?.data) {
       const paymentUrl = paymentResponse?.data?.payUrl;
@@ -223,7 +221,7 @@ export const processOrder = async ({
     }
   } catch (error) {
     console.error("Failed to create order:", error);
-    
+
     // Kiểm tra lỗi 409 với message exception.cart.quantity.invalid
     if (
       error?.response?.status === 409 &&

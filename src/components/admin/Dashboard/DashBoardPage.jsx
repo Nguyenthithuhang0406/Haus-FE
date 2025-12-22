@@ -52,6 +52,9 @@ const DashboardPage = () => {
     setEndDate(value);
   };
 
+  // State cho saleGraph riêng
+  const [saleGraph, setSaleGraph] = useState(null);
+
   // Fetch statistics data
   useEffect(() => {
     const fetchStatistics = async () => {
@@ -69,6 +72,29 @@ const DashboardPage = () => {
     };
 
     fetchStatistics();
+  }, []);
+
+  // Fetch saleGraph riêng từ API order-by-month
+  useEffect(() => {
+    const fetchSaleGraph = async () => {
+      try {
+        const response = await getOrderStatistics();
+        // response từ getOrderStatistics() đã là response.data từ axios
+        // Nếu API trả về { status: 200, message: "...", data: { saleGraph: {...} } }
+        // thì response sẽ là { status: 200, message: "...", data: { saleGraph: {...} } }
+        // và response.data.saleGraph là saleGraph
+        if (response?.data?.saleGraph) {
+          setSaleGraph(response.data.saleGraph);
+        } else if (response?.saleGraph) {
+          // Fallback nếu format cũ (saleGraph ở root level)
+          setSaleGraph(response.saleGraph);
+        }
+      } catch (err) {
+        console.error("Error fetching sale graph:", err);
+      }
+    };
+
+    fetchSaleGraph();
   }, []);
 
   // Fetch best sellers
@@ -122,28 +148,30 @@ const DashboardPage = () => {
     return `${value >= 0 ? "+" : ""}${value}%`;
   };
 
-  // Transform saleGraph data to chart format
-  const chartData = statistics?.saleGraph
-    ? Object.keys(statistics.saleGraph).map((month) => {
-        const monthNames = [
-          "Tháng 1",
-          "Tháng 2",
-          "Tháng 3",
-          "Tháng 4",
-          "Tháng 5",
-          "Tháng 6",
-          "Tháng 7",
-          "Tháng 8",
-          "Tháng 9",
-          "Tháng 10",
-          "Tháng 11",
-          "Tháng 12",
-        ];
-        return {
-          month: monthNames[parseInt(month) - 1],
-          sales: statistics.saleGraph[month],
-        };
-      })
+  // Transform saleGraph data to chart format từ API riêng
+  const chartData = saleGraph
+    ? Object.keys(saleGraph)
+        .sort((a, b) => parseInt(a) - parseInt(b))
+        .map((month) => {
+          const monthNames = [
+            "Tháng 1",
+            "Tháng 2",
+            "Tháng 3",
+            "Tháng 4",
+            "Tháng 5",
+            "Tháng 6",
+            "Tháng 7",
+            "Tháng 8",
+            "Tháng 9",
+            "Tháng 10",
+            "Tháng 11",
+            "Tháng 12",
+          ];
+          return {
+            month: monthNames[parseInt(month) - 1],
+            sales: saleGraph[month] || 0,
+          };
+        })
     : [];
 
   const categoryRevenue = [
