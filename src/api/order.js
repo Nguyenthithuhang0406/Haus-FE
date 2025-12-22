@@ -126,15 +126,24 @@ export const getOrderStatisticsByCriteria = async (startDate, endDate) => {
   }
 };
 
-export const getBestSellerProducts = async (pageNum = 1, pageSize = 10) => {
+export const getBestSellerProducts = async (
+  pageNum = 1,
+  pageSize = 10,
+  startDate,
+  endDate
+) => {
   try {
+    const params = {
+      pageNum,
+      pageSize,
+    };
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+
     const response = await request(axiosPrivate, {
       method: "GET",
       url: "/statistics/get-best-seller",
-      params: {
-        pageNum,
-        pageSize,
-      },
+      params: params,
     });
 
     return response.data;

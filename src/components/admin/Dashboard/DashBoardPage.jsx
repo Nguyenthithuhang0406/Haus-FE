@@ -105,7 +105,7 @@ const DashboardPage = () => {
     fetchSaleGraph();
   }, []);
 
-  // Fetch best sellers
+  // Fetch best sellers - cập nhật theo startDate và endDate
   useEffect(() => {
     let isMounted = true;
 
@@ -115,16 +115,23 @@ const DashboardPage = () => {
 
         const response = await getBestSellerProducts(
           bestSellersPageNum,
-          bestSellersPageSize
+          bestSellersPageSize,
+          startDate || undefined,
+          endDate || undefined
         );
 
         if (!isMounted) return;
 
         // Update dữ liệu mới
-        setBestSellers(response.data.items || []);
+        // response từ API đã là response.data từ axios
+        // Nếu API trả về { status: 200, message: "...", data: {...} }
+        // thì response sẽ là { status: 200, message: "...", data: {...} }
+        // và response.data là object chứa items và pageCustom
+        const responseData = response?.data || response || {};
+        setBestSellers(responseData.items || []);
         setBestSellersPagination((prev) => ({
           ...prev,
-          ...(response.data.pageCustom || {}),
+          ...(responseData.pageCustom || {}),
         }));
       } catch (err) {
         console.error("Error fetching best sellers:", err);
@@ -140,7 +147,7 @@ const DashboardPage = () => {
     return () => {
       isMounted = false;
     };
-  }, [bestSellersPageNum, bestSellersPageSize]);
+  }, [bestSellersPageNum, bestSellersPageSize, startDate, endDate]);
 
   // Fetch categoryRevenue từ API - luôn call API, kể cả khi chưa chọn ngày
   useEffect(() => {
@@ -495,7 +502,7 @@ const DashboardPage = () => {
                           <p className="font-semibold text-sm">
                             {formatVND(p.price)}
                           </p>
-                          {p.discountPercent && (
+                          {p.discountPercent > 0 && (
                             <p className="text-xs text-red-500">
                               -{p.discountPercent}%
                             </p>
