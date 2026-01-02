@@ -107,15 +107,43 @@ export const getOrderStatistics = async () => {
   }
 };
 
-export const getBestSellerProducts = async (pageNum = 1, pageSize = 10) => {
+export const getOrderStatisticsByCriteria = async (startDate, endDate) => {
   try {
+    const params = {};
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+
+    const response = await request(axiosPrivate, {
+      method: "GET",
+      url: "/statistics/get-order-by-four-criteria",
+      params: params,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi lấy thống kê đơn hàng theo tiêu chí:", error);
+    throw error;
+  }
+};
+
+export const getBestSellerProducts = async (
+  pageNum = 1,
+  pageSize = 10,
+  startDate,
+  endDate
+) => {
+  try {
+    const params = {
+      pageNum,
+      pageSize,
+    };
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+
     const response = await request(axiosPrivate, {
       method: "GET",
       url: "/statistics/get-best-seller",
-      params: {
-        pageNum,
-        pageSize,
-      },
+      params: params,
     });
 
     return response.data;
@@ -135,6 +163,38 @@ export const searchOrderByNumber = async (orderNumber) => {
     return response.data;
   } catch (error) {
     console.error("Lỗi tra cứu đơn hàng:", error);
+    throw error;
+  }
+};
+
+export const getSaleByParentCategory = async (startDate, endDate) => {
+  try {
+    const params = {};
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+
+    const response = await request(axiosPrivate, {
+      method: "GET",
+      url: "/statistics/get-sale-by-parent-category",
+      params: params,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi lấy thống kê doanh thu theo danh mục:", error);
+    throw error;
+  }
+};
+
+export const cancelOrder = async (orderId) => {
+  try {
+    const response = await request(axiosPrivate, {
+      method: "POST",
+      url: `/orders/cancel/${orderId}`,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi hủy đơn hàng:", error);
     throw error;
   }
 };

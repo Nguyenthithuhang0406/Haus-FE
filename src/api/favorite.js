@@ -56,7 +56,6 @@ export async function syncFavoritesAfterLogin() {
     }
 
     localStorage.removeItem("likeProducts");
-    console.log("Đã đồng bộ yêu thích từ local lên server");
   } catch (error) {
     console.error("Lỗi sync yêu thích:", error);
   }

@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { getOrderStatistics, getBestSellerProducts } from "@/api/order";
+import {
+  getOrderStatistics,
+  getBestSellerProducts,
+  getSaleByParentCategory,
+  getOrderStatisticsByCriteria,
+} from "@/api/order";
 import {
   LineChart,
   Line,
@@ -15,18 +20,21 @@ import {
 } from "recharts";
 
 const DashboardPage = () => {
-  const today = new Date();
-  const todayString = today.toISOString().split("T")[0];
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
-  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
-    .toISOString()
-    .split("T")[0];
-
-  const [startDate, setStartDate] = useState(firstDayOfMonth);
-  const [endDate, setEndDate] = useState(todayString);
+  // Statistics state
   const [statistics, setStatistics] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [statisticsLoading, setStatisticsLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // SaleGraph state (không phụ thuộc ngày)
+  const [saleGraph, setSaleGraph] = useState(null);
+  const [saleGraphLoading, setSaleGraphLoading] = useState(false);
+
+  // CategoryRevenue state (phụ thuộc ngày)
+  const [categoryRevenue, setCategoryRevenue] = useState([]);
+  const [categoryRevenueLoading, setCategoryRevenueLoading] = useState(false);
 
   // Best sellers state
   const [bestSellers, setBestSellers] = useState([]);
@@ -43,35 +51,69 @@ const DashboardPage = () => {
   const handleStartDateChange = (e) => {
     const value = e.target.value;
     setStartDate(value);
-    if (endDate && value > endDate) setEndDate(value);
+    if (endDate && value && value > endDate) setEndDate(value);
   };
 
   const handleEndDateChange = (e) => {
     const value = e.target.value;
-    if (startDate && value < startDate) return;
+    if (startDate && value && value < startDate) return;
     setEndDate(value);
   };
 
-  // Fetch statistics data
+  // Fetch statistics data - gọi API với startDate và endDate (phụ thuộc ngày)
   useEffect(() => {
     const fetchStatistics = async () => {
       try {
-        setLoading(true);
+        setStatisticsLoading(true);
         setError(null);
-        const response = await getOrderStatistics();
-        setStatistics(response.data);
+        const response = await getOrderStatisticsByCriteria(
+          startDate || undefined,
+          endDate || undefined
+        );
+        // response từ API đã là response.data từ axios
+        // Nếu API trả về { status: 200, message: "...", data: {...} }
+        // thì response sẽ là { status: 200, message: "...", data: {...} }
+        // và response.data là object chứa completedOrders, totalOrders, etc.
+        const statisticsData = response?.data || response || {};
+        setStatistics(statisticsData);
       } catch (err) {
         console.error("Error fetching statistics:", err);
         setError("Không thể tải dữ liệu thống kê");
       } finally {
-        setLoading(false);
+        setStatisticsLoading(false);
       }
     };
 
     fetchStatistics();
+  }, [startDate, endDate]);
+
+  // Fetch saleGraph riêng từ API order-by-month (KHÔNG phụ thuộc ngày - chỉ gọi 1 lần)
+  useEffect(() => {
+    const fetchSaleGraph = async () => {
+      try {
+        setSaleGraphLoading(true);
+        const response = await getOrderStatistics();
+        // response từ getOrderStatistics() đã là response.data từ axios
+        // Nếu API trả về { status: 200, message: "...", data: { saleGraph: {...} } }
+        // thì response sẽ là { status: 200, message: "...", data: { saleGraph: {...} } }
+        // và response.data.saleGraph là saleGraph
+        if (response?.data?.saleGraph) {
+          setSaleGraph(response.data.saleGraph);
+        } else if (response?.saleGraph) {
+          // Fallback nếu format cũ (saleGraph ở root level)
+          setSaleGraph(response.saleGraph);
+        }
+      } catch (err) {
+        console.error("Error fetching sale graph:", err);
+      } finally {
+        setSaleGraphLoading(false);
+      }
+    };
+
+    fetchSaleGraph();
   }, []);
 
-  // Fetch best sellers
+  // Fetch best sellers - cập nhật theo startDate và endDate
   useEffect(() => {
     let isMounted = true;
 
@@ -81,16 +123,23 @@ const DashboardPage = () => {
 
         const response = await getBestSellerProducts(
           bestSellersPageNum,
-          bestSellersPageSize
+          bestSellersPageSize,
+          startDate || undefined,
+          endDate || undefined
         );
 
         if (!isMounted) return;
 
         // Update dữ liệu mới
-        setBestSellers(response.data.items || []);
+        // response từ API đã là response.data từ axios
+        // Nếu API trả về { status: 200, message: "...", data: {...} }
+        // thì response sẽ là { status: 200, message: "...", data: {...} }
+        // và response.data là object chứa items và pageCustom
+        const responseData = response?.data || response || {};
+        setBestSellers(responseData.items || []);
         setBestSellersPagination((prev) => ({
           ...prev,
-          ...(response.data.pageCustom || {}),
+          ...(responseData.pageCustom || {}),
         }));
       } catch (err) {
         console.error("Error fetching best sellers:", err);
@@ -106,7 +155,62 @@ const DashboardPage = () => {
     return () => {
       isMounted = false;
     };
-  }, [bestSellersPageNum, bestSellersPageSize]);
+  }, [bestSellersPageNum, bestSellersPageSize, startDate, endDate]);
+
+  // Fetch categoryRevenue từ API - phụ thuộc ngày
+  useEffect(() => {
+    const fetchCategoryRevenue = async () => {
+      try {
+        setCategoryRevenueLoading(true);
+        // Truyền startDate và endDate (có thể là empty string hoặc undefined)
+        const response = await getSaleByParentCategory(
+          startDate || undefined,
+          endDate || undefined
+        );
+        // response từ getSaleByParentCategory() đã là response.data từ axios
+        // Nếu API trả về { status: 200, message: "...", data: {...} }
+        // thì response sẽ là { status: 200, message: "...", data: {...} }
+        // và response.data là object với key là "3.Phòng khách"
+        // Kiểm tra cả response.data.data (nếu có) và response.data
+        const categoryData =
+          response?.data?.data || response?.data || response || {};
+
+        // Transform dữ liệu từ API format sang format cho PieChart
+        // Sử dụng Map để tránh trùng lặp tên (nếu có)
+        const categoryMap = new Map();
+
+        Object.keys(categoryData).forEach((key) => {
+          // Loại bỏ số thứ tự và dấu chấm ở đầu (ví dụ: "3.Phòng khách" -> "Phòng khách")
+          const name = key.replace(/^\d+\./, "").trim();
+          const value = categoryData[key] || 0;
+
+          // Nếu tên đã tồn tại, cộng dồn giá trị
+          if (categoryMap.has(name)) {
+            categoryMap.set(name, categoryMap.get(name) + value);
+          } else {
+            categoryMap.set(name, value);
+          }
+        });
+
+        const transformedData = Array.from(categoryMap.entries())
+          .map(([name, value]) => ({
+            name: name,
+            value: value,
+          }))
+          .filter((item) => item.value > 0) // Chỉ hiển thị danh mục có doanh thu > 0
+          .sort((a, b) => b.value - a.value); // Sắp xếp theo doanh thu giảm dần
+
+        setCategoryRevenue(transformedData);
+      } catch (err) {
+        console.error("Error fetching category revenue:", err);
+        setCategoryRevenue([]);
+      } finally {
+        setCategoryRevenueLoading(false);
+      }
+    };
+
+    fetchCategoryRevenue();
+  }, [startDate, endDate]);
 
   // Format functions
   const formatVND = (value) => value.toLocaleString("vi-VN") + " ₫";
@@ -122,40 +226,33 @@ const DashboardPage = () => {
     return `${value >= 0 ? "+" : ""}${value}%`;
   };
 
-  // Transform saleGraph data to chart format
-  const chartData = statistics?.saleGraph
-    ? Object.keys(statistics.saleGraph).map((month) => {
-        const monthNames = [
-          "Tháng 1",
-          "Tháng 2",
-          "Tháng 3",
-          "Tháng 4",
-          "Tháng 5",
-          "Tháng 6",
-          "Tháng 7",
-          "Tháng 8",
-          "Tháng 9",
-          "Tháng 10",
-          "Tháng 11",
-          "Tháng 12",
-        ];
-        return {
-          month: monthNames[parseInt(month) - 1],
-          sales: statistics.saleGraph[month],
-        };
-      })
+  // Transform saleGraph data to chart format từ API riêng
+  const chartData = saleGraph
+    ? Object.keys(saleGraph)
+        .sort((a, b) => parseInt(a) - parseInt(b))
+        .map((month) => {
+          const monthNames = [
+            "Tháng 1",
+            "Tháng 2",
+            "Tháng 3",
+            "Tháng 4",
+            "Tháng 5",
+            "Tháng 6",
+            "Tháng 7",
+            "Tháng 8",
+            "Tháng 9",
+            "Tháng 10",
+            "Tháng 11",
+            "Tháng 12",
+          ];
+          return {
+            month: monthNames[parseInt(month) - 1],
+            sales: saleGraph[month] || 0,
+          };
+        })
     : [];
 
-  const categoryRevenue = [
-    { name: "Phòng ngủ", value: 13000000 },
-    { name: "Ngoài trời", value: 10000000 },
-    { name: "Phòng khách", value: 8000000 },
-    { name: "Nhà bếp & thiết bị", value: 7000000 },
-    { name: "Văn phòng tại nhà", value: 6000000 },
-    { name: "Phòng ăn", value: 4000000 },
-    { name: "Phòng trẻ em", value: 3500000 },
-    { name: "Phòng tắm", value: 3000000 },
-  ];
+  // categoryRevenue đã được fetch từ API và lưu trong state
 
   const COLORS = [
     "#4F46E5",
@@ -217,18 +314,11 @@ const DashboardPage = () => {
   }, []);
 
   const isSmallScreen = windowWidth < 1024;
-  const totalRevenue = stats[0]?.amount || 0;
-
-  if (loading) {
-    return (
-      <div className="p-4 md:p-6 flex items-center justify-center h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Đang tải dữ liệu...</p>
-        </div>
-      </div>
-    );
-  }
+  // Tính tổng doanh thu từ categoryRevenue (từ API)
+  const totalRevenue =
+    categoryRevenue.reduce((sum, item) => sum + (item.value || 0), 0) ||
+    stats[0]?.amount ||
+    0;
 
   if (error) {
     return (
@@ -274,8 +364,16 @@ const DashboardPage = () => {
               className="border px-3 py-1 rounded-md w-full md:w-auto"
               value={startDate}
               onChange={handleStartDateChange}
-              max={todayString}
             />
+            {startDate && (
+              <button
+                onClick={() => setStartDate("")}
+                className="text-gray-400 hover:text-red-600 text-sm"
+                title="Xóa"
+              >
+                ✕
+              </button>
+            )}
           </div>
           <div className="flex items-center space-x-2">
             <label className="text-sm text-gray-600">Đến:</label>
@@ -284,14 +382,27 @@ const DashboardPage = () => {
               className="border px-3 py-1 rounded-md w-full md:w-auto"
               value={endDate}
               onChange={handleEndDateChange}
-              max={todayString}
               min={startDate || undefined}
             />
+            {endDate && (
+              <button
+                onClick={() => setEndDate("")}
+                className="text-gray-400 hover:text-red-600 text-sm"
+                title="Xóa"
+              >
+                ✕
+              </button>
+            )}
           </div>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative">
+          {statisticsLoading && (
+            <div className="absolute inset-0 bg-white bg-opacity-80 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+          )}
           {stats.map((item, idx) => (
             <div
               key={idx}
@@ -312,8 +423,13 @@ const DashboardPage = () => {
 
         {/* LineChart + Best Sellers */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="bg-white shadow-md rounded-2xl p-4 lg:col-span-2">
+          <div className="bg-white shadow-md rounded-2xl p-4 lg:col-span-2 relative">
             <h3 className="font-semibold mb-4">Biểu đồ doanh thu theo tháng</h3>
+            {saleGraphLoading && (
+              <div className="absolute inset-0 bg-white bg-opacity-80 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              </div>
+            )}
             <div className="w-full h-[250px] sm:h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={chartData}>
@@ -385,7 +501,7 @@ const DashboardPage = () => {
                           <p className="font-semibold text-sm">
                             {formatVND(p.price)}
                           </p>
-                          {p.discountPercent && (
+                          {p.discountPercent > 0 && (
                             <p className="text-xs text-red-500">
                               -{p.discountPercent}%
                             </p>
@@ -442,8 +558,13 @@ const DashboardPage = () => {
           </div>
         </div>
 
-        <div className="bg-white shadow-md rounded-2xl p-4">
+        <div className="bg-white shadow-md rounded-2xl p-4 relative">
           <h3 className="font-semibold mb-4">Tỷ lệ doanh thu theo danh mục</h3>
+          {categoryRevenueLoading && (
+            <div className="absolute inset-0 bg-white bg-opacity-80 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+          )}
           <div className="text-center md:pl-30 xl:pr-40">
             <h4 className="text-gray-600 text-sm font-semibold">
               Tổng doanh thu

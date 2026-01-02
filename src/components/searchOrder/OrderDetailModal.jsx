@@ -178,7 +178,7 @@ const OrderDetailModal = ({ visible, order, onClose }) => {
         <div className="flex items-center gap-2">
           <FileTextOutlined className="text-xl" />
           <span className="text-lg font-semibold">
-            Chi tiết đơn hàng #{order.orderNumber}
+            Chi tiết đơn hàng {order.orderNumber}
           </span>
         </div>
       }
@@ -195,7 +195,7 @@ const OrderDetailModal = ({ visible, order, onClose }) => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <p className="text-sm text-gray-600">Mã đơn hàng</p>
-              <p className="font-semibold">#{order.orderNumber}</p>
+              <p className="font-semibold">{order.orderNumber}</p>
             </div>
             <div>
               <p className="text-sm text-gray-600">Trạng thái đơn hàng</p>

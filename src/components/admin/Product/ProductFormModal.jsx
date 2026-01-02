@@ -217,7 +217,6 @@ export default function ProductFormModal({
   };
 
   const handleSubmit = async (values) => {
-    console.log({ ...values, previews, imagesIdDelete });
     if (editId) {
       await handleEdit(values);
     } else {

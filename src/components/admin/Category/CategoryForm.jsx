@@ -11,7 +11,6 @@ import { toast } from "react-toastify";
 import axios from "axios";
 
 export default function CategoryForm({ editId, rooms, onClose }) {
-  console.log("Rooms in CategoryForm:", rooms);
   const [categories, setCategories] = useState({
     name: "",
     room: rooms[0].id,
@@ -30,7 +29,6 @@ export default function CategoryForm({ editId, rooms, onClose }) {
               description: cat.data.description || "",
             });
 
-            console.log("ParentId:", cat.data.parentId, "Rooms:", rooms);
           }
         } catch (error) {
           console.log(error);

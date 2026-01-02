@@ -53,7 +53,6 @@ const CartPage = () => {
     if (!isLoggedIn()) {
       setLoading(true);
       setCartItems(cartItemsInRedux);
-      console.log("cart in redux:", cartItemsInRedux);
       setLoading(false);
     }
   }, [cartItemsInRedux]);
