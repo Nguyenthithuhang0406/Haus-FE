@@ -63,12 +63,7 @@ const CancelOrderModal = ({ visible, order, onCancel, onConfirm }) => {
           timestamp: new Date().toISOString(),
         };
 
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        onConfirm(order?.id, cancelData);
-
-        // Hiển thị thông báo thành công
-        message.success("Hủy đơn hàng thành công!");
+        await onConfirm(order?.id, cancelData);
 
         // Reset form và đóng modal
         handleClose();

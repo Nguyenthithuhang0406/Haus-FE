@@ -185,3 +185,16 @@ export const getSaleByParentCategory = async (startDate, endDate) => {
     throw error;
   }
 };
+
+export const cancelOrder = async (orderId) => {
+  try {
+    const response = await request(axiosPrivate, {
+      method: "POST",
+      url: `/orders/cancel/${orderId}`,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi hủy đơn hàng:", error);
+    throw error;
+  }
+};

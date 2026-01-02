@@ -4,7 +4,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import SidebarProfile from "@/components/auth/SidebarProfile";
 import OrderItem from "@/components/searchOrder/OrderItem";
 import InvoiceButton from "@/components/payment/bill/InvoiceButton";
-import { getAllOrder, searchOrderByNumber } from "@/api/order";
+import { getAllOrder, searchOrderByNumber, cancelOrder } from "@/api/order";
 
 const { Option } = Select;
 
@@ -197,19 +197,20 @@ const OrderInfor = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleCancelOrder = (orderId, cancelData) => {
-    setOrders((prev) =>
-      prev.map((o) =>
-        o.id === orderId
-          ? {
-              ...o,
-              status: "Bị hoàn",
-              cancelReason: cancelData.reason,
-              canceledAt: cancelData.timestamp,
-            }
-          : o
-      )
-    );
+  const handleCancelOrder = async (orderId) => {
+    try {
+      setLoading(true);
+      const response = await cancelOrder(orderId);
+      if (response.status === 200) {
+        message.success("Hủy đơn hàng thành công!");
+        fetchOrders(currentPage, statusFilter);
+      }
+    } catch (error) {
+      console.log(error);
+      message.error("Hủy đơn hàng thất bại, vui lòng thử lại sau!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Hiển thị orders (khi search thì đã gọi API và set orders rồi)
@@ -291,11 +292,10 @@ const OrderInfor = () => {
                 <div className="p-4 sm:p-6 min-h-[400px] relative">
                   {displayOrders.length > 0 ? (
                     <div
-                      className={`transition-opacity duration-300 ${
-                        loading
-                          ? "opacity-50 pointer-events-none"
-                          : "opacity-100"
-                      }`}
+                      className={`transition-opacity duration-300 ${loading
+                        ? "opacity-50 pointer-events-none"
+                        : "opacity-100"
+                        }`}
                     >
                       {displayOrders.map((order) => (
                         <OrderItem

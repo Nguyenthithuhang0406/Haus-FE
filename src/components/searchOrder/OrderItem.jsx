@@ -108,8 +108,8 @@ const OrderItem = ({ order, onCancelOrder }) => {
     setShowCancelModal(true);
   };
 
-  const handleConfirmCancel = (orderId, cancelData) => {
-    onCancelOrder(orderId, cancelData);
+  const handleConfirmCancel = async (orderId, cancelData) => {
+    await onCancelOrder(orderId, cancelData);
   };
 
   const handleDownloadInvoice = async () => {
