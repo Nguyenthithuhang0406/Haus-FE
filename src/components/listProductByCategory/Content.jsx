@@ -19,7 +19,7 @@ const Content = ({ products, total, filter, setFilter }) => {
             className="w-[200px] rounded-[8px]"
             popupClassName="rounded-[8px]"
             value={filter.sortBy}
-            onChange={(value) => setFilter({ ...filter, sortBy: value })}
+            onChange={(value) => setFilter({ ...filter, sortBy: value, pageNum: 1 })}
           >
             <Option value="asc">A -&gt; Z</Option>
             <Option value="desc">Z -&gt; A</Option>
@@ -43,9 +43,9 @@ const Content = ({ products, total, filter, setFilter }) => {
       <Pagination
         defaultCurrent={1}
         total={total}
-        pageSize={filter.limit}
-        current={filter.page}
-        onChange={(page) => setFilter({ ...filter, page: page })}
+        pageSize={filter.pageSize}
+        current={filter.pageNum}
+        onChange={(page) => setFilter({ ...filter, pageNum: page })}
       />
     </div>
   );
