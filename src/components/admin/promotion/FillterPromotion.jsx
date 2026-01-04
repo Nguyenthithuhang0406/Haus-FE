@@ -44,7 +44,7 @@ const FillterPromotion = ({
           className="bg-[#ad7555] text-white border-2 border-[#ad7555] 
                    hover:bg-white hover:text-[#ad7555] hover:border-[#ad7555] 
                    px-4 py-2  flex items-center gap-2 
-                   text-sm font-medium transition-all duration-200"
+                   text-sm font-medium transition-all duration-200 rounded-lg"
         >
           <Plus size={18} />
           <span>Thêm khuyến mãi</span>
@@ -56,7 +56,7 @@ const FillterPromotion = ({
           className="w-full bg-[#ad7555] text-white border-2 border-[#ad7555] 
                    hover:bg-white hover:text-[#ad7555] hover:border-[#ad7555] 
                    px-4 py-2  flex items-center justify-center gap-2 
-                   text-sm font-medium transition-all duration-200"
+                   text-sm font-medium transition-all duration-200 rounded-lg"
         >
           <Plus size={18} />
           <span>Thêm khuyến mãi</span>
@@ -85,7 +85,7 @@ const FillterPromotion = ({
         </div>
 
         {/* Filter Controls */}
-        <div className="p-6">
+        <div className="p-6 rounded-lg">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Promotion Type Filter */}
             <div className="space-y-2">
@@ -233,7 +233,7 @@ const FillterPromotion = ({
           </div>
 
           {mobileFilterExpanded && (
-            <div className="p-6">
+            <div className="p-6 rounded-lg">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 {/* Promotion Type Filter */}
                 <div className="space-y-2">
