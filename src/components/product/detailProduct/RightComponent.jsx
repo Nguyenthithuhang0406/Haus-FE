@@ -18,6 +18,7 @@ import {
   removeFavorite,
   selectIsFavorite,
 } from "@/store/favoriteSlice";
+import { useButtonLoading } from "@/hooks/useButtonLoading";
 
 const RightComponent = ({
   product,
@@ -29,6 +30,25 @@ const RightComponent = ({
   const dispatch = useDispatch();
   const addCartBtnRef = useRef(null);
   const navigate = useNavigate();
+
+  // Sử dụng hook để manage loading state cho button Thêm vào giỏ
+  const { isLoading: isAddingToCart, execute: executeAddToCart } =
+    useButtonLoading(async () => {
+      await handleAddToCart();
+    });
+
+  // Sử dụng hook để manage loading state cho button Mua ngay
+  const { isLoading: isBuyingNow, execute: executeBuyNow } = useButtonLoading(
+    async () => {
+      await handleClickBuyNow();
+    }
+  );
+
+  // Sử dụng hook để manage loading state cho button yêu thích
+  const { isLoading: isToggling, execute: executeToggleFavorite } =
+    useButtonLoading(async () => {
+      await handleToggleFavorite();
+    });
 
   const benefits = [
     {
@@ -147,11 +167,12 @@ const RightComponent = ({
       <p>
         <span className="font-semibold">Tình trạng: </span>
         <span
-          className={`${(product?.productVariations[selectedVariantIndex]
+          className={`${
+            (product?.productVariations[selectedVariantIndex]
               ?.inventoryQuantity || 0) > 0
               ? "text-[#28a745]"
               : "text-red-500"
-            }`}
+          }`}
         >
           {(product?.productVariations[selectedVariantIndex]
             ?.inventoryQuantity || 0) > 0
@@ -192,17 +213,18 @@ const RightComponent = ({
                 key={type?.id}
                 aria-label={type?.color}
                 onClick={() => setSelectedVariantIndex(index)}
-                className={`w-[40px] h-[40px] rounded-lg border-[1px] p-[2px] cursor-pointer flex items-center justify-center ${index === selectedVariantIndex
+                className={`w-[40px] h-[40px] rounded-lg border-[1px] p-[2px] cursor-pointer flex items-center justify-center ${
+                  index === selectedVariantIndex
                     ? "border-[#9a542c]"
                     : "border-[#e4e4e4]"
-                  }`}
+                }`}
               >
                 <img
                   ref={addCartBtnRef}
                   src={type?.media?.url}
                   alt={type?.color}
                   className={`w-full h-full object-cover`}
-                // onClick={() => setTypeIndex(index)}
+                  // onClick={() => setTypeIndex(index)}
                 />
               </div>
             ))}
@@ -231,27 +253,31 @@ const RightComponent = ({
 
           <div className="w-full flex items-center justify-between gap-[10px]">
             <button
-              onClick={() => handleAddToCart()}
-              className="w-full px-[8px] py-[14px] font-medium text-[#ad7555] border-[1px] border-[#ad7555] rounded-lg bg-transparent hover:text-white hover:bg-[#ad7555]"
+              onClick={() => executeAddToCart()}
+              disabled={isAddingToCart}
+              className="w-full px-[8px] py-[14px] font-medium text-[#ad7555] border-[1px] border-[#ad7555] rounded-lg bg-transparent hover:text-white hover:bg-[#ad7555] disabled:opacity-60 disabled:cursor-not-allowed transition-all"
             >
-              THÊM VÀO GIỎ
+              {isAddingToCart ? "Đang thêm..." : "THÊM VÀO GIỎ"}
             </button>
             <button
-              onClick={handleToggleFavorite}
-              className={`w-[53px] h-[53px] border-[1px] border-[#ad7555] rounded-lg text-[24px] flex items-center justify-center transition-colors ${isFavorite
+              onClick={() => executeToggleFavorite()}
+              disabled={isToggling}
+              className={`w-[53px] h-[53px] border-[1px] border-[#ad7555] rounded-lg text-[24px] flex items-center justify-center transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
+                isFavorite
                   ? "bg-[#ad7555] text-white"
                   : "text-[#ad7555] bg-transparent hover:text-white hover:bg-[#ad7555]"
-                }`}
+              }`}
             >
               <CiHeart className="text-[30px]" />
             </button>
           </div>
 
           <button
-            onClick={handleClickBuyNow}
-            className="w-full px-[8px] py-[14px] bg-[#ad7555] text-white font-medium border-[1px] border-[#ad7555] hover:text-[#ad7555] hover:bg-transparent rounded-lg"
+            onClick={() => executeBuyNow()}
+            disabled={isBuyingNow}
+            className="w-full px-[8px] py-[14px] bg-[#ad7555] text-white font-medium border-[1px] border-[#ad7555] hover:text-[#ad7555] hover:bg-transparent rounded-lg disabled:opacity-60 disabled:cursor-not-allowed transition-all"
           >
-            MUA NGAY
+            {isBuyingNow ? "Đang xử lý..." : "MUA NGAY"}
           </button>
 
           <div className="w-full flex items-center break-words">
@@ -271,8 +297,9 @@ const RightComponent = ({
           {benefits.map((benefit, index) => (
             <div
               key={index}
-              className={`py-[20px] flex flex-col gap-[10px] items-center justify-center ${index === 1 ? "lg:border-y lg:border-[#e4e4e4]" : ""
-                }`}
+              className={`py-[20px] flex flex-col gap-[10px] items-center justify-center ${
+                index === 1 ? "lg:border-y lg:border-[#e4e4e4]" : ""
+              }`}
             >
               <div className="w-[50px] h-[50px] bg-[#ad7555] rounded-xl text-[24px] text-[#e4e4e4] flex items-center justify-center">
                 {benefit.icon}

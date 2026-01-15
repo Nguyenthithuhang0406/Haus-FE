@@ -1,9 +1,10 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useShippingFee } from "@/hooks/useShippingFee";
 import { usePromotion } from "@/hooks/usePromotion";
 import { processOrder } from "@/services/orderService";
 import { useNavigate } from "react-router-dom";
+import { useButtonLoading } from "@/hooks/useButtonLoading";
 
 const ProductPayment = ({
   listProducts,
@@ -13,7 +14,27 @@ const ProductPayment = ({
   setOrderNote,
 }) => {
   const navigate = useNavigate();
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const products = useMemo(() => listProducts || [], [listProducts]);
+
+  // Sử dụng hook để manage loading state cho button Đặt hàng
+  const { isLoading, execute: executeOrder } = useButtonLoading(async () => {
+    setIsPlacingOrder(true);
+    try {
+      await processOrder({
+        listProducts,
+        diliveryAddress,
+        paymentMethod,
+        orderNote,
+        shippingFee,
+        total,
+        promotion,
+        navigate,
+      });
+    } finally {
+      setIsPlacingOrder(false);
+    }
+  });
 
   const subtotal = useMemo(
     () =>
@@ -51,16 +72,7 @@ const ProductPayment = ({
   });
 
   const handleOrder = async () => {
-    await processOrder({
-      listProducts,
-      diliveryAddress,
-      paymentMethod,
-      orderNote,
-      shippingFee,
-      total,
-      promotion,
-      navigate,
-    });
+    await executeOrder();
   };
   return (
     <div className="w-[600px] md:w-[500px] rounded-lg border border-gray-200 shadow-lg flex flex-col">
@@ -173,9 +185,10 @@ const ProductPayment = ({
           </Link>
           <button
             onClick={handleOrder}
-            className="px-5 py-2.5 bg-[#ad7555] hover:bg-[#945f46] text-white font-semibold rounded-xl shadow-md cursor-pointer"
+            disabled={isLoading}
+            className="px-5 py-2.5 bg-[#ad7555] hover:bg-[#945f46] text-white font-semibold rounded-xl shadow-md cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed transition-all"
           >
-            Đặt hàng
+            {isLoading ? "Đang đặt hàng..." : "Đặt hàng"}
           </button>
         </div>
       </div>

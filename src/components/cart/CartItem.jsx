@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Minus, Plus, X, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -12,6 +12,7 @@ const CartItem = ({
   onToggleSelect,
 }) => {
   const navigate = useNavigate();
+  const [removingVariantId, setRemovingVariantId] = useState(null);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat("vi-VN").format(price) + "đ";
@@ -20,6 +21,15 @@ const CartItem = ({
   const handleProductClick = () => {
     if (item?.id) {
       navigate(`/detailProduct/${item.id}`);
+    }
+  };
+
+  const handleRemove = async () => {
+    setRemovingVariantId(variant?.id);
+    try {
+      await onRemove(variant?.id);
+    } finally {
+      setRemovingVariantId(null);
     }
   };
   return (
@@ -59,8 +69,9 @@ const CartItem = ({
               {item?.productName}
             </h3>
             <button
-              onClick={() => onRemove(variant?.id)}
-              className="text-gray-400 hover:text-red-600 transition-colors p-1 flex-shrink-0"
+              onClick={handleRemove}
+              disabled={removingVariantId === variant?.id}
+              className="text-gray-400 hover:text-red-600 transition-colors p-1 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <X size={18} />
             </button>
@@ -248,8 +259,9 @@ const CartItem = ({
         </div>
 
         <button
-          onClick={() => onRemove(variant?.id)}
-          className="text-gray-400 hover:text-red-600 transition-colors p-2"
+          onClick={handleRemove}
+          disabled={removingVariantId === variant?.id}
+          className="text-gray-400 hover:text-red-600 transition-colors p-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <X size={20} />
         </button>
