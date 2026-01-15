@@ -15,10 +15,12 @@ export const VariantSchema = Yup.object().shape({
     .required("Ảnh bắt buộc")
     .test("fileType", "Chỉ chấp nhận file ảnh (jpg, png, jpeg)", (value) => {
       if (!value) return false;
-      return ["image/jpeg", "image/png", "image/jpg"].includes(value.type);
+      if (typeof value === "string") return true; // Hỗ trợ URL cũ
+      return ["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(value.type);
     })
     .test("fileSize", "Ảnh phải nhỏ hơn 5MB", (value) => {
       if (!value) return false;
+      if (typeof value === "string") return true; // Hỗ trợ URL cũ
       return value.size <= 5 * 1024 * 1024;
     }),
 });

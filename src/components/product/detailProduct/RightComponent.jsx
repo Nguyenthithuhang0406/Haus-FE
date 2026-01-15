@@ -79,6 +79,7 @@ const RightComponent = ({
       product?.productVariations[selectedVariantIndex]?.inventoryQuantity == 0
     ) {
       toast.error("Sản phẩm đã hết hàng");
+      return;
     }
     const imageUrl = product.productVariations[selectedVariantIndex].media?.url;
 
@@ -146,12 +147,11 @@ const RightComponent = ({
       <p>
         <span className="font-semibold">Tình trạng: </span>
         <span
-          className={`${
-            (product?.productVariations[selectedVariantIndex]
+          className={`${(product?.productVariations[selectedVariantIndex]
               ?.inventoryQuantity || 0) > 0
               ? "text-[#28a745]"
               : "text-red-500"
-          }`}
+            }`}
         >
           {(product?.productVariations[selectedVariantIndex]
             ?.inventoryQuantity || 0) > 0
@@ -192,18 +192,17 @@ const RightComponent = ({
                 key={type?.id}
                 aria-label={type?.color}
                 onClick={() => setSelectedVariantIndex(index)}
-                className={`w-[40px] h-[40px] rounded-lg border-[1px] p-[2px] cursor-pointer flex items-center justify-center ${
-                  index === selectedVariantIndex
+                className={`w-[40px] h-[40px] rounded-lg border-[1px] p-[2px] cursor-pointer flex items-center justify-center ${index === selectedVariantIndex
                     ? "border-[#9a542c]"
                     : "border-[#e4e4e4]"
-                }`}
+                  }`}
               >
                 <img
                   ref={addCartBtnRef}
                   src={type?.media?.url}
                   alt={type?.color}
                   className={`w-full h-full object-cover`}
-                  // onClick={() => setTypeIndex(index)}
+                // onClick={() => setTypeIndex(index)}
                 />
               </div>
             ))}
@@ -239,11 +238,10 @@ const RightComponent = ({
             </button>
             <button
               onClick={handleToggleFavorite}
-              className={`w-[53px] h-[53px] border-[1px] border-[#ad7555] rounded-lg text-[24px] flex items-center justify-center transition-colors ${
-                isFavorite
+              className={`w-[53px] h-[53px] border-[1px] border-[#ad7555] rounded-lg text-[24px] flex items-center justify-center transition-colors ${isFavorite
                   ? "bg-[#ad7555] text-white"
                   : "text-[#ad7555] bg-transparent hover:text-white hover:bg-[#ad7555]"
-              }`}
+                }`}
             >
               <CiHeart className="text-[30px]" />
             </button>
@@ -273,9 +271,8 @@ const RightComponent = ({
           {benefits.map((benefit, index) => (
             <div
               key={index}
-              className={`py-[20px] flex flex-col gap-[10px] items-center justify-center ${
-                index === 1 ? "lg:border-y lg:border-[#e4e4e4]" : ""
-              }`}
+              className={`py-[20px] flex flex-col gap-[10px] items-center justify-center ${index === 1 ? "lg:border-y lg:border-[#e4e4e4]" : ""
+                }`}
             >
               <div className="w-[50px] h-[50px] bg-[#ad7555] rounded-xl text-[24px] text-[#e4e4e4] flex items-center justify-center">
                 {benefit.icon}
