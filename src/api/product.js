@@ -87,6 +87,7 @@ export const updateProduct = async (data) => {
       categories,
       imageIdsToDelete,
       images,
+      inventoryQuantity,
     } = data;
 
     const requestData = {
@@ -97,6 +98,7 @@ export const updateProduct = async (data) => {
       detailDescription,
       categories,
       imageIdsToDelete,
+      inventoryQuantity,
     };
     const formData = new FormData();
     formData.append("request", JSON.stringify(requestData));

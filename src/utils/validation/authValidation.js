@@ -21,6 +21,9 @@ export const RegisterSchema = Yup.object({
   email: Yup.string()
     .email("Email không hợp lệ")
     .required("Vui lòng nhập email"),
+  username: Yup.string()
+    .min(3, "Tên đăng nhập phải ít nhất 3 ký tự")
+    .required("Vui lòng nhập tên đăng nhập"),
   password: Yup.string()
     .matches(
       passwordRules,

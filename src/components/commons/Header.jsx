@@ -9,6 +9,7 @@ import { AiOutlineHeart } from "react-icons/ai";
 import { GrCart } from "react-icons/gr";
 import Logo from "@/assets/icons/Logo";
 import { removeAllCookies } from "@/utils/cookies";
+import { clearAccessToken } from "@/utils/tokenMemory";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { setKeySearch } from "@/store/searchSlice";
@@ -65,6 +66,7 @@ const Header = () => {
 
   const handleLogout = () => {
     removeAllCookies();
+    clearAccessToken();
     setIsLogin(false);
     // Load số lượng giỏ hàng từ local cart sau khi đăng xuất
     dispatch(loadCartQuantity());

@@ -7,6 +7,8 @@ import "aos/dist/aos.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getCookie } from "./utils/cookies";
+import { refreshToken } from "@/api/auth";
+import { getAccessToken } from "@/utils/tokenMemory";
 import { useDispatch } from "react-redux";
 import { loadFavorites } from "./store/favoriteSlice";
 
@@ -52,6 +54,14 @@ const App = () => {
     // Load favorites khi vào trang web
     dispatch(loadFavorites());
     // loadCartQuantity sẽ được gọi trong UserLayout để tránh gọi lại mỗi lần chuyển trang
+
+    // Preload access token into memory if we have a refresh token
+    const hasRefresh = getCookie("refreshToken");
+    const hasAccess = getAccessToken();
+    if (hasRefresh && !hasAccess) {
+      // Silent refresh; ignore errors if BE not ready
+      refreshToken().catch(() => {});
+    }
   }, [dispatch]);
 
   const ProtectedRoute = ({ children, allowedRoles }) => {

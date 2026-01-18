@@ -49,6 +49,7 @@ export default function ProductFormModal({
               detailDescription: response.data.detailDescription || "",
               price: response.data.price || "",
               material: response.data.material || "",
+              inventoryQuantity: response.data.inventoryQuantity || "",
             });
             setPrevImages(response.data.medias || []);
             setPreviews(imgs);
@@ -124,7 +125,7 @@ export default function ProductFormModal({
     const newPreviews = previews.filter((_, i) => i !== idx);
     const imageUrlToDelete = previews[idx];
     const imageToDelete = prevImages.find(
-      (img) => img.url === imageUrlToDelete
+      (img) => img.url === imageUrlToDelete,
     );
     if (imageToDelete) {
       setImagesIdDelete((prev) => [...prev, imageToDelete.id]);
@@ -183,6 +184,7 @@ export default function ProductFormModal({
       categories: [values.categories],
       images: values.images,
       imageIdsToDelete: imagesIdDelete,
+      inventoryQuantity: values.inventoryQuantity,
     };
 
     setLoading(true);
@@ -308,8 +310,8 @@ export default function ProductFormModal({
                         values.description.length > 480
                           ? "text-red-500"
                           : values.description.length > 450
-                          ? "text-yellow-600"
-                          : "text-gray-500"
+                            ? "text-yellow-600"
+                            : "text-gray-500"
                       }`}
                     >
                       {values.description?.length || 0} / 500
@@ -364,8 +366,8 @@ export default function ProductFormModal({
                         values.detailDescription.length > 1900
                           ? "text-red-500"
                           : values.detailDescription.length > 1800
-                          ? "text-yellow-600"
-                          : "text-gray-500"
+                            ? "text-yellow-600"
+                            : "text-gray-500"
                       }`}
                     >
                       {values.detailDescription?.length || 0} / 2000

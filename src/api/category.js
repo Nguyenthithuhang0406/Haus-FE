@@ -24,9 +24,9 @@ export const getAllCategory = async (data) => {
 
 export const getAllCategoryChildren = async () => {
   try {
-    const response = await request(axiosPublic, {
+    const response = await request(axiosPrivate, {
       method: "GET",
-      url: "/category/sub",
+      url: "/category/all",
     });
     return response.data;
   } catch (error) {

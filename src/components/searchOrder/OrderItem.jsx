@@ -5,12 +5,14 @@ import CancelOrderModal from "./CancelOrderModal";
 import OrderDetailModal from "./OrderDetailModal";
 import ProductRow from "./ProductRow";
 import { getInvoicePdf } from "@/api/order";
+import { useButtonLoading } from "@/hooks/useButtonLoading";
 
 const OrderItem = ({ order, onCancelOrder }) => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [isCanceling, setIsCanceling] = useState(false);
 
   const products = order.products || [
     {
@@ -109,7 +111,12 @@ const OrderItem = ({ order, onCancelOrder }) => {
   };
 
   const handleConfirmCancel = async (orderId, cancelData) => {
-    await onCancelOrder(orderId, cancelData);
+    setIsCanceling(true);
+    try {
+      await onCancelOrder(orderId, cancelData);
+    } finally {
+      setIsCanceling(false);
+    }
   };
 
   const handleDownloadInvoice = async () => {
@@ -165,9 +172,10 @@ const OrderItem = ({ order, onCancelOrder }) => {
         {canCancel && (
           <button
             onClick={handleCancelClick}
-            className="text-red-500 hover:text-red-700 font-medium text-xs sm:text-sm transition-colors whitespace-nowrap"
+            disabled={isCanceling}
+            className="text-red-500 hover:text-red-700 font-medium text-xs sm:text-sm transition-colors whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Huỷ đơn
+            {isCanceling ? "Đang hủy..." : "Huỷ đơn"}
           </button>
         )}
       </div>

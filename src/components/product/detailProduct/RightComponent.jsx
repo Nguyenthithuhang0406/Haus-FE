@@ -18,6 +18,7 @@ import {
   removeFavorite,
   selectIsFavorite,
 } from "@/store/favoriteSlice";
+import { useButtonLoading } from "@/hooks/useButtonLoading";
 
 const RightComponent = ({
   product,
@@ -29,6 +30,25 @@ const RightComponent = ({
   const dispatch = useDispatch();
   const addCartBtnRef = useRef(null);
   const navigate = useNavigate();
+
+  // Sử dụng hook để manage loading state cho button Thêm vào giỏ
+  const { isLoading: isAddingToCart, execute: executeAddToCart } =
+    useButtonLoading(async () => {
+      await handleAddToCart();
+    });
+
+  // Sử dụng hook để manage loading state cho button Mua ngay
+  const { isLoading: isBuyingNow, execute: executeBuyNow } = useButtonLoading(
+    async () => {
+      await handleClickBuyNow();
+    }
+  );
+
+  // Sử dụng hook để manage loading state cho button yêu thích
+  const { isLoading: isToggling, execute: executeToggleFavorite } =
+    useButtonLoading(async () => {
+      await handleToggleFavorite();
+    });
 
   const benefits = [
     {
@@ -79,6 +99,7 @@ const RightComponent = ({
       product?.productVariations[selectedVariantIndex]?.inventoryQuantity == 0
     ) {
       toast.error("Sản phẩm đã hết hàng");
+      return;
     }
     const imageUrl = product.productVariations[selectedVariantIndex].media?.url;
 
@@ -232,14 +253,16 @@ const RightComponent = ({
 
           <div className="w-full flex items-center justify-between gap-[10px]">
             <button
-              onClick={() => handleAddToCart()}
-              className="w-full px-[8px] py-[14px] font-medium text-[#ad7555] border-[1px] border-[#ad7555] rounded-lg bg-transparent hover:text-white hover:bg-[#ad7555]"
+              onClick={() => executeAddToCart()}
+              disabled={isAddingToCart}
+              className="w-full px-[8px] py-[14px] font-medium text-[#ad7555] border-[1px] border-[#ad7555] rounded-lg bg-transparent hover:text-white hover:bg-[#ad7555] disabled:opacity-60 disabled:cursor-not-allowed transition-all"
             >
-              THÊM VÀO GIỎ
+              {isAddingToCart ? "Đang thêm..." : "THÊM VÀO GIỎ"}
             </button>
             <button
-              onClick={handleToggleFavorite}
-              className={`w-[53px] h-[53px] border-[1px] border-[#ad7555] rounded-lg text-[24px] flex items-center justify-center transition-colors ${
+              onClick={() => executeToggleFavorite()}
+              disabled={isToggling}
+              className={`w-[53px] h-[53px] border-[1px] border-[#ad7555] rounded-lg text-[24px] flex items-center justify-center transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
                 isFavorite
                   ? "bg-[#ad7555] text-white"
                   : "text-[#ad7555] bg-transparent hover:text-white hover:bg-[#ad7555]"
@@ -250,10 +273,11 @@ const RightComponent = ({
           </div>
 
           <button
-            onClick={handleClickBuyNow}
-            className="w-full px-[8px] py-[14px] bg-[#ad7555] text-white font-medium border-[1px] border-[#ad7555] hover:text-[#ad7555] hover:bg-transparent rounded-lg"
+            onClick={() => executeBuyNow()}
+            disabled={isBuyingNow}
+            className="w-full px-[8px] py-[14px] bg-[#ad7555] text-white font-medium border-[1px] border-[#ad7555] hover:text-[#ad7555] hover:bg-transparent rounded-lg disabled:opacity-60 disabled:cursor-not-allowed transition-all"
           >
-            MUA NGAY
+            {isBuyingNow ? "Đang xử lý..." : "MUA NGAY"}
           </button>
 
           <div className="w-full flex items-center break-words">
