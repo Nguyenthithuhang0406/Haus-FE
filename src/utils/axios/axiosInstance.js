@@ -3,7 +3,11 @@ import { get, set } from "lodash";
 import { getCookie, removeAllCookies } from "../cookies";
 import { refreshToken } from "@/api/auth";
 import { saveReturnUrl } from "../returnUrl";
-import { getAccessToken, setAccessToken } from "../tokenMemory";
+import {
+  getAccessToken,
+  setAccessToken,
+  setOnTokenExpired,
+} from "../tokenMemory";
 
 const createAxiosInstance = (baseURL) => {
   return axios.create({
@@ -20,6 +24,17 @@ const axiosPublic = createAxiosInstance(import.meta.env.VITE_APP_URL_BE);
 
 // Instance có token (dùng cho API cần đăng nhập)
 const axiosPrivate = createAxiosInstance(import.meta.env.VITE_APP_URL_BE);
+
+// Setup token expiration callback for auto-refresh
+setOnTokenExpired(async () => {
+  try {
+    await refreshToken();
+  } catch (error) {
+    console.error("Auto-refresh token failed:", error);
+    removeAllCookies();
+    window.location.href = "/auth";
+  }
+});
 
 axiosPrivate.interceptors.request.use(
   (request) => {
