@@ -7,6 +7,7 @@ import { IoHeart } from "react-icons/io5";
 import { MdAccountCircle } from "react-icons/md";
 import { menuProjects } from "@/utils/contants/Menu";
 import { removeAllCookies } from "@/utils/cookies";
+import { clearAccessToken } from "@/utils/tokenMemory";
 import { getAllCategory } from "@/api/category";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -67,6 +68,7 @@ const Menu = () => {
 
   const handleLogout = () => {
     removeAllCookies();
+    clearAccessToken();
     setIsLogin(false);
     // Load số lượng giỏ hàng từ local cart sau khi đăng xuất
     dispatch(loadCartQuantity());

@@ -3,11 +3,15 @@ import { get, set } from "lodash";
 import { getCookie, removeAllCookies } from "../cookies";
 import { refreshToken } from "@/api/auth";
 import { saveReturnUrl } from "../returnUrl";
+import { getAccessToken, setAccessToken } from "../tokenMemory";
 
 const createAxiosInstance = (baseURL) => {
   return axios.create({
     baseURL,
     withCredentials: true,
+    // CSRF support: Axios will read cookie `csrfToken` and send header `X-CSRF-Token`
+    xsrfCookieName: "csrfToken",
+    xsrfHeaderName: "X-CSRF-Token",
   });
 };
 
@@ -19,7 +23,7 @@ const axiosPrivate = createAxiosInstance(import.meta.env.VITE_APP_URL_BE);
 
 axiosPrivate.interceptors.request.use(
   (request) => {
-    const token = getCookie("accessToken");
+    const token = getAccessToken();
     if (!token) {
       return request;
     }
@@ -97,6 +101,9 @@ axiosPrivate.interceptors.response.use(
         // Cập nhật header mặc định
         axiosPrivate.defaults.headers.common["Authorization"] =
           "Bearer " + accessToken;
+
+        // Lưu access token vào memory
+        setAccessToken(accessToken);
 
         // Cập nhật header cho request hiện tại
         originalRequest.headers["Authorization"] = "Bearer " + accessToken;
