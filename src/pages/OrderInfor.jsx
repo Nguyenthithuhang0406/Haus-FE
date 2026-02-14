@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useCallback,
+} from "react";
 import { Input, Pagination, Select, message } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import SidebarProfile from "@/components/auth/SidebarProfile";
@@ -16,6 +22,7 @@ const OrderInfor = () => {
   const [totalElements, setTotalElements] = useState(0);
   const [loading, setLoading] = useState(false);
   const searchTimeoutRef = useRef(null);
+  const initialLoadRef = useRef(false);
 
   const pageSize = 2;
 
@@ -87,35 +94,34 @@ const OrderInfor = () => {
     };
   };
 
-  const fetchOrders = async (
-    pageNum = 1,
-    status = "all",
-    customPageSize = null
-  ) => {
-    try {
-      setLoading(true);
-      // Sử dụng status trực tiếp từ filter (giống admin - lowercase)
-      const response = await getAllOrder({
-        status: status && status !== "all" ? status : undefined,
-        pageNum,
-        pageSize: customPageSize || pageSize,
-      });
+  const fetchOrders = useCallback(
+    async (pageNum = 1, status = "all", customPageSize = null) => {
+      try {
+        setLoading(true);
+        // Sử dụng status trực tiếp từ filter (giống admin - lowercase)
+        const response = await getAllOrder({
+          status: status && status !== "all" ? status : undefined,
+          pageNum,
+          pageSize: customPageSize || pageSize,
+        });
 
-      const list = response.data?.items || [];
-      const formatted = list.map(formatOrder);
+        const list = response.data?.items || [];
+        const formatted = list.map(formatOrder);
 
-      setOrders(formatted);
+        setOrders(formatted);
 
-      if (response.data?.pageCustom) {
-        setTotalElements(response.data.pageCustom.totalElement || 0);
+        if (response.data?.pageCustom) {
+          setTotalElements(response.data.pageCustom.totalElement || 0);
+        }
+      } catch (error) {
+        console.log(error);
+        message.error("Lấy danh sách đơn hàng thất bại!");
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.log(error);
-      message.error("Lấy danh sách đơn hàng thất bại!");
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [pageSize],
+  );
 
   const handleSearchOrder = async (orderNumber) => {
     try {
@@ -147,9 +153,14 @@ const OrderInfor = () => {
     }
   };
 
-  // Xử lý search theo mã đơn hàng với debounce
+  const prevStatusFilterRef = useRef("all");
+  const prevPageRef = useRef(1);
+  const prevSearchRef = useRef("");
+
+  // Xử lý search theo mã đơn hàng với debounce + clear search
   useEffect(() => {
     const text = searchText.trim();
+    const prevText = prevSearchRef.current.trim();
 
     // Clear timeout cũ nếu có
     if (searchTimeoutRef.current) {
@@ -157,15 +168,20 @@ const OrderInfor = () => {
       searchTimeoutRef.current = null;
     }
 
-    // Nếu không có search, reset về trang 1 và gọi API ngay lập tức
+    // Cập nhật prevSearch
+    prevSearchRef.current = searchText;
+
+    // Nếu text rỗng
     if (text === "") {
-      setCurrentPage(1);
-      fetchOrders(1, statusFilter);
+      // Nếu trước đó đang search (prevText != ""), giờ clear search
+      if (prevText !== "") {
+        // Reload danh sách orders với filter hiện tại
+        fetchOrders(1, statusFilter);
+      }
       return;
     }
 
-    // Debounce: chỉ gọi API sau 800ms khi người dùng dừng nhập
-    // Tăng thời gian debounce để tránh gọi API quá nhiều
+    // Debounce: gọi API sau 800ms khi người dùng dừng nhập
     searchTimeoutRef.current = setTimeout(() => {
       handleSearchOrder(text);
       searchTimeoutRef.current = null;
@@ -177,24 +193,51 @@ const OrderInfor = () => {
         searchTimeoutRef.current = null;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchText]);
+  }, [searchText, statusFilter]);
 
-  // Xử lý filter status và pagination
+  // Xử lý khi filter status thay đổi - reset search, page, và gọi API
+  useEffect(() => {
+    // Nếu status khác lần trước
+    if (statusFilter !== prevStatusFilterRef.current) {
+      prevStatusFilterRef.current = statusFilter;
+
+      // Reset search box nếu đang search
+      const hadSearch = searchText.trim() !== "";
+      if (hadSearch) {
+        setSearchText("");
+        // 🔑 Không gọi API ngay, để search effect xử lý và detect clear search
+        return;
+      }
+
+      // Nếu không có search: cập nhật prevPageRef và gọi API
+      prevPageRef.current = 1;
+      setCurrentPage(1);
+      fetchOrders(1, statusFilter);
+    }
+  }, [statusFilter, searchText]);
+
+  // Xử lý pagination - gọi API khi page thay đổi (không search)
   useEffect(() => {
     const text = searchText.trim();
 
-    // Chỉ gọi API khi không có search
-    if (text === "") {
+    // Nếu đang search, không gọi API
+    if (text !== "") {
+      return;
+    }
+
+    // Nếu page thực sự thay đổi (so với lần trước) → gọi API
+    if (currentPage !== prevPageRef.current) {
+      prevPageRef.current = currentPage;
       fetchOrders(currentPage, statusFilter);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, statusFilter]);
+  }, [currentPage, statusFilter, searchText, fetchOrders]);
 
-  // Load dữ liệu ban đầu
+  // Load dữ liệu ban đầu - chỉ chạy 1 lần
   useEffect(() => {
-    fetchOrders(1, "all");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!initialLoadRef.current) {
+      initialLoadRef.current = true;
+      fetchOrders(1, "all");
+    }
   }, []);
 
   const handleCancelOrder = async (orderId) => {
@@ -292,10 +335,11 @@ const OrderInfor = () => {
                 <div className="p-4 sm:p-6 min-h-[400px] relative">
                   {displayOrders.length > 0 ? (
                     <div
-                      className={`transition-opacity duration-300 ${loading
-                        ? "opacity-50 pointer-events-none"
-                        : "opacity-100"
-                        }`}
+                      className={`transition-opacity duration-300 ${
+                        loading
+                          ? "opacity-50 pointer-events-none"
+                          : "opacity-100"
+                      }`}
                     >
                       {displayOrders.map((order) => (
                         <OrderItem

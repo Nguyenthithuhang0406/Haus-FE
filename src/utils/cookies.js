@@ -12,4 +12,6 @@ export const removeAllCookies = () => {
   Object.keys(cookies.get()).forEach((key) => {
     cookies.remove(key);
   });
+  // Also clear auth-related localStorage
+  localStorage.removeItem("role");
 };

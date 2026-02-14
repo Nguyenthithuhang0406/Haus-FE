@@ -24,7 +24,8 @@ const LeftComponent = ({
 
     const all = [...base, ...variantMedias];
     const unique = all.filter(
-      (item, index, self) => index === self.findIndex((t) => t.url === item.url)
+      (item, index, self) =>
+        index === self.findIndex((t) => t.url === item.url),
     );
     return unique;
   }, [product]);
@@ -49,7 +50,6 @@ const LeftComponent = ({
     }
   }, [updateNavigation]);
 
-
   useEffect(() => {
     if (!swiperRef.current || !product?.productVariations) return;
 
@@ -71,7 +71,7 @@ const LeftComponent = ({
 
     // Kiểm tra ảnh thuộc variant nào
     const foundVariantIndex = product?.productVariations?.findIndex(
-      (v) => v.media?.url === image.url
+      (v) => v.media?.url === image.url,
     );
 
     // Nếu ảnh thuộc variant nào đó → set lại selectedVariantIndex
@@ -155,35 +155,46 @@ const LeftComponent = ({
       {/* Danh sách ảnh bên dưới */}
       <div
         key={indexImage}
-        className="flex w-full gap-2 px-5 max-h-[500px] overflow-y-auto max-[500px]:hidden"
+        className="w-full px-5 overflow-x-auto overflow-y-hidden max-[500px]:hidden max-h-[160px]"
+        style={{
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
       >
-        {displayMedias.map((image, index) => (
-          <div
-            key={image.id}
-            onClick={() => handleClickThumbnail(image, index)}
-            className={`w-full cursor-pointer rounded-2xl border border-gray-200 shadow-md opacity-60 
-              ${
+        <style>{`
+          div::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
+        <div className="flex gap-2 items-center min-w-min">
+          {displayMedias.map((image, index) => (
+            <div
+              key={image.id}
+              onClick={() => handleClickThumbnail(image, index)}
+              className={`w-[120px] h-[120px] flex-shrink-0 cursor-pointer rounded-2xl border border-gray-200 shadow-md opacity-60 
+                ${
+                  indexImage === index
+                    ? "border-[#9a542c] shadow-lg opacity-100"
+                    : ""
+                }`}
+              style={
                 indexImage === index
-                  ? "border-[#034c9b] shadow-lg opacity-100"
-                  : ""
-              }`}
-            style={
-              indexImage === index
-                ? {
-                    boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
-                    opacity: 1,
-                    borderColor: "#9a542c",
-                  }
-                : {}
-            }
-          >
-            <img
-              src={image.url}
-              alt="product"
-              className="w-full h-[120px] object-cover rounded-2xl shadow"
-            />
-          </div>
-        ))}
+                  ? {
+                      boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
+                      opacity: 1,
+                      borderColor: "#9a542c",
+                    }
+                  : {}
+              }
+            >
+              <img
+                src={image.url}
+                alt="product"
+                className="w-full h-full object-cover rounded-2xl shadow"
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

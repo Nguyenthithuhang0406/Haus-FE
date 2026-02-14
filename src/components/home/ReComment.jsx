@@ -85,7 +85,7 @@ const ReComment = () => {
                   <div className="flex items-center gap-[10px]">
                     <div className="border-4 rounded-full border-[#ad7555] p-2 bg-white">
                       <img
-                        src="https://hoseiki.vn/wp-content/uploads/2025/03/hinh-cute-chibi-21.jpg"
+                        src="https://image.dienthoaivui.com.vn/x,webp,q90/https://dashboard.dienthoaivui.com.vn/uploads/dashboard/editor_upload/avatar-cute-34.jpg"
                         alt="AnhMinhHoa"
                         className="w-[50px] h-[50px] object-cover rounded-full"
                       />

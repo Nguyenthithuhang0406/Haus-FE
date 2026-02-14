@@ -1,9 +1,7 @@
 import { jwtDecode } from "jwt-decode";
-import { getCookie } from "@/utils/cookies";
 import { getAccessToken } from "@/utils/tokenMemory";
 
 export function isLoggedIn() {
-  // Prefer memory access token if present
   const accessToken = getAccessToken();
   if (accessToken) {
     try {
@@ -15,9 +13,5 @@ export function isLoggedIn() {
       return false;
     }
   }
-
-  // Fallback: if refreshToken cookie exists, consider user logged in
-  // Requests may trigger refresh to obtain access token
-  const refreshToken = getCookie("refreshToken");
-  return Boolean(refreshToken);
+  return false;
 }

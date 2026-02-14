@@ -23,7 +23,7 @@ const ProductItem = ({ product, onRemoveFavorite }) => {
 
   // Check favorite từ Redux
   const isFavorite = useSelector((state) =>
-    selectIsFavorite(state, product?.id)
+    selectIsFavorite(state, product?.id),
   );
 
   const handleLike = async (e) => {
@@ -36,7 +36,7 @@ const ProductItem = ({ product, onRemoveFavorite }) => {
         onRemoveFavorite?.();
       } else {
         await dispatch(
-          addFavorite({ productId: product.id, product })
+          addFavorite({ productId: product.id, product }),
         ).unwrap();
       }
     } catch (err) {
@@ -74,7 +74,7 @@ const ProductItem = ({ product, onRemoveFavorite }) => {
               cartQuantity: 1,
             },
           ],
-        })
+        }),
       );
       flyToCart(imageUrl, imageRef.current);
       dispatch(setQuantityOfCart(quantityOfCart + 1));
@@ -135,34 +135,47 @@ const ProductItem = ({ product, onRemoveFavorite }) => {
           {(product?.inventoryQuantity || 0) === 0
             ? "Hết hàng"
             : product?.productVariations &&
-              product?.productVariations.length > 1
-            ? "Tùy chọn"
-            : "Thêm vào giỏ hàng"}
+                product?.productVariations.length > 1
+              ? "Tùy chọn"
+              : "Thêm vào giỏ hàng"}
         </button>
       </div>
 
       {/* List thumbnail */}
-      <div className="absolute top-[190px] lg:top-[190px] xl:top-[250px] flex gap-2 px-5 items-center z-10">
-        {product?.medias &&
-          product?.medias.map((image, index) => (
-            <div
-              onMouseEnter={() => setIndexImage(index)}
-              key={index}
-              className={`w-[30px] h-[30px] rounded-lg overflow-hidden p-[2px] border 
-              ${
-                index === indexImage
-                  ? "border-[#ad7555] shadow-md z-10"
-                  : "border-gray-300"
-              }`}
-            >
-              <img
-                ref={imageRef}
-                src={image?.url}
-                alt={product?.productName}
-                className="w-full h-full rounded-full"
-              />
-            </div>
-          ))}
+      <div
+        className="absolute top-[190px] lg:top-[190px] xl:top-[250px] w-full px-5 overflow-x-auto overflow-y-hidden z-10"
+        style={{
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
+      >
+        <style>{`
+          div::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
+        <div className="flex gap-2 items-center min-w-min">
+          {product?.medias &&
+            product?.medias.map((image, index) => (
+              <div
+                onMouseEnter={() => setIndexImage(index)}
+                key={index}
+                className={`w-[30px] h-[30px] rounded-lg overflow-hidden p-[2px] border flex-shrink-0
+                ${
+                  index === indexImage
+                    ? "border-[#ad7555] shadow-md z-10"
+                    : "border-gray-300"
+                }`}
+              >
+                <img
+                  ref={imageRef}
+                  src={image?.url}
+                  alt={product?.productName}
+                  className="w-full h-full rounded-full"
+                />
+              </div>
+            ))}
+        </div>
       </div>
 
       {/* Tên sản phẩm */}
@@ -187,7 +200,7 @@ const ProductItem = ({ product, onRemoveFavorite }) => {
       <div className="absolute bottom-[20px] w-full px-5 flex flex-col lg:flex-row justify-between lg:items-center text-[15px] font-medium">
         <p className="text-[#ff6347] font-medium">
           {formatNumber(
-            product?.price * (1 - (product?.discountPercent ?? 0) / 100)
+            product?.price * (1 - (product?.discountPercent ?? 0) / 100),
           )}
           đ
         </p>
