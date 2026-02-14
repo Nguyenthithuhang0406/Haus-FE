@@ -1,6 +1,5 @@
 import { request } from "@/utils/axios/axios-http";
 import { axiosPrivate, axiosPublic } from "@/utils/axios/axiosInstance";
-import { getCookie, removeAllCookies, setCookie } from "@/utils/cookies";
 import {
   getAccessToken,
   setAccessToken,
@@ -69,9 +68,9 @@ export const login = async (data) => {
     } = response.data.data;
     // Store accessToken in memory with auto-refresh (short-lived: ~10 min default)
     setAccessToken(accessToken, expiresIn);
-    // Persist refreshToken and role in cookies
-    setCookie("refreshToken", refreshToken);
-    setCookie("role", role);
+    // refreshToken is stored by BE in HTTP-only cookies (auto-sent by browser)
+    // role stored in localStorage
+    localStorage.setItem("role", role);
 
     return response.data;
   } catch (error) {
@@ -90,8 +89,10 @@ export const logout = async () => {
         token,
       },
     });
-    removeAllCookies();
+    // Clear memory token and localStorage
     clearAccessToken();
+    localStorage.removeItem("role");
+    // HTTP-only cookies will be cleared by BE
     return response.data;
   } catch (error) {
     console.log(error);
@@ -100,24 +101,15 @@ export const logout = async () => {
 };
 
 export const refreshToken = async () => {
-  const refreshToken = getCookie("refreshToken");
   try {
+    // refreshToken is sent automatically by browser in HTTP-only cookies
     const response = await request(axiosPublic, {
       method: "POST",
       url: "/auth/refresh",
-      data: {
-        refreshToken,
-      },
     });
-    const {
-      accessToken,
-      refreshToken: newRefreshToken,
-      expiresIn = 600,
-    } = response.data.data;
+    const { accessToken, expiresIn = 600 } = response.data.data;
     // Update memory access token with new expiration
     setAccessToken(accessToken, expiresIn);
-    // Rotate refresh token in cookie
-    setCookie("refreshToken", newRefreshToken);
     return response.data;
   } catch (error) {
     console.log(error);

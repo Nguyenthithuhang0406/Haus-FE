@@ -1,6 +1,6 @@
 import axios from "axios";
 import { get, set } from "lodash";
-import { getCookie, removeAllCookies } from "../cookies";
+import { removeAllCookies } from "../cookies";
 import { refreshToken } from "@/api/auth";
 import { saveReturnUrl } from "../returnUrl";
 import {
@@ -48,7 +48,7 @@ axiosPrivate.interceptors.request.use(
   (_error) => {
     console.log(
       "🚀 ~ axiosInstance.interceptors.request.use ~ _error:",
-      _error
+      _error,
     );
     const errorResponse = {
       status: null,
@@ -56,7 +56,7 @@ axiosPrivate.interceptors.request.use(
       errors: null,
     };
     return Promise.reject(errorResponse);
-  }
+  },
 );
 
 // ----- Response Interceptor -----
@@ -96,14 +96,6 @@ axiosPrivate.interceptors.response.use(
           .catch((err) => {
             return Promise.reject(err);
           });
-      }
-
-      const refreshTokenCookie = getCookie("refreshToken");
-      if (!refreshTokenCookie) {
-        removeAllCookies();
-        saveReturnUrl();
-        window.location.href = "/auth";
-        return Promise.reject(new Error("No refresh token available"));
       }
 
       originalRequest._retry = true;
@@ -150,6 +142,6 @@ axiosPrivate.interceptors.response.use(
       errors: get(error, "response.data.errors", null),
     };
     return Promise.reject(errorResponse);
-  }
+  },
 );
 export { axiosPublic, axiosPrivate };

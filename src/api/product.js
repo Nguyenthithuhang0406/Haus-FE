@@ -28,7 +28,7 @@ export const getAllProducts = async (data) => {
           material && `material:${material}`,
         ]
           .filter(Boolean)
-          .join(","),
+          .join("&"),
       },
     });
     return response.data;
@@ -168,7 +168,7 @@ export const getProductByCategoryId = async (data) => {
           color && `color:${color}`,
         ]
           .filter(Boolean)
-          .join(","),
+          .join("&"),
       },
     });
     return response.data;

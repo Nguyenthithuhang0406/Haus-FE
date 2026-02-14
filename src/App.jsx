@@ -6,7 +6,6 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { getCookie } from "./utils/cookies";
 import { refreshToken } from "@/api/auth";
 import { getAccessToken } from "@/utils/tokenMemory";
 import { useDispatch } from "react-redux";
@@ -22,17 +21,17 @@ const ChangePassword = lazy(() => import("@/pages/ChangePassword"));
 const ViewEditInfor = lazy(() => import("@/pages/ViewEditInfor"));
 const Promotion = lazy(() => import("@/pages/Promotion"));
 const LayoutAdmin = lazy(() => import("@/components/admin/Layouta"));
-const ManagerCategory = lazy(() =>
-  import("@/components/admin/Category/CategoriesPage")
+const ManagerCategory = lazy(
+  () => import("@/components/admin/Category/CategoriesPage"),
 );
-const ManagerProduct = lazy(() =>
-  import("@/components/admin/Product/ProductsPage")
+const ManagerProduct = lazy(
+  () => import("@/components/admin/Product/ProductsPage"),
 );
-const ListProductByCategory = lazy(() =>
-  import("@/pages/ListProductByCategory")
+const ListProductByCategory = lazy(
+  () => import("@/pages/ListProductByCategory"),
 );
-const DashboardPage = lazy(() =>
-  import("@/components/admin/Dashboard/DashBoardPage")
+const DashboardPage = lazy(
+  () => import("@/components/admin/Dashboard/DashBoardPage"),
 );
 const Order = lazy(() => import("@/pages/OrderManagerment"));
 const DetailProduct = lazy(() => import("@/pages/DetailProduct"));
@@ -55,17 +54,17 @@ const App = () => {
     dispatch(loadFavorites());
     // loadCartQuantity sẽ được gọi trong UserLayout để tránh gọi lại mỗi lần chuyển trang
 
-    // Preload access token into memory if we have a refresh token
-    const hasRefresh = getCookie("refreshToken");
+    // Preload access token into memory if user is logged in (check by role in localStorage)
+    const hasUserLogged = localStorage.getItem("role");
     const hasAccess = getAccessToken();
-    if (hasRefresh && !hasAccess) {
+    if (hasUserLogged && !hasAccess) {
       // Silent refresh; ignore errors if BE not ready
       refreshToken().catch(() => {});
     }
   }, [dispatch]);
 
   const ProtectedRoute = ({ children, allowedRoles }) => {
-    const role = getCookie("role");
+    const role = localStorage.getItem("role");
 
     if (!role) {
       return <Navigate to="/auth" replace />;
