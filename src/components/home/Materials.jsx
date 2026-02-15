@@ -158,15 +158,17 @@ const Materials = () => {
             <div
               key={index}
               onClick={() => handleMaterialClick(item.name)}
-              style={{
-                backgroundImage: `url(${item.image})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-              }}
-              className={`w-[210px] h-[57px] rounded-xl cursor-pointer flex items-center justify-center bg-[length:0%_100%] hover:bg-[length:100%_100%] 
-             bg-no-repeat bg-center transition-[background-size] duration-500 ease-out ${
+              className={`w-[210px] h-[57px] rounded-xl cursor-pointer flex items-center justify-center overflow-hidden
+             bg-cover-center-no-repeat ${
                selectedMaterial === item.name ? "ring-2 ring-[#ad7555]" : ""
+             } ${
+               index === 0
+                 ? "material-bg-1"
+                 : index === 1
+                   ? "material-bg-2"
+                   : index === 2
+                     ? "material-bg-3"
+                     : "material-bg-4"
              }`}
             >
               <div

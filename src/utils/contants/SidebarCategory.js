@@ -113,47 +113,57 @@ export const listCategory = [
   },
 ];
 export const listColor = [
-    {
-      color: "#fffdd0",
-      title: "Kem",
-    },
-    {
-      color: "#a52a2a",
-      title: "Nâu",
-    },
-    {
-      color: "#ffc0cb",
-      title: "Hồng",
-    },
-    {
-      color: "#000000",
-      title: "Đen",
-    },
-    {
-      color: "#ffa500",
-      title: "Cam",
-    },
-    {
-      color: "#ffff00",
-      title: "Vàng",
-    },
-    {
-      color: "#0000ff",
-      title: "Xanh dương",
-    },
-    {
-      color: "#ff0000",
-      title: "Đỏ",
-    },
-    {
-      color: "#00ff00",
-      title: "Xanh lá cây",
-    },
-    {
-      color: "#800080",
-      title: "Tím",
-    },
-  ];
+  {
+    color: "#fffdd0",
+    className: "color-swatch--kem",
+    title: "Kem",
+  },
+  {
+    color: "#a52a2a",
+    className: "color-swatch--nau",
+    title: "Nâu",
+  },
+  {
+    color: "#ffc0cb",
+    className: "color-swatch--hong",
+    title: "Hồng",
+  },
+  {
+    color: "#000000",
+    className: "color-swatch--den",
+    title: "Đen",
+  },
+  {
+    color: "#ffa500",
+    className: "color-swatch--cam",
+    title: "Cam",
+  },
+  {
+    color: "#ffff00",
+    className: "color-swatch--vang",
+    title: "Vàng",
+  },
+  {
+    color: "#0000ff",
+    className: "color-swatch--xanh-duong",
+    title: "Xanh dương",
+  },
+  {
+    color: "#ff0000",
+    className: "color-swatch--do",
+    title: "Đỏ",
+  },
+  {
+    color: "#00ff00",
+    className: "color-swatch--xanh-la",
+    title: "Xanh lá cây",
+  },
+  {
+    color: "#800080",
+    className: "color-swatch--tim",
+    title: "Tím",
+  },
+];
 
 export const listStyle = [
   {

@@ -63,7 +63,11 @@ const SideBar = ({ filter, setFilter }) => {
                 <p
                   className="break-words"
                   onClick={() =>
-                    setFilter({ ...filter, categoryId: category.id, pageNum: 1 })
+                    setFilter({
+                      ...filter,
+                      categoryId: category.id,
+                      pageNum: 1,
+                    })
                   }
                 >
                   {category.categoryName}
@@ -79,7 +83,11 @@ const SideBar = ({ filter, setFilter }) => {
                   {category.subCategories.map((child) => (
                     <p
                       onClick={() =>
-                        setFilter({ ...filter, categoryId: child.id, pageNum: 1 })
+                        setFilter({
+                          ...filter,
+                          categoryId: child.id,
+                          pageNum: 1,
+                        })
                       }
                       key={child.id}
                       className="cursor-pointer font-medium hover:text-[#ad7555]"
@@ -113,7 +121,11 @@ const SideBar = ({ filter, setFilter }) => {
                 onChange={(e) =>
                   filter.priceRange === e.target.value
                     ? setFilter({ ...filter, priceRange: "", pageNum: 1 })
-                    : setFilter({ ...filter, priceRange: e.target.value, pageNum: 1 })
+                    : setFilter({
+                        ...filter,
+                        priceRange: e.target.value,
+                        pageNum: 1,
+                      })
                 }
                 className="w-[20px] h-[20px]"
               />
@@ -130,7 +142,11 @@ const SideBar = ({ filter, setFilter }) => {
                 onChange={(e) =>
                   filter.priceRange === e.target.value
                     ? setFilter({ ...filter, priceRange: "", pageNum: 1 })
-                    : setFilter({ ...filter, priceRange: e.target.value, pageNum: 1 })
+                    : setFilter({
+                        ...filter,
+                        priceRange: e.target.value,
+                        pageNum: 1,
+                      })
                 }
                 className="w-[20px] h-[20px]"
               />
@@ -147,7 +163,11 @@ const SideBar = ({ filter, setFilter }) => {
                 onChange={(e) =>
                   filter.priceRange === e.target.value
                     ? setFilter({ ...filter, priceRange: "", pageNum: 1 })
-                    : setFilter({ ...filter, priceRange: e.target.value, pageNum: 1 })
+                    : setFilter({
+                        ...filter,
+                        priceRange: e.target.value,
+                        pageNum: 1,
+                      })
                 }
                 className="w-[20px] h-[20px]"
               />
@@ -164,7 +184,11 @@ const SideBar = ({ filter, setFilter }) => {
                 onChange={(e) =>
                   filter.priceRange === e.target.value
                     ? setFilter({ ...filter, priceRange: "", pageNum: 1 })
-                    : setFilter({ ...filter, priceRange: e.target.value, pageNum: 1 })
+                    : setFilter({
+                        ...filter,
+                        priceRange: e.target.value,
+                        pageNum: 1,
+                      })
                 }
                 className="w-[20px] h-[20px]"
               />
@@ -181,7 +205,11 @@ const SideBar = ({ filter, setFilter }) => {
                 onChange={(e) =>
                   filter.priceRange === e.target.value
                     ? setFilter({ ...filter, priceRange: "", pageNum: 1 })
-                    : setFilter({ ...filter, priceRange: e.target.value, pageNum: 1 })
+                    : setFilter({
+                        ...filter,
+                        priceRange: e.target.value,
+                        pageNum: 1,
+                      })
                 }
                 className="w-[20px] h-[20px]"
               />
@@ -207,20 +235,18 @@ const SideBar = ({ filter, setFilter }) => {
           <div className="w-full flex flex-wrap gap-[10px]">
             {colors.map((color) => (
               <div
-                className={`flex items-center gap-[10px] p-[7px] rounded-[8px] border-[1px] ${filter.color === color.title
+                className={`flex items-center gap-[10px] p-[7px] rounded-[8px] border-[1px] ${
+                  filter.color === color.title
                     ? "border-[#ad7555]"
                     : "border-[#e9e9e9]"
-                  } hover:border-[#ad7555] cursor-pointer`}
+                } hover:border-[#ad7555] cursor-pointer`}
                 onClick={() =>
                   filter.color === color.title
                     ? setFilter({ ...filter, color: "", pageNum: 1 })
                     : setFilter({ ...filter, color: color.title, pageNum: 1 })
                 }
               >
-                <div
-                  className="w-[20px] h-[20px] rounded-[8px] "
-                  style={{ backgroundColor: color.color }}
-                ></div>
+                <div className={`color-swatch ${color.className || ""}`}></div>
                 <p className="font-medium">{color.title}</p>
               </div>
             ))}
@@ -249,7 +275,11 @@ const SideBar = ({ filter, setFilter }) => {
                   onClick={() =>
                     filter.keyword === style.title
                       ? setFilter({ ...filter, keyword: "", pageNum: 1 })
-                      : setFilter({ ...filter, keyword: style.title, pageNum: 1 })
+                      : setFilter({
+                          ...filter,
+                          keyword: style.title,
+                          pageNum: 1,
+                        })
                   }
                 />
                 <p className="font-medium">{style.title}</p>

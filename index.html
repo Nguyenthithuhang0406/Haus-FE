@@ -3,19 +3,49 @@
 
 <head>
   <meta charset="UTF-8" />
-  <!-- Security: Content Security Policy -->
-  <!-- Protects against XSS, inline script injection, unauthorized resource loading -->
+  <!-- Bảo mật: Chính sách Bảo vệ Nội dung (CSP) -->
+  <!-- CSP tuyệt đối giúp chặn XSS, tiêm script nội tuyến, tải tài nguyên không được phép -->
   <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
-        script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval' 'unsafe-inline' https://kit.fontawesome.com;
-        style-src 'self' 'unsafe-inline' https://ka-f.fontawesome.com;
+        script-src 'self' https://kit.fontawesome.com;
+        style-src 'self' %VITE_CSP_STYLE% https://ka-f.fontawesome.com;
         img-src 'self' data: https:;
         font-src 'self' https://ka-f.fontawesome.com data:;
-        connect-src 'self' https: http: ws: wss:;
+        connect-src 'self' %VITE_CSP_CONNECT% https: ws: wss:;
         frame-ancestors 'none';
         base-uri 'self';
         form-action 'self';
-        upgrade-insecure-requests
+        object-src 'none';
+        media-src 'self' https:;
+        worker-src 'self';
+        upgrade-insecure-requests;
+        block-all-mixed-content
+      " />
+
+  <!-- Các Header Bảo mật Bổ sung -->
+  <!-- Ngăn chặn tiệm loại MIME -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+
+  <!-- Ngăn chặn Clickjacking -->
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+
+  <!-- Bảo vệ XSS (hỗ trợ trình duyệt cũ) -->
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+
+  <!-- Chính sách Referrer: chỉ gửi referrer đến cùng origin -->
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+  <!-- Chính sách Quyền: vô hiệu hóa các tính năng nguy hiểm -->
+  <meta http-equiv="Permissions-Policy" content="
+        geolocation=(),
+        microphone=(),
+        camera=(),
+        payment=(),
+        usb=(),
+        magnetometer=(),
+        gyroscope=(),
+        accelerometer=()
       " />
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />

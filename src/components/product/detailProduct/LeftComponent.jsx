@@ -155,37 +155,15 @@ const LeftComponent = ({
       {/* Danh sách ảnh bên dưới */}
       <div
         key={indexImage}
-        className="w-full px-5 overflow-x-auto overflow-y-hidden max-[500px]:hidden max-h-[160px]"
-        style={{
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
-        }}
+        className="w-full px-5 overflow-x-auto overflow-y-hidden max-[500px]:hidden max-h-[160px] scrollbar-hide"
       >
-        <style>{`
-          div::-webkit-scrollbar {
-            display: none;
-          }
-        `}</style>
         <div className="flex gap-2 items-center min-w-min">
           {displayMedias.map((image, index) => (
             <div
               key={image.id}
               onClick={() => handleClickThumbnail(image, index)}
               className={`w-[120px] h-[120px] flex-shrink-0 cursor-pointer rounded-2xl border border-gray-200 shadow-md opacity-60 
-                ${
-                  indexImage === index
-                    ? "border-[#9a542c] shadow-lg opacity-100"
-                    : ""
-                }`}
-              style={
-                indexImage === index
-                  ? {
-                      boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
-                      opacity: 1,
-                      borderColor: "#9a542c",
-                    }
-                  : {}
-              }
+                ${indexImage === index ? "product-thumb-active" : ""}`}
             >
               <img
                 src={image.url}

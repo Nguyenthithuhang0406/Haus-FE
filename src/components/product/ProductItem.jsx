@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaRegHeart } from "react-icons/fa";
 import { flyToCart, formatNumber } from "@/utils/function";
@@ -20,6 +20,21 @@ const ProductItem = ({ product, onRemoveFavorite }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const imageRef = useRef(null);
+
+  // Combine medias from both sources (medias array and productVariations)
+  const allMedias = useMemo(() => {
+    const base = product?.medias || [];
+    const variantMedias =
+      product?.productVariations?.map((v) => v.media)?.filter(Boolean) || [];
+    const all = [...base, ...variantMedias];
+
+    // Remove duplicates based on URL
+    const unique = all.filter(
+      (item, index, self) =>
+        index === self.findIndex((t) => t.url === item.url),
+    );
+    return unique;
+  }, [product]);
 
   // Check favorite từ Redux
   const isFavorite = useSelector((state) =>
@@ -109,7 +124,7 @@ const ProductItem = ({ product, onRemoveFavorite }) => {
       {/* Ảnh sản phẩm */}
       <div className="absolute top-0 left-0 w-full h-[184px] lg:h-[185px] xl:h-[245px] overflow-hidden">
         <img
-          src={product?.medias ? product?.medias[indexImage]?.url : ""}
+          src={allMedias.length > 0 ? allMedias[indexImage]?.url : ""}
           alt={product?.productName}
           className="w-full h-full object-cover rounded-t-xl transform scale-110 group-hover:scale-100 transition-transform duration-300"
         />
@@ -142,21 +157,10 @@ const ProductItem = ({ product, onRemoveFavorite }) => {
       </div>
 
       {/* List thumbnail */}
-      <div
-        className="absolute top-[190px] lg:top-[190px] xl:top-[250px] w-full px-5 overflow-x-auto overflow-y-hidden z-10"
-        style={{
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
-        }}
-      >
-        <style>{`
-          div::-webkit-scrollbar {
-            display: none;
-          }
-        `}</style>
+      <div className="absolute top-[190px] lg:top-[190px] xl:top-[250px] w-full px-5 overflow-x-auto overflow-y-hidden z-10 scrollbar-hide">
         <div className="flex gap-2 items-center min-w-min">
-          {product?.medias &&
-            product?.medias.map((image, index) => (
+          {allMedias.length > 0 &&
+            allMedias.map((image, index) => (
               <div
                 onMouseEnter={() => setIndexImage(index)}
                 key={index}
