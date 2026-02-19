@@ -11,6 +11,7 @@ import { useDispatch } from "react-redux";
 import { syncFavoritesToServer, loadFavorites } from "@/store/favoriteSlice";
 import { syncLocalCartToServer, loadCartQuantity } from "@/store/orderSlice";
 import { getReturnUrl } from "@/utils/returnUrl";
+import { FcGoogle } from "react-icons/fc";
 
 export default function AuthForm() {
   const [isLogin, setIsLogin] = useState(true);
@@ -80,7 +81,7 @@ export default function AuthForm() {
             "Register successful. OTP has been sent to your email"
         ) {
           toast.success(
-            "Đăng ký thành công! Mã OTP đã được gửi tới email của bạn."
+            "Đăng ký thành công! Mã OTP đã được gửi tới email của bạn.",
           );
 
           navigate("/auth/verifyOTP", {
@@ -351,11 +352,7 @@ export default function AuthForm() {
                   className="w-full border border-gray-300 py-2 rounded-md flex justify-center items-center gap-2 cursor-pointer text-sm md:text-base hover:bg-gray-100 transition"
                   data-aos="flip-up"
                 >
-                  <img
-                    src="https://www.svgrepo.com/show/355037/google.svg"
-                    alt="Google"
-                    className="w-5 h-5"
-                  />
+                  <FcGoogle />
                   Đăng nhập bằng Google
                 </button>
               </Form>
