@@ -29,7 +29,7 @@ const WishList = () => {
 
       // Filter items mới, loại bỏ những item đã bị xóa khỏi Redux và không còn trong removing
       const newItems = items.filter(
-        (item) => !removingIds.includes(item.product?.id || item.id)
+        (item) => !removingIds.includes(item.product?.id || item.id),
       );
 
       // Giữ lại items đang removing từ prevItems
@@ -115,15 +115,9 @@ const WishList = () => {
               return (
                 <div
                   key={itemId}
-                  className={`${isRemoving ? "pointer-events-none" : ""}`}
-                  style={{
-                    transition:
-                      "opacity 0.3s ease-in-out, transform 0.3s ease-in-out",
-                    opacity: isRemoving ? 0 : 1,
-                    transform: isRemoving
-                      ? "scale(0.95) translateX(-16px)"
-                      : "scale(1) translateX(0)",
-                  }}
+                  className={`wishlist-card ${
+                    isRemoving ? "wishlist-card--removing" : ""
+                  }`}
                 >
                   <ProductItem
                     product={item.product || item}

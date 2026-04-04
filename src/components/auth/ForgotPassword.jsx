@@ -272,7 +272,7 @@ const ForgotPassword = () => {
                   <div className="flex-1 px-4">
                     <button className="w-full bg-[#e14b33] hover:bg-red-600 text-white py-1 flex items-center justify-center space-x-3 transition duration-200 text-sm">
                       <span className="pr-3 border-r border-[#ce452f]">
-                        <i className="fa-brands fa-google-plus-g"></i>
+                        <i className="fa-brands fa-google"></i>
                       </span>
                       <span>Google</span>
                     </button>

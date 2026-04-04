@@ -84,16 +84,11 @@ const Discounted = () => {
     fetchData();
   }, []);
   return (
-    <div
-      style={{
-        backgroundImage: `url("https://bizweb.dktcdn.net/100/570/902/themes/1027061/assets/bg-flash-sale.jpg?1750130832000")`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      }}
-      className="w-full xl:h-[700px] px-[20px]  md:px-[50px] xl:px-[130px] py-[50px]"
-    >
-      <div data-aos="fade-down" className="w-full flex xl:relative">
+    <div className="relative w-full xl:h-[700px] px-[20px] md:px-[50px] xl:px-[130px] py-[50px] flash-sale-bg bg-cover-center-no-repeat">
+      <div
+        data-aos="fade-down"
+        className="relative z-10 w-full flex xl:relative"
+      >
         <img
           src="https://bizweb.dktcdn.net/100/570/902/themes/1027061/assets/bg-title-flashsale.png?1750130832000"
           className="hidden xl:flex z-10"
@@ -102,7 +97,7 @@ const Discounted = () => {
           <div className="hidden xl:flex w-[270px]"></div>
           <Countdown
             targetDate={getTargetDate(
-              listDiscountedProduct[0]?.daysRemaining || 0
+              listDiscountedProduct[0]?.daysRemaining || 0,
             )}
           />
           <p className="text-[30px] md:text-[35px] xl:text-[42px] leading-[140%] text-[#ad7555] font-semibold">
@@ -113,7 +108,7 @@ const Discounted = () => {
 
       <div
         data-aos="fade-up"
-        className="w-full flex items-center justify-between gap-4 relative mt-[50px]"
+        className="relative z-10 w-full flex items-center justify-between gap-4 mt-[50px]"
       >
         <button
           ref={prevRef}

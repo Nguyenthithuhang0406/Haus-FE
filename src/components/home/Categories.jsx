@@ -8,13 +8,7 @@ const Categories = () => {
     <div className="w-full h-[317px] xl:h-[407px] px-[20px]  md:px-[50px] lg:px-[130px] py-[20px] flex items-center justify-between gap-[20px]">
       <div
         data-aos="zoom-in-left"
-        style={{
-          backgroundImage: `url(${listRoom[0].image})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-        className="w-1/4 h-full hidden md:flex flex-col justify-end gap-[10px] rounded-lg px-[20px] py-[30px]"
+        className="w-1/4 h-full hidden md:flex flex-col justify-end gap-[10px] rounded-lg px-[20px] py-[30px] categories-bg-1 bg-cover-center-no-repeat"
       >
         <p className="text-[24px] text-[#64340F] font-semibold leading-[140%]">
           {listRoom[0].title}
@@ -31,12 +25,7 @@ const Categories = () => {
         <div className="w-full h-1/2 flex items-center justify-between gap-[20px]">
           <div
             data-aos="zoom-in-down"
-            style={{
-              backgroundImage: `url(${listRoom[1].image})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-            className="w-1/3 h-full rounded-lg px-[20px] py-[30px] flex flex-col gap-[10px] items-start"
+            className="w-1/3 h-full rounded-lg px-[20px] py-[30px] flex flex-col gap-[10px] items-start categories-bg-2 bg-cover-center-no-repeat"
           >
             <p className="text-[18px] md:text-[20px] lg:text-[24px] text-[#64340F] font-semibold leading-[140%]">
               {listRoom[1].title}
@@ -51,12 +40,7 @@ const Categories = () => {
 
           <div
             data-aos="zoom-in-down"
-            style={{
-              backgroundImage: `url(${listRoom[2].image})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-            className="w-2/3 h-full rounded-lg px-[20px] py-[30px] flex flex-col gap-[10px] items-end"
+            className="w-2/3 h-full rounded-lg px-[20px] py-[30px] flex flex-col gap-[10px] items-end categories-bg-3 bg-cover-center-no-repeat"
           >
             <p className="text-[18px] md:text-[20px] lg:text-[24px] text-[#64340F] font-semibold leading-[140%]">
               {listRoom[2].title}
@@ -73,12 +57,7 @@ const Categories = () => {
         <div className="w-full h-1/2 flex items-center justify-between gap-[20px]">
           <div
             data-aos="zoom-in-up"
-            style={{
-              backgroundImage: `url(${listRoom[3].image})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-            className="w-2/3 h-full rounded-lg px-[20px] py-[30px] flex flex-col gap-[10px] items-start"
+            className="w-2/3 h-full rounded-lg px-[20px] py-[30px] flex flex-col gap-[10px] items-start categories-bg-4 bg-cover-center-no-repeat"
           >
             <p className="text-[18px] md:text-[20px] lg:text-[24px] text-[#64340F] font-semibold leading-[140%]">
               {listRoom[3].title}
@@ -93,12 +72,7 @@ const Categories = () => {
 
           <div
             data-aos="zoom-in-up"
-            style={{
-              backgroundImage: `url(${listRoom[4].image})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-            className="w-1/3 h-full rounded-lg px-[20px] py-[30px] flex flex-col gap-[10px] items-end"
+            className="w-1/3 h-full rounded-lg px-[20px] py-[30px] flex flex-col gap-[10px] items-end categories-bg-5 bg-cover-center-no-repeat"
           >
             <p className="text-[18px] md:text-[20px] lg:text-[24px] text-[#64340F] font-semibold leading-[140%]">
               {listRoom[4].title}

@@ -68,7 +68,7 @@ const DashboardPage = () => {
         setError(null);
         const response = await getOrderStatisticsByCriteria(
           startDate || undefined,
-          endDate || undefined
+          endDate || undefined,
         );
         // response từ API đã là response.data từ axios
         // Nếu API trả về { status: 200, message: "...", data: {...} }
@@ -125,7 +125,7 @@ const DashboardPage = () => {
           bestSellersPageNum,
           bestSellersPageSize,
           startDate || undefined,
-          endDate || undefined
+          endDate || undefined,
         );
 
         if (!isMounted) return;
@@ -165,7 +165,7 @@ const DashboardPage = () => {
         // Truyền startDate và endDate (có thể là empty string hoặc undefined)
         const response = await getSaleByParentCategory(
           startDate || undefined,
-          endDate || undefined
+          endDate || undefined,
         );
         // response từ getSaleByParentCategory() đã là response.data từ axios
         // Nếu API trả về { status: 200, message: "...", data: {...} }
@@ -272,28 +272,28 @@ const DashboardPage = () => {
           title: "Tổng doanh thu",
           amount: statistics.totalOrders?.totalOrder || 0,
           change: formatPercentChange(
-            statistics.totalOrders?.percentIncrease || 0
+            statistics.totalOrders?.percentIncrease || 0,
           ),
         },
         {
           title: "Doanh thu đơn mới đặt",
           amount: statistics.pendingOrders?.totalOrder || 0,
           change: formatPercentChange(
-            statistics.pendingOrders?.percentIncrease || 0
+            statistics.pendingOrders?.percentIncrease || 0,
           ),
         },
         {
           title: "Doanh thu đơn đã giao",
           amount: statistics.completedOrders?.totalOrder || 0,
           change: formatPercentChange(
-            statistics.completedOrders?.percentIncrease || 0
+            statistics.completedOrders?.percentIncrease || 0,
           ),
         },
         {
           title: "Doanh thu đơn hoàn trả",
           amount: statistics.returnOrders?.totalOrder || 0,
           change: formatPercentChange(
-            statistics.returnOrders?.percentIncrease || 0
+            statistics.returnOrders?.percentIncrease || 0,
           ),
         },
       ]
@@ -338,22 +338,6 @@ const DashboardPage = () => {
 
   return (
     <>
-      <style>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fade-in {
-          animation: fadeIn 0.4s ease-out forwards;
-          opacity: 0;
-        }
-      `}</style>
       <div className="p-4 md:p-6 space-y-8">
         {/* Filter Date */}
         <div className="w-full flex flex-col md:flex-row md:justify-end gap-3 md:gap-6">
@@ -468,12 +452,9 @@ const DashboardPage = () => {
                     {bestSellers.map((p, index) => (
                       <div
                         key={`${p.id}-${bestSellersPageNum}`}
-                        className="flex items-center gap-3 animate-fade-in"
-                        style={{
-                          animationDelay: bestSellersLoading
-                            ? "0ms"
-                            : `${index * 30}ms`,
-                        }}
+                        className={`flex items-center gap-3 animate-fade-in fade-delay-${
+                          bestSellersLoading ? 0 : Math.min(index, 10) * 30
+                        }`}
                       >
                         {p.image ? (
                           <img
@@ -538,7 +519,10 @@ const DashboardPage = () => {
                       <button
                         onClick={() =>
                           setBestSellersPageNum((prev) =>
-                            Math.min(bestSellersPagination.totalPages, prev + 1)
+                            Math.min(
+                              bestSellersPagination.totalPages,
+                              prev + 1,
+                            ),
                           )
                         }
                         disabled={
@@ -610,8 +594,8 @@ const DashboardPage = () => {
                               ? 110
                               : "70%"
                             : isSmallScreen
-                            ? 100
-                            : "65%"
+                              ? 100
+                              : "65%"
                         }
                       />
                     ))}

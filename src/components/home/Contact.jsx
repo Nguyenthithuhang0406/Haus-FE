@@ -6,17 +6,11 @@ const Contact = () => {
     <div className="h-[500px] w-full">
       <div
         data-aos="fade-up"
-        style={{
-          backgroundImage: `url("https://bizweb.dktcdn.net/100/570/902/themes/1027061/assets/img_video.jpg?1755707267701")`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-        className="w-full h-[700px] sm:h-[303px] relative"
+        className="w-full h-[700px] sm:h-[303px] relative home-contact-bg bg-cover-center-no-repeat"
       >
         <div
           data-aos="fade-down"
-          className="mx-[20px]  md:mx-[50px] xl:mx-[130px] bg-[#ad7555] rounded-md p-[40px] flex flex-col sm:flex-row items-center justify-between absolute top-[250px]"
+          className="mx-[20px] md:mx-[50px] xl:mx-[130px] bg-[#ad7555] rounded-md p-[40px] flex flex-col sm:flex-row items-center justify-between absolute top-[250px] z-10"
         >
           <div className="w-2/3 lg:w-3/4 flex flex-col gap-[20px] text-[#ffffff]">
             <p className="text-[20px] lg:text-[26px] xl:text-[30px] font-semibold leading-[120%]">
