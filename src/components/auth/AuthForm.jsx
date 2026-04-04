@@ -50,6 +50,13 @@ export default function AuthForm() {
 
           toast.success("Đăng nhập thành công!");
 
+          const role = localStorage.getItem("role");
+
+          if (role === "ADMIN") {
+            navigate("/admin/dashboard");
+            return;
+          }
+
           // Kiểm tra return URL và redirect về đó, nếu không có thì về home
           const returnUrl = getReturnUrl();
           navigate(returnUrl || "/");
