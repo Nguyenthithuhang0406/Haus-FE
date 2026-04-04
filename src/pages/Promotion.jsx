@@ -18,7 +18,7 @@ const Promotion = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [currentPromotion, setCurrentPromotion] = useState(null);
-  const [isAsc, setIsAsc] = useState(true); 
+  const [isAsc, setIsAsc] = useState(true);
   const [deleteItem, setDeleteItem] = useState({
     isShowConfirm: false,
     id: null,
@@ -88,7 +88,7 @@ const Promotion = () => {
   const handleDeletePromotion = async (id) => {
     try {
       const response = await deletePromotion(id);
-      if ((response.status === 200)) {
+      if (response.status === 200) {
         toast.success("Xóa khuyến mãi thành công!");
         setDeleteItem({ isShowConfirm: false, id: null });
       }
@@ -101,6 +101,12 @@ const Promotion = () => {
           case 400:
             toast.error("Không tìm thấy khuyến mãi");
             break;
+          case 429:
+            toast.error(
+              "Bạn gửi yêu cầu quá nhiều lần. Vui lòng đợi một chút rồi thử lại.",
+            );
+            break;
+
           default:
             toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
         }
@@ -125,39 +131,37 @@ const Promotion = () => {
         isAsc={isAsc}
         setIsAsc={setIsAsc}
       />
- <div className="max-w-full mx-auto px-8 pb-8">
+      <div className="max-w-full mx-auto px-8 pb-8">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-     
-      <ListPromotion
-        promotions={promotions}
-        openDetailModal={openDetailModal}
-        openEditModal={openEditModal}
-        handleDeletePromotion={(id) =>
-          setDeleteItem({ isShowConfirm: true, id })
-        }
-        pageNum={filters.pageNum}
-        pageSize={filters.pageSize}
-      />
-       {totalPagi.totalElements > 0 && (
-        <div className="flex justify-end my-8">
-          <Pagination
-            current={filters.pageNum}
-            pageSize={filters.pageSize}
-            total={totalPagi.totalElements}
-            showSizeChanger={false}
-            showQuickJumper={false}
-            
-            onChange={(page) =>
-              setFilters(prev => ({
-                ...prev,
-                pageNum: Number(page)
-              }))
+          <ListPromotion
+            promotions={promotions}
+            openDetailModal={openDetailModal}
+            openEditModal={openEditModal}
+            handleDeletePromotion={(id) =>
+              setDeleteItem({ isShowConfirm: true, id })
             }
+            pageNum={filters.pageNum}
+            pageSize={filters.pageSize}
           />
+          {totalPagi.totalElements > 0 && (
+            <div className="flex justify-end my-8">
+              <Pagination
+                current={filters.pageNum}
+                pageSize={filters.pageSize}
+                total={totalPagi.totalElements}
+                showSizeChanger={false}
+                showQuickJumper={false}
+                onChange={(page) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    pageNum: Number(page),
+                  }))
+                }
+              />
+            </div>
+          )}
         </div>
-      )}
-</div>
-</div>
+      </div>
       {showAddModal && <PromotionCreate setShowAddModal={setShowAddModal} />}
 
       {showEditModal && (
@@ -178,12 +182,9 @@ const Promotion = () => {
           item={{ name: `Khuyến mãi ${deleteItem.id}` }}
           onCancel={() => setDeleteItem({ isShowConfirm: false, id: null })}
           onConfirm={() => handleDeletePromotion(deleteItem.id)}
-
         />
       )}
     </div>
-
-
   );
 };
 

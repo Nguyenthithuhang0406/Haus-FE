@@ -88,6 +88,12 @@ const Menu = () => {
           case 500:
             toast.error("Lỗi hệ thống");
             break;
+          case 429:
+            toast.error(
+              "Bạn gửi yêu cầu quá nhiều lần. Vui lòng đợi một chút rồi thử lại.",
+            );
+            break;
+
           default:
             toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
         }

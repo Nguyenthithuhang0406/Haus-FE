@@ -45,6 +45,12 @@ const ViewEditInfor = () => {
           case 500:
             toast.error("Lỗi hệ thống");
             break;
+          case 429:
+            toast.error(
+              "Bạn gửi yêu cầu quá nhiều lần. Vui lòng đợi một chút rồi thử lại.",
+            );
+            break;
+
           default:
             toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
         }
@@ -172,6 +178,12 @@ const ViewEditInfor = () => {
             case 401:
               toast.error("Bạn không có quyền truy cập");
               break;
+            case 429:
+              toast.error(
+                "Bạn gửi yêu cầu quá nhiều lần. Vui lòng đợi một chút rồi thử lại.",
+              );
+              break;
+
             default:
               toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
           }
@@ -218,6 +230,12 @@ const ViewEditInfor = () => {
             case 401:
               toast.error("Bạn không có quyền truy cập");
               break;
+            case 429:
+              toast.error(
+                "Bạn gửi yêu cầu quá nhiều lần. Vui lòng đợi một chút rồi thử lại.",
+              );
+              break;
+
             default:
               toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
           }
@@ -349,10 +367,11 @@ const ViewEditInfor = () => {
                             onChange={(e) =>
                               handleInputChange("firstName", e.target.value)
                             }
-                            className={`w-full px-4 py-3 bg-gray-50 border rounded-md focus:outline-none focus:ring-2 ${errors.firstName
-                              ? "border-red-300 focus:ring-red-500"
-                              : "border-gray-200 focus:ring-[#ad7555]"
-                              }`}
+                            className={`w-full px-4 py-3 bg-gray-50 border rounded-md focus:outline-none focus:ring-2 ${
+                              errors.firstName
+                                ? "border-red-300 focus:ring-red-500"
+                                : "border-gray-200 focus:ring-[#ad7555]"
+                            }`}
                           />
                           {errors.firstName && (
                             <p className="text-red-600 text-sm mt-1">
@@ -370,10 +389,11 @@ const ViewEditInfor = () => {
                             onChange={(e) =>
                               handleInputChange("lastName", e.target.value)
                             }
-                            className={`w-full px-4 py-3 bg-gray-50 border rounded-md focus:outline-none focus:ring-2 ${errors.lastName
-                              ? "border-red-300 focus:ring-red-500"
-                              : "border-gray-200 focus:ring-[#ad7555]"
-                              }`}
+                            className={`w-full px-4 py-3 bg-gray-50 border rounded-md focus:outline-none focus:ring-2 ${
+                              errors.lastName
+                                ? "border-red-300 focus:ring-red-500"
+                                : "border-gray-200 focus:ring-[#ad7555]"
+                            }`}
                           />
                           {errors.lastName && (
                             <p className="text-red-600 text-sm mt-1">
@@ -392,10 +412,11 @@ const ViewEditInfor = () => {
                             onChange={(e) =>
                               handleInputChange("email", e.target.value)
                             }
-                            className={`w-full px-4 py-3 bg-gray-50 border rounded-md focus:outline-none focus:ring-2 ${errors.email
-                              ? "border-red-300 focus:ring-red-500"
-                              : "border-gray-200 focus:ring-[#ad7555]"
-                              }`}
+                            className={`w-full px-4 py-3 bg-gray-50 border rounded-md focus:outline-none focus:ring-2 ${
+                              errors.email
+                                ? "border-red-300 focus:ring-red-500"
+                                : "border-gray-200 focus:ring-[#ad7555]"
+                            }`}
                           />
                           {errors.email && (
                             <p className="text-red-600 text-sm mt-1">
@@ -414,10 +435,11 @@ const ViewEditInfor = () => {
                             onChange={(e) =>
                               handleInputChange("phone", e.target.value)
                             }
-                            className={`w-full px-4 py-3 bg-gray-50 border rounded-md focus:outline-none focus:ring-2 ${errors.phone
-                              ? "border-red-300 focus:ring-red-500"
-                              : "border-gray-200 focus:ring-[#ad7555]"
-                              }`}
+                            className={`w-full px-4 py-3 bg-gray-50 border rounded-md focus:outline-none focus:ring-2 ${
+                              errors.phone
+                                ? "border-red-300 focus:ring-red-500"
+                                : "border-gray-200 focus:ring-[#ad7555]"
+                            }`}
                           />
                           {errors.phone && (
                             <p className="text-red-600 text-sm mt-1">
@@ -435,21 +457,22 @@ const ViewEditInfor = () => {
                             value={
                               editForm.dateOfBirth
                                 ? editForm.dateOfBirth
-                                  .split("/")
-                                  .reverse()
-                                  .join("-") // convert "dd/MM/yyyy" -> "yyyy-MM-dd" để hiển thị
+                                    .split("/")
+                                    .reverse()
+                                    .join("-") // convert "dd/MM/yyyy" -> "yyyy-MM-dd" để hiển thị
                                 : ""
                             }
                             onChange={(e) =>
                               handleInputChange(
                                 "dateOfBirth",
-                                formatDateForApi(e.target.value)
+                                formatDateForApi(e.target.value),
                               )
                             }
-                            className={`w-full px-4 py-3 bg-gray-50 border rounded-md focus:outline-none focus:ring-2 ${errors.dateOfBirth
-                              ? "border-red-300 focus:ring-red-500"
-                              : "border-gray-200 focus:ring-[#ad7555]"
-                              }`}
+                            className={`w-full px-4 py-3 bg-gray-50 border rounded-md focus:outline-none focus:ring-2 ${
+                              errors.dateOfBirth
+                                ? "border-red-300 focus:ring-red-500"
+                                : "border-gray-200 focus:ring-[#ad7555]"
+                            }`}
                           />
                           {errors.dateOfBirth && (
                             <p className="text-red-600 text-sm mt-1">
@@ -470,10 +493,11 @@ const ViewEditInfor = () => {
                             onChange={(value) =>
                               handleInputChange("gender", value)
                             }
-                            className={`w-full h-[49px] bg-gray-50 border rounded-md focus:outline-none focus:ring-2 ${errors.gender
-                              ? "border-red-300 focus:ring-red-500"
-                              : "border-gray-200 focus:ring-[#ad7555]"
-                              }`}
+                            className={`w-full h-[49px] bg-gray-50 border rounded-md focus:outline-none focus:ring-2 ${
+                              errors.gender
+                                ? "border-red-300 focus:ring-red-500"
+                                : "border-gray-200 focus:ring-[#ad7555]"
+                            }`}
                           >
                             <Select.Option value="OTHER">Khác</Select.Option>
                             <Select.Option value="MALE">Nam</Select.Option>
@@ -498,10 +522,11 @@ const ViewEditInfor = () => {
                               onChange={(e) =>
                                 handleInputChange("password", e.target.value)
                               }
-                              className={`w-full px-4 py-3 pr-12 bg-gray-50 border rounded-md focus:outline-none focus:ring-2 ${errors.password
-                                ? "border-red-300 focus:ring-red-500"
-                                : "border-gray-200 focus:ring-[#ad7555]"
-                                }`}
+                              className={`w-full px-4 py-3 pr-12 bg-gray-50 border rounded-md focus:outline-none focus:ring-2 ${
+                                errors.password
+                                  ? "border-red-300 focus:ring-red-500"
+                                  : "border-gray-200 focus:ring-[#ad7555]"
+                              }`}
                               placeholder="Nhập mật khẩu để xác nhận"
                             />
                             {showPassword ? (

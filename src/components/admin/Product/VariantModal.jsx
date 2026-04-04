@@ -73,6 +73,12 @@ export default function VariantModal({
           case 404:
             toast.error("Thêm biến thể thất bại, vui lòng thử lại!");
             break;
+          case 429:
+            toast.error(
+              "Bạn gửi yêu cầu quá nhiều lần. Vui lòng đợi một chút rồi thử lại.",
+            );
+            break;
+
           default:
             toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
         }
@@ -102,6 +108,12 @@ export default function VariantModal({
           case 404:
             toast.error("Thêm biến thể thất bại, vui lòng thử lại!");
             break;
+          case 429:
+            toast.error(
+              "Bạn gửi yêu cầu quá nhiều lần. Vui lòng đợi một chút rồi thử lại.",
+            );
+            break;
+
           default:
             toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
         }

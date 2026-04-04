@@ -53,8 +53,9 @@ const PromotionCreate = ({ setShowAddModal }) => {
     }
 
     if (formData.type === "order") {
-      if (!formData.minPriceOrder|| Number(formData.minPriceOrder)<0) newErrors.minPriceOrder = "Nhập giá tối thiểu có giá trị dương";
-      if (!formData.maxPriceOrder||Number(formData.maxPriceOrder)<0) {
+      if (!formData.minPriceOrder || Number(formData.minPriceOrder) < 0)
+        newErrors.minPriceOrder = "Nhập giá tối thiểu có giá trị dương";
+      if (!formData.maxPriceOrder || Number(formData.maxPriceOrder) < 0) {
         newErrors.maxPriceOrder = "Nhập giá tối đa có giá trị dương";
       } else if (
         Number(formData.maxPriceOrder) < Number(formData.minPriceOrder)
@@ -129,6 +130,12 @@ const PromotionCreate = ({ setShowAddModal }) => {
           case 400:
             toast.error("Dữ liệu không hợp lệ");
             break;
+          case 429:
+            toast.error(
+              "Bạn gửi yêu cầu quá nhiều lần. Vui lòng đợi một chút rồi thử lại.",
+            );
+            break;
+
           default:
             toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
         }
@@ -176,7 +183,9 @@ const PromotionCreate = ({ setShowAddModal }) => {
           {/* Ngày bắt đầu - kết thúc */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-base font-semibold mb-2">Ngày bắt đầu</label>
+              <label className="block text-base font-semibold mb-2">
+                Ngày bắt đầu
+              </label>
               <input
                 type="date"
                 name="startDate"
@@ -189,7 +198,9 @@ const PromotionCreate = ({ setShowAddModal }) => {
               )}
             </div>
             <div>
-              <label className="block text-base font-semibold mb-2">Ngày kết thúc</label>
+              <label className="block text-base font-semibold mb-2">
+                Ngày kết thúc
+              </label>
               <input
                 type="date"
                 name="endDate"
@@ -205,7 +216,9 @@ const PromotionCreate = ({ setShowAddModal }) => {
 
           {/* Trạng thái */}
           <div>
-            <label className="block text-base font-semibold mb-2">Trạng thái</label>
+            <label className="block text-base font-semibold mb-2">
+              Trạng thái
+            </label>
             <select
               name="status"
               value={formData.status}
