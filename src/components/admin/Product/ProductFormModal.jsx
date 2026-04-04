@@ -63,6 +63,10 @@ export default function ProductFormModal({
               case 404:
                 toast.error("Không tìm thấy sản phẩm");
                 break;
+              case 429:
+                toast.error("Bạn gửi yêu cầu quá nhiều lần. Vui lòng đợi một chút rồi thử lại.");
+                break;
+
               default:
                 toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
             }
@@ -93,6 +97,10 @@ export default function ProductFormModal({
             case 404:
               toast.error("Lấy danh mục thất bại, vui lòng thử lại!");
               break;
+            case 429:
+              toast.error("Bạn gửi yêu cầu quá nhiều lần. Vui lòng đợi một chút rồi thử lại.");
+              break;
+
             default:
               toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
           }
@@ -164,6 +172,10 @@ export default function ProductFormModal({
           case 404:
             toast.error("Thêm sản phẩm thất bại, vui lòng thử lại!");
             break;
+          case 429:
+            toast.error("Bạn gửi yêu cầu quá nhiều lần. Vui lòng đợi một chút rồi thử lại.");
+            break;
+
           default:
             toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
         }
@@ -209,6 +221,10 @@ export default function ProductFormModal({
           case 404:
             toast.error("Sửa sản phẩm thất bại, vui lòng thử lại!");
             break;
+          case 429:
+            toast.error("Bạn gửi yêu cầu quá nhiều lần. Vui lòng đợi một chút rồi thử lại.");
+            break;
+
           default:
             toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
         }

@@ -38,6 +38,10 @@ export default function ProductViewModal({
           case 404:
             toast.error("Không tìm thấy sản phẩm");
             break;
+          case 429:
+            toast.error("Bạn gửi yêu cầu quá nhiều lần. Vui lòng đợi một chút rồi thử lại.");
+            break;
+
           default:
             toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
         }
@@ -71,6 +75,10 @@ export default function ProductViewModal({
           case 404:
             toast.error("Không tìm thấy biến thể");
             break;
+          case 429:
+            toast.error("Bạn gửi yêu cầu quá nhiều lần. Vui lòng đợi một chút rồi thử lại.");
+            break;
+
           default:
             toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
         }

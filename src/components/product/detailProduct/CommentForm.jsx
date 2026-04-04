@@ -29,7 +29,11 @@ const CommentForm = ({ setIsShowAddComment, product, onSuccess }) => {
         onSuccess();
       }
     } catch (error) {
-      if (error.response && error.response.status === 401) {
+      if (error.response && error.response.status === 429) {
+        alert(
+          "Bạn gửi yêu cầu quá nhiều lần. Vui lòng đợi một chút rồi thử lại.",
+        );
+      } else if (error.response && error.response.status === 401) {
         alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
       } else if (
         error.response &&

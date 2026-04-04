@@ -6,9 +6,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 
 const PromotionEdit = ({ setShowEditModal, currentPromotion }) => {
-  const [selectedType, setSelectedType] = useState(
-    currentPromotion.type
-  );
+  const [selectedType, setSelectedType] = useState(currentPromotion.type);
   const [formData, setFormData] = useState(currentPromotion);
   const [errors, setErrors] = useState({}); // lưu lỗi từng field
 
@@ -46,8 +44,9 @@ const PromotionEdit = ({ setShowEditModal, currentPromotion }) => {
     }
 
     if (formData.type === "order") {
-      if (!formData.minPriceOrder|| Number(formData.minPriceOrder)<0) newErrors.minPriceOrder = "Nhập giá tối thiểu có giá trị dương";
-      if (!formData.maxPriceOrder||Number(formData.maxPriceOrder)<0) {
+      if (!formData.minPriceOrder || Number(formData.minPriceOrder) < 0)
+        newErrors.minPriceOrder = "Nhập giá tối thiểu có giá trị dương";
+      if (!formData.maxPriceOrder || Number(formData.maxPriceOrder) < 0) {
         newErrors.maxPriceOrder = "Nhập giá tối đa có giá trị dương";
       } else if (
         Number(formData.maxPriceOrder) < Number(formData.minPriceOrder)
@@ -64,7 +63,6 @@ const PromotionEdit = ({ setShowEditModal, currentPromotion }) => {
     return Object.keys(newErrors).length === 0;
   };
 
- 
   const handleEditPromotion = async () => {
     if (!validateForm()) {
       toast.error("Vui lòng kiểm tra lại các trường bị lỗi");
@@ -115,6 +113,12 @@ const PromotionEdit = ({ setShowEditModal, currentPromotion }) => {
           case 404:
             toast.error("Không tìm thấy khuyến mãi");
             break;
+          case 429:
+            toast.error(
+              "Bạn gửi yêu cầu quá nhiều lần. Vui lòng đợi một chút rồi thử lại.",
+            );
+            break;
+
           default:
             toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
         }
@@ -196,7 +200,9 @@ const PromotionEdit = ({ setShowEditModal, currentPromotion }) => {
 
           {/* Trạng thái */}
           <div>
-            <label className="block text-base font-semibold mb-2">Trạng thái</label>
+            <label className="block text-base font-semibold mb-2">
+              Trạng thái
+            </label>
             <select
               name="status"
               value={formData.status}

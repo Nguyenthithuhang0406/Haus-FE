@@ -143,7 +143,14 @@ const OrderInfor = () => {
       setOrders([]);
       setTotalElements(0);
       // Kiểm tra nếu là lỗi 404 hoặc không tìm thấy
-      if (error.response?.status === 404 || error.response?.status === 400) {
+      if (error.response?.status === 429) {
+        message.error(
+          "Bạn gửi yêu cầu quá nhiều lần. Vui lòng đợi một chút rồi thử lại.",
+        );
+      } else if (
+        error.response?.status === 404 ||
+        error.response?.status === 400
+      ) {
         message.warning("Không tìm thấy đơn hàng với mã này");
       } else {
         message.error("Lỗi khi tra cứu đơn hàng!");

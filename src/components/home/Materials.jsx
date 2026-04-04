@@ -53,7 +53,13 @@ const Materials = () => {
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
-        toast.error("Đã xảy ra lỗi khi tải sản phẩm");
+        if (error.response.status === 429) {
+          toast.error(
+            "Bạn gửi yêu cầu quá nhiều lần. Vui lòng đợi một chút rồi thử lại.",
+          );
+        } else {
+          toast.error("Đã xảy ra lỗi khi tải sản phẩm");
+        }
       }
       console.log(error);
       // Fallback về listProduct nếu API lỗi

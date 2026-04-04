@@ -66,6 +66,12 @@ export default function AuthForm() {
             case 404:
               toast.error("Email hoặc mật khẩu không đúng.");
               break;
+            case 429:
+              toast.error(
+                "Bạn gửi yêu cầu quá nhiều lần. Vui lòng đợi một chút rồi thử lại.",
+              );
+              break;
+
             default:
               toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
           }
@@ -103,6 +109,12 @@ export default function AuthForm() {
             case 409:
               toast.error("Tên đăng nhập đã tồn tại");
               break;
+            case 429:
+              toast.error(
+                "Bạn gửi yêu cầu quá nhiều lần. Vui lòng đợi một chút rồi thử lại.",
+              );
+              break;
+
             default:
               toast.error("Đã xảy ra lỗi, vui lòng kiểm tra lại kết nối!");
           }
